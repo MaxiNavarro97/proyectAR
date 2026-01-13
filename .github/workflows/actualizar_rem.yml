@@ -1,4 +1,4 @@
-name: Actualizar Datos REM
+name: Actualizar Datos ProyectAR
 
 on:
   schedule:
@@ -23,15 +23,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas openpyxl requests beautifulsoup4
 
-      - name: Ejecutar script de procesamiento
-        # Ahora el comando es más limpio sin el espacio
-        run: python src/scripts/generador_rem_v2.py
+      - name: Ejecutar motor de datos (Data Engine)
+        # Usamos el nuevo nombre del script
+        run: python src/scripts/data_engine.py
 
       - name: Commitear y pushear cambios
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
-          # Agregamos la carpeta REM que definimos antes
+          
+          # Agregamos las carpetas donde el script genera archivos
           git add public/REM/
-          git commit -m "Auto-update: Inflación REM actualizada" || exit 0
+          git add public/market/
+          
+          git commit -m "Auto-update: Sincronización de Mercado y REM" || exit 0
           git push
