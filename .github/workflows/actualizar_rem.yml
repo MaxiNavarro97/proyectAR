@@ -1,0 +1,37 @@
+name: Actualizar Datos REM
+
+on:
+  schedule:
+    # Corre todos los lunes a las 09:00 UTC (06:00 AM Argentina)
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Permite darle al botón "Play" manual en GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas openpyxl requests beautifulsoup4
+
+      - name: Ejecutar script de procesamiento
+        # Ahora el comando es más limpio sin el espacio
+        run: python src/scripts/generador_rem_v2.py
+
+      - name: Commitear y pushear cambios
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          # Agregamos la carpeta REM que definimos antes
+          git add public/REM/
+          git commit -m "Auto-update: Inflación REM actualizada" || exit 0
+          git push
