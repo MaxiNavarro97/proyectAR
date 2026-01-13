@@ -1,16 +1,21 @@
-# React + Vite
+# ProyectAR v0.9.0 🇦🇷📈
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Simulador interactivo de **créditos hipotecarios UVA** y **contratos de alquiler** diseñado para el contexto económico argentino.
 
-Currently, two official plugins are available:
+## 🚀 Características
+- **Proyección UVA:** Cálculo basado en el REM (Relevamiento de Expectativas de Mercado) del BCRA.
+- **Simulador de Alquileres:** Ajuste de cuotas escalonadas y proyección de expensas.
+- **Datos en tiempo real:** Integración con APIs para cotización de Dólar e Índice UVA.
+- **Interfaz Profesional:** Modo oscuro, gráficos dinámicos y reportes exportables.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tecnologías
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
+- [Lucide Icons](https://lucide.dev/)
 
-## React Compiler
+## 📝 Disclaimer
+Esta es una herramienta de simulación con fines informativos y educativos. Los resultados presentados son proyecciones y no constituyen asesoramiento financiero.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 👨‍💻 Autor
+Desarrollado por [@MaxiNavarro97](https://github.com/MaxiNavarro97) - **Rockstar Solutions**
