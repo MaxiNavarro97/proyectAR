@@ -720,7 +720,7 @@ export default function App() {
         <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 h-28 flex items-center justify-between px-10 shadow-sm">
           <div className="flex items-center gap-5">
             <div className="bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl shadow-indigo-600/30"><Calculator className="w-8 h-8" /></div>
-            <div className="flex flex-col"><span className="font-black text-3xl tracking-tighter uppercase leading-none italic">Proyect<span className="text-sky-400 text-[1.25em]">AR</span></span><span className="text-[11px] font-black tracking-[0.3em] text-slate-500 uppercase mt-3 opacity-60 italic leading-none">v0.9.1</span></div>
+            <div className="flex flex-col"><span className="font-black text-3xl tracking-tighter uppercase leading-none italic">Proyect<span className="text-sky-400 text-[1.25em]">AR</span></span><span className="text-[11px] font-black tracking-[0.3em] text-slate-500 uppercase mt-3 opacity-60 italic leading-none">v0.9.2</span></div>
           </div>
           <div className="flex items-center gap-10">
             <div className="hidden lg:flex gap-3 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-2xl border dark:border-slate-700 shadow-inner">
