@@ -18,6 +18,20 @@ const money = (v) => new Intl.NumberFormat('es-AR', {
   maximumFractionDigits: 0 
 }).format(v);
 
+const formatDateTime = (dateStr) => {
+  if (!dateStr) return '---';
+  const d = new Date(dateStr);
+  return d.toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric', 
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }) + ' HS';
+};
+
+
 // --- COMPONENTES AUXILIARES ---
 
 function NavBtn({ active, onClick, icon, label, color }) {
@@ -662,13 +676,26 @@ export default function App() {
         {/* FUENTES Y VALORES SUPERIORES */}
         <div className="bg-slate-900 text-white py-3 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
           <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-3 md:gap-2 text-[10px] font-black tracking-widest uppercase text-slate-500 leading-none">
+
             <div className="flex items-center gap-3 sm:gap-6 leading-none">
+              {/* Fuentes */}
               <div className="flex items-center gap-2">
                 <Globe className="w-3 h-3" /> Fuentes: <a href="https://dolarapi.com" target="_blank" className="hover:text-emerald-400">DolarAPI</a> • <a href="https://argentinadatos.com" target="_blank" className="hover:text-indigo-400">ArgentinaDatos</a>
               </div>
+
               <span className="hidden md:inline text-slate-700">|</span>
+
+              {/* Última Actualización Formateada */}
+              <div className="flex items-center gap-2 text-slate-400">
+                <Clock className="w-3 h-3 text-indigo-500" /> 
+                <span>ACTUALIZADO: {formatDateTime(lastUpdate)}</span>
+              </div>
+
+              <span className="hidden lg:inline text-slate-700">|</span>
               <span className="hidden sm:inline">REM: {remDateLabel || '---'}</span>
-            </div>
+            </div       >
+
+            {/* Valores de Mercado */}
             <div className="flex gap-4 sm:gap-12 items-center font-mono leading-none">
               <div>DÓLAR OFICIAL <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
               <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
