@@ -276,15 +276,15 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
   };
 
   const banks = [
-    { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/nacion.png" },
-    { n: "Bco. Ciudad", u: "https://www.bancociudad.com.ar/personas/creditos/hipotecarios", l: "/logos/ciudad.png" },
-    { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/creditos-hipotecarios/uva/", l: "/logos/hipotecario.png" },
-    { n: "Santander", u: "https://www.santander.com.ar/banco/online/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
-    { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/prestamos/hipotecarios-uva.html", l: "/logos/bbva.png" },
-    { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/macro.png" },
-    { n: "Galicia", u: "https://www.galicia.ar/personas/prestamos/prestamos-hipotecarios", l: "/logos/galicia.png" },
+    { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/bconacion.png" },
+    { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
+    { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" },
+    { n: "Santander", u: "https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
+    { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l: "/logos/bbva.png" },
+    { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" },
+    { n: "Galicia", u: "https://www.galicia.ar/personas/prestamos/prestamo-hipotecario-uva", l: "/logos/galicia.png" },
     { n: "Patagonia", u: "https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios-uva.php", l: "/logos/patagonia.png" },
-    { n: "Bco. Provincia", u: "https://www.bancoprovincia.com.ar/Principal/hipotecarios_uva", l: "/logos/provincia.png" },
+    { n: "Bco. Provincia", u: "https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l: "/logos/provincia.png" },
   ];
 
   return (
