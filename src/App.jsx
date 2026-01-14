@@ -404,7 +404,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
                 <TrendingUp className="w-3 h-3"/> INFLACIÓN PROYECTADA
                 <div className="group relative">
                   <HelpCircle className="w-3.5 h-3.5 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
-                  <div className="absolute left-0 bottom-full mb-2 w-72 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 normal-case tracking-normal">
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-[85vw] sm:w-72 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 normal-case tracking-normal">
                     <b className="text-indigo-400">REM:</b> Relevamiento de Expectativas de Mercado (BCRA). Expertos estiman valores para los primeros 36 meses. <br/><br/> 
                     Para el tiempo restante, se aplica una "Inercia": modo Auto (último dato del REM) o modo Fija (valor propio). <br/><br/>
                     <b className="text-indigo-400">Manual:</b> Tasa fija todos los meses. Escenarios lineales.
