@@ -176,6 +176,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
 function MortgageCalculator({ uvaValue, remData, remStatus }) {
   const hoy = new Date();
   const [amount, setAmount] = useState(0); 
+  const [salary, setSalary] = useState(0); 
   const [years, setYears] = useState(20);
   const [rate, setRate] = useState("5.5");
   const [extraRate, setExtraRate] = useState("0.1"); 
@@ -189,7 +190,6 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
   const [startMonth, setStartMonth] = useState(hoy.getMonth());
   const [startYear, setStartYear] = useState(hoy.getFullYear());
 
-  // Sincronizar Inercia manual con el último REM disponible para evitar saltos
   useEffect(() => {
     if (remData && remData.length > 0) {
       const lastValue = remData[remData.length - 1].valor;
@@ -211,7 +211,6 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
     const monthlyRate = rateNum / 12;
     const manualMonthlyInf = Math.pow(1 + inflationNum / 100, 1 / 12) - 1;
     
-    // Blindaje de acceso al array
     let remStabMon = (remStabilizedMode === 'auto' && remData && remData.length > 0) 
       ? remData[remData.length - 1].valor / 100 
       : (Number(String(remStabilizedValue).replace(',', '.')) || 0) / 100;
@@ -250,7 +249,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
       });
       let currentMonthInf = (dateMode === 'generic') ? manualMonthlyInf : (inflationMode === 'rem' ? (remMatch ? remMatch.valor / 100 : remStabMon) : manualMonthlyInf);
       projUva *= (1 + currentMonthInf);
-      currentDate.setMonth(currentDate.getMonth() + 1);
+      currentDate.setMonth(currentDate.getMonth() + 1); // FIX: Incremento correcto del objeto Date
     }
     return data;
   }, [amount, years, rate, extraRate, system, inflation, inflationMode, remStabilizedMode, remStabilizedValue, uvaValue, dateMode, startMonth, startYear, remData]);
@@ -291,9 +290,24 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="lg:col-span-3 space-y-6">
-        {/* Modo Temporal */}
+        {/* Tiempo de inicio del crédito */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border dark:border-slate-800">
-          <div className="flex items-center gap-3 mb-6"><div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg shadow-indigo-500/20"><CalendarDays className="w-4 h-4" /></div><h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none">Modo Temporal</h3></div>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg shadow-indigo-500/20">
+                <CalendarDays className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none">
+                Inicio del crédito
+              </h3>
+            </div>
+            <div className="group relative">
+              <HelpCircle className="w-4 h-4 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+              <div className="absolute right-0 bottom-full mb-2 w-64 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 italic normal-case tracking-normal">
+                {"La fecha de inicio permite al simulador sincronizar la primera cuota con el dato de inflación proyectado por el REM para ese mes específico. Esto asegura que la curva de actualización de la UVA sea coherente con el calendario fiscal."}
+              </div>
+            </div>
+          </div>
           <div className="space-y-4">
             <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-inner mb-4">
               <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-sky-400' : 'text-slate-500'}`}>CALENDARIO</button>
@@ -323,12 +337,21 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
             <div className="group relative">
               <HelpCircle className="w-4 h-4 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
               <div className="absolute right-0 bottom-full mb-2 w-56 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 italic">
-                Las condiciones finales las indica cada entidad bancaria. Consultá las webs oficiales abajo para obtener los datos precisos de tu simulación.
+                {"Las condiciones finales las indica cada entidad bancaria. Consultá las webs oficiales abajo para obtener los datos precisos de tu simulación."}
               </div>
             </div>
           </div>
           
           <CurrencyInput label="Monto del Préstamo" value={amount} onChange={setAmount} />
+
+          {/* KPI SUELDO OPCIONAL */}
+          <CurrencyInput 
+            label="Sueldo Neto Mensual (Opcional)" 
+            value={salary} 
+            onChange={setSalary} 
+            sublabel="Para calcular la afectación de tus ingresos sobre la cuota."
+          />
+
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800"><label className="text-[10px] font-black text-slate-400 block mb-3 uppercase tracking-widest leading-none italic">Plazo: {years} años</label><input type="range" min="5" max="30" value={years} onChange={(e)=>setYears(Number(e.target.value))} className="w-full accent-indigo-600 cursor-pointer"/></div>
             <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800"><label className="text-[10px] font-black text-indigo-500 block mb-2 uppercase tracking-widest text-center leading-none italic">Tasa (TNA %)</label><input type="text" value={rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" /></div>
@@ -340,7 +363,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
               <div className="group relative inline-block ml-1">
                 <HelpCircle className="w-3 h-3 text-slate-300 cursor-help hover:text-rose-500 transition-colors" />
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-slate-800 text-[9px] text-white font-medium rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 normal-case tracking-normal leading-tight italic">
-                  Incluye seguros (vida, incendio) y mantenimiento de cuenta informado por el banco.
+                  {"Incluye seguros (vida, incendio) y mantenimiento de cuenta informado por el banco."}
                 </div>
               </div>
             </label>
@@ -359,22 +382,34 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
           </div>
 
           <div className="pt-4 border-t dark:border-slate-800">
-            <div className="flex items-center justify-between mb-4"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 leading-none italic"><TrendingUp className="w-3 h-3"/> Inflación Proyectada</label><div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-inner">
-              <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded-lg transition-all ${inflationMode === 'rem' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-20 cursor-not-allowed grayscale' : ''}`}>REM</button>
-              <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg transition-all ${inflationMode === 'manual' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
-            </div></div>
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 leading-none italic">
+                <TrendingUp className="w-3 h-3"/> Inflación Proyectada
+                <div className="group relative">
+                  <HelpCircle className="w-3.5 h-3.5 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+                  <div className="absolute left-0 bottom-full mb-2 w-72 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 italic normal-case tracking-normal">
+                    <b className="text-indigo-400">REM:</b> Relevamiento de Expectativas de Mercado (BCRA). Utiliza el consenso dinámico de más de 40 consultoras y bancos que estiman un valor distinto para cada mes. El REM provee proyecciones de expertos para los primeros 36 meses. <br/><br/>  Para el tiempo restante, ProyectAR aplica una "Inercia": podés usar el último dato del REM de forma constante (Modo Auto) o setear un valor propio (Modo Fija). <br/><br/>
+                    <b className="text-indigo-400">Manual:</b> Ignora el mercado y aplica una misma tasa fija todos los meses. Es útil para proyectar escenarios lineales de largo plazo o pruebas de estrés personalizadas.
+                  </div>
+                </div>
+              </label>
+              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-inner">
+                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded-lg transition-all ${inflationMode === 'rem' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-20 cursor-not-allowed grayscale' : ''}`}>REM</button>
+                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg transition-all ${inflationMode === 'manual' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
+              </div>
+            </div>
             <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
               {inflationMode === 'manual' ? (
                 <div className="animate-in fade-in">
-                   <div className="flex justify-between items-center mb-2"><span className="text-[10px] font-black text-indigo-500 uppercase">Estimación Anual</span><span className="text-[11px] font-mono font-black dark:text-white">{inflation}%</span></div>
-                   <input type="range" min="0" max="100" step="0.5" value={Number(String(inflation).replace(',', '.')) || 0} onChange={(e)=>setInflation(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
+                    <div className="flex justify-between items-center mb-2"><span className="text-[10px] font-black text-indigo-500 uppercase">Estimación Anual</span><span className="text-[11px] font-mono font-black dark:text-white">{inflation}%</span></div>
+                    <input type="range" min="0" max="100" step="0.5" value={Number(String(inflation).replace(',', '.')) || 0} onChange={(e)=>setInflation(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
                 </div>
               ) : (
                 <div className="flex flex-col gap-4 animate-in fade-in">
                   <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[10px] font-black text-indigo-500 uppercase tracking-tighter leading-none flex items-center gap-1"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl shadow-inner"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'auto' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'custom' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>FIJA</button></div></div>
                   {remStabilizedMode === 'auto' ? 
                       <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 text-[10px] font-black dark:text-white uppercase tracking-tighter italic">
-                        Aplicando {remData && remData.length > 0 ? remData[remData.length-1].valor : '---'}% mensual (Último REM)
+                        {"Aplicando " + (remData && remData.length > 0 ? remData[remData.length-1].valor : '---') + "% mensual (Último REM)"}
                       </div> 
                       : 
                       <div className="animate-in fade-in"><div className="flex justify-between items-center mb-1"><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tasa fija mensual</span><span className="text-[11px] font-mono font-black text-indigo-500">{remStabilizedValue}%</span></div><input type="range" min="0" max="10" step="0.1" value={Number(String(remStabilizedValue).replace(',', '.')) || 0} onChange={(e)=>setRemStabilizedValue(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" /></div>
@@ -385,27 +420,11 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
           </div>
         </div>
 
-        {/* Lógica de Proyección */}
-        <div className="rounded-3xl p-6 bg-indigo-600 text-white shadow-xl relative overflow-hidden">
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-4 leading-none"><Activity className="w-3 h-3 text-emerald-400 animate-pulse" /><h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white/60 font-mono italic leading-none">Lógica de Proyección</h4></div>
-            <h3 className="text-xl font-black leading-tight mb-4 tracking-tighter italic italic">Entendiendo el REM</h3>
-            <div className="space-y-3">
-              <p className="text-[11px] leading-relaxed text-indigo-50/90 font-medium tracking-tight italic">El REM es el Relevamiento de Expectativas de Mercado del BCRA. Reúne el consenso de expertos sobre la inflación futura.</p>
-              <p className="text-[11px] leading-relaxed text-indigo-50/90 font-medium tracking-tight italic"><b>ProyectAR</b> lo usa para los primeros 36 meses. Luego aplica la <b>Inercia:</b></p>
-              <ul className="text-[10px] space-y-2 text-indigo-100 font-bold tracking-tighter italic">
-                <li className="flex gap-2"><span>•</span> <span><b>Auto:</b> Prolonga el último dato del REM para el resto del crédito.</span></li>
-                <li className="flex gap-2"><span>•</span> <span><b>Fija:</b> Te permite definir vos la tasa mensual de largo plazo.</span></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
         {/* Sección de Bancos */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border dark:border-slate-800 shadow-xl space-y-5">
           <div className="px-1">
             <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none mb-1.5 flex items-center gap-2"><Globe className="w-3 h-3 text-indigo-500" /> Web de bancos</h4>
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter italic leading-none">Consultá para completar las condiciones.</p>
+            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter italic leading-none">{"Consultá para completar las condiciones."}</p>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {banks.map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
@@ -419,6 +438,15 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
           <SummaryCard title="Cuota Inicial" value={money(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" subtitle="Vencimiento 1" />
           <SummaryCard title="Carga Intereses" value={money(totals.totalIntereses)} icon={TrendingUp} colorClass="orange" subtitle="Financiamiento Puro" />
           <SummaryCard title="Total Pagado Final" value={money(totals.totalPagadoFinal)} icon={CheckCircle2} colorClass="sky" subtitle="Capital + Int + Gastos" />
+          
+          {/* KPI: Relación Cuota/Ingreso */}
+          <SummaryCard 
+            title="Relación Cuota/Ingreso" 
+            value={salary > 0 ? `${((totals.cuotaInicial / salary) * 100).toFixed(1)}%` : "--- %"} 
+            icon={Activity} 
+            colorClass={salary > 0 && (totals.cuotaInicial / salary) > 0.3 ? "rose" : "emerald"} 
+            subtitle={salary > 0 ? "Límite: 25% - 40% (Recomendado)" : "Ingresá sueldo p/ calcular"} 
+          />
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border dark:border-slate-800 shadow-sm relative overflow-hidden">
@@ -475,19 +503,17 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
   );
 }
 
-// --- VISTA ALQUILERES (v0.9.0 Final Touches) ---
+// --- VISTA ALQUILERES ---
 function RentCalculator({ remData, remStatus }) {
-  // Defaults en 0 como pediste
   const [rentAmount, setRentAmount] = useState(0);
   const [expensesAmount, setExpensesAmount] = useState(0); 
   const [periodicity, setPeriodicity] = useState(4);
   const [durationYears, setDurationYears] = useState(2); 
   const [inflationMode, setInflationMode] = useState('rem');
   const [manualInf, setManualInf] = useState("40"); 
-  const [adjustExpenses, setAdjustExpenses] = useState(true); // Nuevo toggle
+  const [adjustExpenses, setAdjustExpenses] = useState(true);
 
   const schedule = useMemo(() => {
-    // Si no hay montos, devolvemos array vacío para disparar el placeholder del gráfico
     if (rentAmount === 0 && expensesAmount === 0) return [];
 
     const data = [];
@@ -508,14 +534,12 @@ function RentCalculator({ remData, remStatus }) {
         monthlyRate = Math.pow(1 + (Number(manualInf) / 100), 1/12) - 1; 
       }
 
-      // Solo ajustamos expensas si el toggle está activo
       if (i > 1 && adjustExpenses) {
         currentExpenses *= (1 + monthlyRate);
       }
 
       accumulatedFactor *= (1 + monthlyRate);
 
-      // Ajuste escalonado del alquiler
       if (i > 1 && (i - 1) % periodicity === 0) {
         currentRent *= accumulatedFactor;
         accumulatedFactor = 1;
@@ -526,8 +550,8 @@ function RentCalculator({ remData, remStatus }) {
         label: `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}`,
         shortDate: `${MESES[currentDate.getMonth()]} ${String(currentDate.getFullYear()).slice(-2)}`,
         cuotaTotal: currentRent + currentExpenses, 
-        principal: currentRent, // Mapeado a Alquiler en el gráfico
-        interes: currentExpenses, // Mapeado a Expensas en el gráfico
+        principal: currentRent, 
+        interes: currentExpenses, 
         gastos: 0,
         source: inflationMode === 'rem' ? 'REM' : 'ALQUILER'
       });
@@ -542,7 +566,6 @@ function RentCalculator({ remData, remStatus }) {
         
         <div className="space-y-4">
           <CurrencyInput label="Expensas Iniciales" value={expensesAmount} onChange={setExpensesAmount} />
-          {/* Toggle de Ajuste de Expensas */}
           <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border dark:border-slate-800">
             <span className="text-[10px] font-black uppercase text-slate-500 italic">¿Ajustar por inflación?</span>
             <button 
@@ -566,7 +589,15 @@ function RentCalculator({ remData, remStatus }) {
         </div>
 
         <div>
-          <label className="text-[10px] font-black uppercase text-slate-400 mb-4 block leading-none italic">Ajuste (Meses)</label>
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-[10px] font-black uppercase text-slate-400 block leading-none italic">Ajuste (Meses)</label>
+            <div className="group relative">
+              <HelpCircle className="w-4 h-4 text-slate-300 cursor-help hover:text-emerald-500 transition-colors" />
+              <div className="absolute right-0 bottom-full mb-2 w-64 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 italic normal-case tracking-normal">
+                {"Define cada cuántos meses se actualiza el valor del alquiler. El sistema acumula la inflación del periodo y la aplica de forma escalonada al inicio de cada nuevo ciclo."}
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {[3, 4, 6].map(m => (
               <button key={m} onClick={() => setPeriodicity(m)} className={`py-3 rounded-xl text-xs font-black transition-all ${periodicity === m ? 'bg-emerald-500 text-white shadow-lg' : 'bg-slate-50 dark:bg-slate-800 text-slate-500'}`}>
@@ -577,24 +608,24 @@ function RentCalculator({ remData, remStatus }) {
         </div>
 
         <div className="pt-6 border-t dark:border-slate-800">
-           <div className="flex items-center justify-between mb-4">
-             <label className="text-[10px] font-black text-slate-400 uppercase leading-none italic">Inflación</label>
-             <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-inner">
-               <button disabled={remStatus === 'error'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded transition-all ${inflationMode === 'rem' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>REM</button>
-               <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded transition-all ${inflationMode === 'manual' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
-             </div>
-           </div>
-           
-           {inflationMode === 'manual' ? (
-             <div className="animate-in fade-in space-y-2">
-                <div className="flex justify-between items-center"><span className="text-[10px] font-black text-emerald-500 uppercase">Estimación Anual</span><span className="text-[11px] font-mono font-black dark:text-white">{manualInf}%</span></div>
-                <input type="range" min="0" max="200" step="1" value={manualInf} onChange={(e)=>setManualInf(e.target.value)} className="w-full accent-emerald-500 cursor-pointer" />
-             </div>
-           ) : (
-             <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[9px] text-slate-500 dark:text-slate-400 font-bold leading-relaxed italic">
-               Nota: El REM proyecta los próximos 36 meses, cubriendo la totalidad de este contrato.
-             </div>
-           )}
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-[10px] font-black text-slate-400 uppercase leading-none italic">Inflación</label>
+              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-inner">
+                <button disabled={remStatus === 'error'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded transition-all ${inflationMode === 'rem' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>REM</button>
+                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded transition-all ${inflationMode === 'manual' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
+              </div>
+            </div>
+            
+            {inflationMode === 'manual' ? (
+              <div className="animate-in fade-in space-y-2">
+                 <div className="flex justify-between items-center"><span className="text-[10px] font-black text-emerald-500 uppercase">Estimación Anual</span><span className="text-[11px] font-mono font-black dark:text-white">{manualInf}%</span></div>
+                 <input type="range" min="0" max="200" step="1" value={manualInf} onChange={(e)=>setManualInf(e.target.value)} className="w-full accent-emerald-500 cursor-pointer" />
+              </div>
+            ) : (
+              <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[9px] text-slate-500 dark:text-slate-400 font-bold leading-relaxed italic">
+                {"Nota: El REM proyecta los próximos 36 meses, cubriendo la totalidad de este contrato."}
+              </div>
+            )}
         </div>
       </div>
 
@@ -665,13 +696,11 @@ export default function App() {
   return (
     <div className={darkMode ? 'dark' : ''}>
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-500 flex flex-col">
-        {/* Barra Superior */}
         <div className="bg-slate-900 text-white py-3 border-b border-white/5 relative z-40 px-10">
           <div className="max-w-[1800px] mx-auto flex justify-between items-center text-[10px] font-black tracking-widest uppercase italic text-slate-500">
             <div className="flex items-center gap-6 leading-none">
               <div className="flex items-center gap-2">
-                <Globe className="w-3 h-3" /> 
-                Fuentes: 
+                <Globe className="w-3 h-3" /> Fuentes: 
                 <a href="https://dolarapi.com" target="_blank" className="hover:text-emerald-400 transition-colors">DolarAPI</a> • 
                 <a href="https://argentinadatos.com" target="_blank" className="hover:text-indigo-400 transition-colors">ArgentinaDatos</a> • 
                 <a href="https://www.bcra.gob.ar/relevamiento-expectativas-mercado-rem/" target="_blank" className="hover:text-sky-400 transition-colors">BCRA</a>
@@ -691,7 +720,7 @@ export default function App() {
         <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 h-28 flex items-center justify-between px-10 shadow-sm">
           <div className="flex items-center gap-5">
             <div className="bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl shadow-indigo-600/30"><Calculator className="w-8 h-8" /></div>
-            <div className="flex flex-col"><span className="font-black text-3xl tracking-tighter uppercase leading-none italic">Proyect<span className="text-sky-400 text-[1.25em]">AR</span></span><span className="text-[11px] font-black tracking-[0.3em] text-slate-500 uppercase mt-3 opacity-60 italic leading-none">v0.9.0</span></div>
+            <div className="flex flex-col"><span className="font-black text-3xl tracking-tighter uppercase leading-none italic">Proyect<span className="text-sky-400 text-[1.25em]">AR</span></span><span className="text-[11px] font-black tracking-[0.3em] text-slate-500 uppercase mt-3 opacity-60 italic leading-none">v0.9.1</span></div>
           </div>
           <div className="flex items-center gap-10">
             <div className="hidden lg:flex gap-3 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-2xl border dark:border-slate-700 shadow-inner">
@@ -718,29 +747,24 @@ export default function App() {
         </main>
 
         <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-20 py-16 px-10 flex flex-col lg:flex-row justify-between items-center gap-10">
-          
-          {/* BLOQUE IZQUIERDA: Alineado con el borde de las secciones superiores */}
           <div className="flex-1 text-left">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 italic">
-              República Argentina - 2026
+              {"República Argentina - 2026"}
             </p>
           </div>
 
-          {/* BLOQUE MEDIO: Disclaimer con buen aire */}
           <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60 dark:opacity-40">
             <p className="text-[10px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400">
-              <span className="font-black text-indigo-500">Aviso Legal:</span> ProyectAR es una herramienta de simulación con fines informativos y educativos. Los resultados presentados son proyecciones basadas en datos históricos y estimaciones de mercado (REM - BCRA), por lo que no garantizan resultados futuros. Esta aplicación no constituye asesoramiento financiero, legal o impositivo. La volatilidad económica e incertidumbre propia de proyecciones a largo plazo pueden alterar significativamente estos valores. El usuario es el único responsable de las decisiones tomadas basándose en esta información. Los datos del REM son propiedad del Banco Central de la República Argentina.
+              <span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR es una herramienta de simulación informativa. Los resultados son proyecciones basadas en datos históricos y estimaciones de mercado (REM - BCRA), no garantizan resultados futuros. El usuario es el único responsable de las decisiones tomadas basándose en esta información."}
             </p>
           </div>
 
-          {/* BLOQUE DERECHA: GitHub arriba del Mail */}
           <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 italic">
             <a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors">
               <Github className="w-4 h-4" /> @MaxiNavarro97
             </a>
             <p>Contacto: @maxinavarro1997@gmail.com</p>
           </div>
-          
         </footer>
       </div>
     </div>
