@@ -2,8 +2,8 @@ name: Actualizar Datos ProyectAR
 
 on:
   schedule:
-    # Corre todos los lunes a las 09:00 UTC (06:00 AM Argentina)
-    - cron: '0 9 * * 1'
+    # 10:00 AM Argentina (13:00 UTC) todos los días
+    - cron: '0 13 * * *'
   workflow_dispatch: # Permite darle al botón "Play" manual en GitHub
 
 jobs:
