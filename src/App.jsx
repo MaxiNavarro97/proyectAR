@@ -418,10 +418,36 @@ function MortgageCalculator({ uvaValue, remData, remStatus }) {
                 <TrendingUp className="w-3 h-3"/> INFLACIÓN PROYECTADA
                 <div className="group relative">
                   <HelpCircle className="w-3.5 h-3.5 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-[85vw] sm:w-72 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 normal-case tracking-normal">
-                    <b className="text-indigo-400">REM:</b> Relevamiento de Expectativas de Mercado (BCRA). Expertos estiman valores para los primeros 36 meses. <br/><br/> 
-                    Para el tiempo restante, se aplica una "Inercia": modo Auto (último dato del REM) o modo Fija (valor propio). <br/><br/>
-                    <b className="text-indigo-400">Manual:</b> Tasa fija todos los meses. Escenarios lineales.
+<div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-[85vw] sm:w-80 p-4 bg-slate-900/95 backdrop-blur-md text-[10px] text-slate-300 font-medium rounded-2xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10 normal-case tracking-normal">
+                    {/* Sección REM + INERCIA */}
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                        <b className="text-indigo-400 uppercase tracking-wider">Modo REM (Oficial)</b>
+                      </div>
+                      <p className="mb-2">
+                        Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-indigo-300">mes a mes</span> automáticamente según disponibilidad.
+                      </p>
+                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
+                        <p className="text-[9px] leading-snug">
+                          <span className="text-indigo-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Separador sutil */}
+                    <div className="h-px w-full bg-white/5 mb-3"></div>
+
+                    {/* Sección Manual */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                        <b className="text-emerald-400 uppercase tracking-wider">Modo Manual</b>
+                      </div>
+                      <p>
+                        <span className="text-white font-bold">Control total.</span> Definí una tasa fija para todo el crédito. Ideal para simular <span className="text-emerald-300 font-bold italic">estabilidad a largo plazo</span> o escenarios de inflación objetivo propios.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </label>
