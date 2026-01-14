@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Calculator, DollarSign, Calendar, Percent, 
   TrendingUp, Info, Globe, Home, ArrowRightLeft,
-  Building2, CheckCircle, AlertCircle, Moon, Sun,
-  Download, Filter, ChevronDown, ChevronUp, ExternalLink,
-  Zap, Settings2, CalendarDays, AlertTriangle, Scale,
-  Library, HelpCircle, Wallet, PieChart, ArrowUpRight,
-  TrendingDown, Landmark, FileText, Lightbulb, Mail,
-  Activity, Heart, Twitter, Github, Clock
+  Landmark, FileText, Zap, Settings2, 
+  CalendarDays, AlertTriangle, Scale, Activity, 
+  Github, Clock, Wallet, CheckCircle2,
+  PieChart, Download, Sun, Moon, ExternalLink, ShieldAlert,
+  HelpCircle
 } from 'lucide-react';
 
 // --- CONSTANTES ---
 const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-const YEARS_AHEAD = Array.from({ length: 15 }, (_, i) => new Date().getFullYear() + i);
 
 const money = (v) => new Intl.NumberFormat('es-AR', { 
   style: 'currency', 
@@ -24,71 +22,51 @@ const money = (v) => new Intl.NumberFormat('es-AR', {
 
 function NavBtn({ active, onClick, icon, label, color }) {
   const themes = {
-    indigo: 'text-indigo-600 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-indigo-500/30 scale-105',
-    emerald: 'text-emerald-600 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105',
-    violet: 'text-violet-600 bg-white dark:bg-slate-800 shadow-md border-violet-100 dark:border-violet-500/30 scale-105'
+    indigo: 'text-indigo-600 dark:text-sky-400 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-sky-500/30 scale-105',
+    emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105'
   };
-  
   return (
-    <button 
-      onClick={onClick} 
-      className={`px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition-all border border-transparent active:scale-95 ${active ? themes[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
-    >
-      {icon} {label}
+    <button onClick={onClick} className={`px-4 md:px-5 py-2.5 rounded-xl text-[10px] md:text-xs font-black flex items-center gap-2 transition-all border border-transparent active:scale-95 ${active ? themes[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+      {React.cloneElement(icon, { className: "w-4 h-4 md:w-5 md:h-5" })} {label}
     </button>
   );
 }
 
-function CurrencyInput({ value, onChange, label, sublabel, colorClass = "indigo" }) {
+function CurrencyInput({ value, onChange, label, sublabel }) {
   const [isFocused, setIsFocused] = useState(false);
   const handleChange = (e) => {
     const rawValue = e.target.value.replace(/\D/g, '');
-    onChange(Number(rawValue));
+    const numericValue = rawValue === '' ? 0 : Number(rawValue);
+    onChange(numericValue);
   };
-  const formatted = new Intl.NumberFormat('es-AR', { 
-    style: 'currency', 
-    currency: 'ARS', 
-    maximumFractionDigits: 0 
-  }).format(value);
-
+  const formatted = (isFocused && value === 0) ? '' : money(value);
   return (
-    <div className="group">
-      <label className={`text-[10px] font-black block mb-2 uppercase tracking-widest flex items-center gap-2 transition-colors ${isFocused ? `text-indigo-500` : 'text-slate-400'}`}>
-        {label}
-      </label>
+    <div className="group text-left">
+      <label className={`text-[10px] font-black block mb-2 uppercase tracking-widest flex items-center gap-2 transition-colors ${isFocused ? `text-indigo-500` : 'text-slate-400'}`}>{label}</label>
       <div className={`relative transition-all duration-300 ${isFocused ? 'scale-[1.01]' : ''}`}>
-        <input 
-          type="text" 
-          value={formatted} 
-          onChange={handleChange} 
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-indigo-500/50 dark:focus:border-indigo-400/30 shadow-inner transition-all dark:text-white"
-        />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400">
-          <DollarSign className="w-5 h-5" />
-        </div>
+        <input type="text" value={formatted} onChange={handleChange} onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent focus:border-indigo-500/50 dark:focus:border-indigo-400/30 shadow-inner transition-all dark:text-white" />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
       </div>
-      {sublabel && <p className="text-[9px] text-slate-400 mt-2 italic px-1 leading-relaxed">{sublabel}</p>}
+      {sublabel && <p className="text-[9px] text-slate-400 mt-2  px-1 leading-relaxed">{sublabel}</p>}
     </div>
   );
 }
 
 function SummaryCard({ title, value, icon: Icon, colorClass, subtitle }) {
-  const colorMap = {
-    indigo: 'bg-indigo-500/10 text-indigo-500',
-    orange: 'bg-orange-500/10 text-orange-500',
+  const colorMap = { 
+    indigo: 'bg-indigo-500/10 text-indigo-500', 
+    orange: 'bg-orange-500/10 text-orange-500', 
     emerald: 'bg-emerald-500/10 text-emerald-500',
+    rose: 'bg-rose-500/10 text-rose-500',
+    sky: 'bg-sky-500/10 text-sky-500'
   };
   return (
-    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-4 transition-all hover:translate-y-[-2px] hover:shadow-md">
-      <div className={`p-3 rounded-xl ${colorMap[colorClass] || 'bg-slate-500/10 text-slate-500'}`}>
-        <Icon className="w-5 h-5" />
-      </div>
-      <div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{title}</p>
-        <p className={`text-lg font-black tracking-tight dark:text-white`}>{value}</p>
-        {subtitle && <p className="text-[10px] text-slate-400 font-medium mt-1">{subtitle}</p>}
+    <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-3 transition-all hover:translate-y-[-2px] hover:shadow-md min-w-0 flex-1">
+      <div className={`p-2 md:p-2.5 rounded-xl shrink-0 ${colorMap[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
+      <div className="min-w-0 overflow-hidden text-left">
+        <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 truncate">{title}</p>
+        <p className="text-sm md:text-base font-black tracking-tight dark:text-white leading-none truncate">{value}</p>
+        {subtitle && <p className="text-[7px] md:text-[8px] text-slate-400 font-bold uppercase tracking-tighter mt-1 truncate">{subtitle}</p>}
       </div>
     </div>
   );
@@ -97,597 +75,385 @@ function SummaryCard({ title, value, icon: Icon, colorClass, subtitle }) {
 function BankCard({ name, url, logoUrl }) {
   const [imgError, setImgError] = useState(false);
   return (
-    <a 
-      href={url} 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      className="group relative flex flex-col items-center justify-center p-4 rounded-2xl bg-white dark:bg-slate-800/50 border dark:border-slate-800 hover:border-indigo-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden aspect-square"
-    >
-      <div className="relative z-10 h-10 w-full flex items-center justify-center mb-2">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="group relative flex flex-col items-center justify-center p-2 md:p-3 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500/50 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden aspect-square">
+      <div className="relative z-10 h-8 md:h-10 w-full flex items-center justify-center mb-1 bg-white">
         {!imgError ? (
-          <img src={logoUrl} alt={name} onError={() => setImgError(true)} className="max-h-full max-w-full object-contain grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-110" />
+          <img 
+            src={logoUrl} 
+            alt={name} 
+            onError={() => setImgError(true)} 
+            className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" 
+          />
         ) : (
-          <Landmark className="w-6 h-6 text-slate-300 group-hover:text-indigo-500" />
+          <Landmark className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" />
         )}
       </div>
-      <span className="text-[8px] font-black text-slate-400 group-hover:text-indigo-500 uppercase tracking-tighter text-center">{name}</span>
+      <span className="text-[6px] md:text-[7px] font-black text-slate-500 uppercase tracking-tighter text-center transition-colors group-hover:text-indigo-600">{name}</span>
     </a>
   );
 }
 
-// --- GRÁFICOS ---
+// --- VISUALIZACIÓN DE DATOS ---
 
-function CompositionChart({ data, dateMode }) {
+function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
   const [hovered, setHovered] = useState(null);
-  const containerRef = useRef(null);
 
-  if (!data || data.length === 0) return (
-    <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
-      <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Sin datos para proyectar</p>
-    </div>
-  );
-  
+  if (!data || data.length === 0) {
+    return (
+      <div className="w-full h-full min-h-[300px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50 gap-4">
+        <Calculator className="w-12 h-12 text-slate-300 dark:text-slate-700" />
+        <p className="text-[12px] font-black uppercase tracking-widest text-slate-400 ">No hay información ingresada para proyectar</p>
+      </div>
+    );
+  }
+
   const maxVal = Math.max(...data.map(d => d.cuotaTotal)) * 1.15;
-  const w = 1000, h = 400, padL = 80, padB = 60, padT = 20;
-  
-  const step = Math.max(1, Math.ceil(data.length / 60));
+  const w = 1000, h = 400, padL = 100, padB = 60, padT = 20;
+  const step = Math.max(1, Math.ceil(data.length / (isRent ? 40 : 60)));
   const sampled = data.filter((_, i) => i % step === 0);
+  const lastRemIndex = showRemMarker ? data.findLastIndex(d => d.source === 'REM') : -1;
+  const remMarkerX = lastRemIndex !== -1 ? (padL + (lastRemIndex / (data.length - 1)) * (w - padL)) : null;
 
   return (
-    <div className="relative w-full h-full" ref={containerRef}>
+    <div className="relative w-full h-full">
       {hovered && (
-        <div 
-          className="absolute z-50 pointer-events-none bg-white dark:bg-slate-800 shadow-2xl rounded-xl border dark:border-slate-700 p-4 min-w-[200px] animate-in fade-in zoom-in-95 duration-200"
-          style={{ 
-            left: `${(hovered.x / w) * 100}%`, 
-            top: `${(hovered.y / h) * 100 - 10}%`,
-            transform: 'translate(-50%, -100%)'
-          }}
-        >
+        <div className="absolute z-50 pointer-events-none bg-white dark:bg-slate-800 shadow-2xl rounded-xl border dark:border-slate-700 p-3 md:p-4 min-w-[180px] md:min-w-[200px]" style={{ left: `${(hovered.x / w) * 100}%`, top: `${(hovered.y / h) * 100 - 10}%`, transform: 'translate(-50%, -100%)' }}>
           <div className="flex items-center justify-between mb-2 border-b dark:border-slate-700 pb-1.5">
               <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{hovered.data.label}</p>
-              {/* BUG FIX: Added optional chaining to avoid crash if UVA is missing */}
-              <span className="text-[8px] font-mono text-slate-400">UVA: ${hovered.data.uva?.toFixed(2) || "---"}</span>
+              <span className={`text-[8px] px-1.5 py-0.5 rounded font-black ${hovered.data.source === 'REM' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>{hovered.data.source}</span>
           </div>
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center gap-4">
-              <span className="text-[9px] font-bold text-slate-400 uppercase">Total Cuota:</span>
-              <span className="text-sm font-black dark:text-white">{money(hovered.data.cuotaTotal)}</span>
+          <div className="space-y-1.5 text-[10px] md:text-[11px]">
+            <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 uppercase">Total:</span><span className="font-black dark:text-white">{money(hovered.data.cuotaTotal)}</span></div>
+            <div className="flex justify-between items-center gap-4 text-indigo-500 font-bold uppercase">
+              <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500" /><span>{isRent ? 'Alquiler' : 'Capital'}:</span></div>
+              <span>{money(hovered.data.principal)}</span>
             </div>
-            <div className="flex justify-between items-center gap-4">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                <span className="text-[9px] font-bold text-slate-400 uppercase">Capital:</span>
-              </div>
-              <span className="text-[10px] font-bold dark:text-slate-200">{money(hovered.data.principal)}</span>
-            </div>
-            <div className="flex justify-between items-center gap-4">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-                <span className="text-[9px] font-bold text-slate-400 uppercase">Interés:</span>
-              </div>
-              <span className="text-[10px] font-bold dark:text-slate-200">{money(hovered.data.interes)}</span>
+            <div className="flex justify-between items-center gap-4 text-orange-500 font-bold uppercase">
+              <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-orange-400" /><span>{isRent ? 'Expensas' : 'Interés'}:</span></div>
+              <span>{money(hovered.data.interes)}</span>
             </div>
           </div>
         </div>
       )}
-
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full overflow-visible select-none" preserveAspectRatio="none">
         {[0, 0.25, 0.5, 0.75, 1].map(p => (
           <g key={p}>
             <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-100 dark:text-slate-800" strokeDasharray="4"/>
-            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[14px] fill-slate-400 font-mono font-bold">
-              {Math.round((maxVal * p) / 1000)}k
-            </text>
+            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[10px] md:text-[11px] fill-slate-400 font-mono font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
           </g>
         ))}
-
         {sampled.map((d, i) => {
           const barAreaW = (w - padL) / sampled.length;
           const barW = barAreaW * 0.8;
           const x = padL + i * barAreaW;
           const hInt = (d.interes / maxVal) * (h - padB - padT);
           const hPri = (d.principal / maxVal) * (h - padB - padT);
-
+          const hGas = (d.gastos / maxVal) * (h - padB - padT);
           return (
-            <g 
-              key={i} 
-              onMouseEnter={() => setHovered({ x: x + barW / 2, y: h - padB - hInt - hPri, data: d })}
-              onMouseLeave={() => setHovered(null)}
-              className="group cursor-pointer"
-            >
-              <rect x={x} y={h - padB - hInt} width={barW} height={hInt} fill="#fb923c" rx="1.5" className="transition-all hover:brightness-110"/>
-              <rect x={x} y={h - padB - hInt - hPri} width={barW} height={hPri} fill="#6366f1" rx="1.5" className="transition-all hover:brightness-110"/>
-              
+            <g key={i} onMouseEnter={() => setHovered({ x: x + barW / 2, y: h - padB - hInt - hPri - hGas, data: d })} onMouseLeave={() => setHovered(null)} className="group cursor-pointer">
+              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill="#6366f1" rx="1.5" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill="#fb923c" rx="1.5" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri - hInt - hGas} width={barW} height={hGas} fill="#fb7185" rx="1.5" className="transition-all group-hover:brightness-110"/>
               {(i % Math.ceil(sampled.length/10) === 0) && (
-                <g>
-                  <text x={x + barW/2} y={h - padB + 25} textAnchor="middle" className="text-[12px] fill-slate-500 font-black uppercase tracking-tighter">
-                    {dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}
-                  </text>
-                  <line x1={x + barW/2} y1={h-padB} x2={x+barW/2} y2={h-padB+8} stroke="currentColor" className="text-slate-300 dark:text-slate-700" />
-                </g>
+                <text x={x + barW/2} y={h - padB + 25} textAnchor="middle" className="text-[10px] md:text-[11px] fill-slate-500 font-black uppercase tracking-tighter">{dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}</text>
               )}
             </g>
           );
         })}
-        <line x1={padL} y1={h - padB} x2={w} y2={h - padB} stroke="currentColor" className="text-slate-300 dark:text-slate-700" strokeWidth="2"/>
       </svg>
     </div>
   );
 }
 
-// --- VISTAS ---
-
-function MortgageCalculator({ dolarOficial, uvaValue }) {
-  const [amount, setAmount] = useState(60000000);
-  const [years, setYears] = useState(20);
-  const [rate, setRate] = useState("5.5");
-  const [inflation, setInflation] = useState("35");
+// --- VISTA CALCULADORA HIPOTECARIA ---
+function MortgageCalculator({ uvaValue, remData, remStatus }) {
+  const hoy = new Date();
+  const [amount, setAmount] = useState(0); 
+  const [salary, setSalary] = useState(0); 
+  const [years, setYears] = useState(0);
+  const [rate, setRate] = useState("0");
+  const [extraRate, setExtraRate] = useState("0"); 
+  const [inflation, setInflation] = useState("0");
   const [system, setSystem] = useState('french'); 
   const [inflationMode, setInflationMode] = useState('rem'); 
   const [remStabilizedMode, setRemStabilizedMode] = useState('auto');
-  const [remStabilizedValue, setRemStabilizedValue] = useState("2.5");
+  const [remStabilizedValue, setRemStabilizedValue] = useState("0");
   const [timeframe, setTimeframe] = useState('all');
-  
   const [dateMode, setDateMode] = useState('calendar'); 
-  const [startMonth, setStartMonth] = useState(new Date().getMonth());
-  const [startYear, setStartYear] = useState(new Date().getFullYear());
-
-  const [remData, setRemData] = useState([]);
-  const [remStatus, setRemStatus] = useState('loading');
+  const [startMonth, setStartMonth] = useState(hoy.getMonth());
+  const [startYear, setStartYear] = useState(hoy.getFullYear());
 
   useEffect(() => {
-    const loadRemCsv = async () => {
-      setRemStatus('loading');
-      try {
-        const csvPath = `${window.location.origin}/data/processed/proyeccion_inflacion.csv`;
-        const response = await fetch(csvPath);
-        if (!response.ok) throw new Error("File not found");
-        const text = await response.text();
-        const rows = text.split('\n').slice(1);
-        const parsed = rows.filter(row => row.trim()).map(row => {
-          const columns = row.split(';');
-          if (columns.length < 3) return null;
-          const [mes, año, valor] = columns;
-          return {
-            mes: parseInt(mes),
-            año: parseInt(año),
-            valor: parseFloat(valor.replace(',', '.'))
-          };
-        }).filter(Boolean);
-        
-        if (parsed.length > 0) {
-          setRemData(parsed);
-          setRemStatus('available');
-          setRemStabilizedValue(parsed[parsed.length - 1].valor.toString().replace('.', ','));
-        } else {
-          throw new Error("No data in CSV");
-        }
-      } catch (err) {
-        setRemData([]);
-        setRemStatus('error');
-      }
-    };
-    loadRemCsv();
-  }, []);
-
-  const handleDecimalInput = (value, setter) => {
-    const normalized = value.replace(',', '.');
-    if (normalized === '' || normalized === '.' || /^\d*\.?\d*$/.test(normalized)) {
-      setter(value);
+    if (remData && remData.length > 0) {
+      const lastValue = remData[remData.length - 1].valor;
+      setRemStabilizedValue(String(lastValue).replace('.', ','));
     }
-  };
+  }, [remData]);
 
   useEffect(() => {
-    if (dateMode === 'generic' && inflationMode === 'rem') {
-      setInflationMode('manual');
-    }
-  }, [dateMode, inflationMode]);
+    if (dateMode === 'generic') { setInflationMode('manual'); }
+  }, [dateMode]);
 
   const schedule = useMemo(() => {
-    const totalMonths = years * 12;
+    if (!amount || amount === 0) return [];
+    const totalMonths = Number(years) * 12;
+    if (isNaN(totalMonths) || totalMonths <= 0) return [];
     const currentUva = uvaValue || 1;
-    const rateNum = Number(String(rate).replace(',', '.')) || 0;
+    const rateNum = (Number(String(rate).replace(',', '.')) || 0) / 100;
+    const extraRateNum = (Number(String(extraRate).replace(',', '.')) || 0) / 100;
     const inflationNum = Number(String(inflation).replace(',', '.')) || 0;
-    const monthlyRate = (rateNum / 100) / 12;
+    const monthlyRate = rateNum / 12;
     const manualMonthlyInf = Math.pow(1 + inflationNum / 100, 1 / 12) - 1;
-    
-    let remStabilizedMonthly;
-    if (remStabilizedMode === 'auto' && remData.length > 0) {
-        remStabilizedMonthly = remData[remData.length - 1].valor / 100;
-    } else {
-        remStabilizedMonthly = (Number(String(remStabilizedValue).replace(',', '.')) || 0) / 100;
-    }
-    
+    let remStabMon = (remStabilizedMode === 'auto' && remData && remData.length > 0) 
+      ? remData[remData.length - 1].valor / 100 
+      : (Number(String(remStabilizedValue).replace(',', '.')) || 0) / 100;
     let balanceUva = amount / currentUva;
+    const capitalUvaInicial = amount / currentUva;
     const data = [];
     let projUva = currentUva;
     let currentDate = new Date(startYear, startMonth, 1);
-    const constantAmortizationUva = (amount / currentUva) / totalMonths;
-
+    const constantAmortizationUva = capitalUvaInicial / totalMonths;
     for (let i = 1; i <= totalMonths; i++) {
       if (balanceUva <= 0) break;
       let interestUva = balanceUva * monthlyRate;
       let principalUva;
-
       if (system === 'french') {
-        const pmtUva = monthlyRate > 0 
-          ? (balanceUva * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -(totalMonths - i + 1)))
-          : (amount / currentUva) / totalMonths;
+        const pmtUva = monthlyRate > 0 ? (balanceUva * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -(totalMonths - i + 1))) : constantAmortizationUva;
         principalUva = pmtUva - interestUva;
-      } else {
-        principalUva = constantAmortizationUva;
-      }
-
-      if (principalUva > balanceUva) {
-        principalUva = balanceUva;
-        balanceUva = 0;
-      } else {
-        balanceUva -= principalUva;
-      }
-
+      } else { principalUva = constantAmortizationUva; }
+      if (principalUva > balanceUva) { principalUva = balanceUva; balanceUva = 0; } else { balanceUva -= principalUva; }
+      const gastosPesos = capitalUvaInicial * extraRateNum * projUva;
+      const remMatch = (dateMode === 'calendar' && inflationMode === 'rem' && remData && remData.length > 0) ? remData.find(d => d.mes === (currentDate.getMonth() + 1) && d.año === currentDate.getFullYear()) : null;
+      let sourceName = 'MANUAL';
+      if (inflationMode === 'rem') sourceName = remMatch ? 'REM' : 'INERCIA';
       data.push({
         mes: i,
         label: dateMode === 'calendar' ? `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}` : `Mes ${i}`,
         shortDate: `${MESES[currentDate.getMonth()]} ${String(currentDate.getFullYear()).slice(-2)}`,
-        cuotaTotal: (principalUva + interestUva) * projUva,
-        interes: interestUva * projUva,
-        principal: principalUva * projUva,
-        saldo: balanceUva * projUva,
-        uva: projUva
+        interes: interestUva * projUva, 
+        principal: principalUva * projUva, 
+        gastos: gastosPesos,
+        cuotaTotal: (principalUva + interestUva) * projUva + gastosPesos, 
+        saldo: balanceUva * projUva, 
+        source: sourceName
       });
-
-      let currentMonthInf;
-      if (inflationMode === 'rem' && dateMode === 'calendar' && remData.length > 0) {
-        const found = remData.find(d => d.mes === (currentDate.getMonth() + 1) && d.año === currentDate.getFullYear());
-        currentMonthInf = found ? (found.valor / 100) : remStabilizedMonthly;
-      } else {
-        currentMonthInf = manualMonthlyInf;
-      }
-      
+      let currentMonthInf = (dateMode === 'generic') ? manualMonthlyInf : (inflationMode === 'rem' ? (remMatch ? remMatch.valor / 100 : remStabMon) : manualMonthlyInf);
       projUva *= (1 + currentMonthInf);
-      currentDate.setMonth(currentDate.getMonth() + 1);
+      currentDate.setMonth(currentDate.getMonth() + 1); 
     }
     return data;
-  }, [amount, years, rate, system, inflation, inflationMode, remStabilizedMode, remStabilizedValue, uvaValue, dateMode, startMonth, startYear, remData]);
+  }, [amount, years, rate, extraRate, system, inflation, inflationMode, remStabilizedMode, remStabilizedValue, uvaValue, dateMode, startMonth, startYear, remData]);
 
-  const totals = useMemo(() => {
-    return {
-      totalPagado: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
-      totalInteres: schedule.reduce((acc, curr) => acc + curr.interes, 0),
+  const totals = useMemo(() => ({
+      totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
+      totalIntereses: schedule.reduce((acc, curr) => acc + curr.interes, 0),
       cuotaInicial: schedule[0]?.cuotaTotal || 0,
-    };
-  }, [schedule]);
+  }), [schedule]);
 
-  const exportarAnalisisExcel = () => {
-    const encabezados = ["Periodo", "Cuota Total", "Interes", "Capital", "Saldo Remanente"];
-    const filas = schedule.map(d => [d.label, Math.round(d.cuotaTotal), Math.round(d.interes), Math.round(d.principal), Math.round(d.saldo)].join(";"));
-    const contenidoCsv = [encabezados.join(";"), ...filas].join("\n");
-    const blob = new Blob(["\uFEFF" + contenidoCsv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+  const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
+
+  const exportToCSV = () => {
+    if (schedule.length === 0) return;
+    const headers = ["Mes", "Cuota Total", "Interes", "Capital", "Gastos", "Saldo Pendiente", "Origen"];
+    const rows = schedule.map(d => [d.label, Math.round(d.cuotaTotal), Math.round(d.interes), Math.round(d.principal), Math.round(d.gastos), Math.round(d.saldo), d.source]);
+    let csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
     const link = document.createElement("a");
-    link.href = url;
-    link.download = `HipotecAR_Reporte_${new Date().getTime()}.csv`;
-    link.click();
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `ProyectAR_Hipotecas_${new Date().getTime()}.csv`);
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
-
-  const filteredData = useMemo(() => {
-    if (timeframe === 'all') return schedule;
-    return schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12));
-  }, [schedule, timeframe]);
-
-  const banks = [
-    { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "https://www.bna.com.ar/Content/img/logo-bna.png" },
-    { n: "Bco. Ciudad", u: "https://www.bancociudad.com.ar/personas/creditos/hipotecarios", l: "https://www.bancociudad.com.ar/Content/img/logo-header.png" },
-    { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/creditos-hipotecarios/uva/", l: "https://www.hipotecario.com.ar/images/logo-hipotecario.png" },
-    { n: "Santander", u: "https://www.santander.com.ar/banco/online/personas/prestamos/hipotecarios-uva", l: "https://www.santander.com.ar/banco/online/static/media/logo-santander.f1a84f33.svg" },
-    { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/prestamos/hipotecarios-uva.html", l: "https://www.bbva.com.ar/favicon.ico" },
-    { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos/hipotecarios-uva", l: "https://www.macro.com.ar/images/default-source/logos/logo-macro.png" },
-  ];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      
-      {/* SIDEBAR IZQUIERDO */}
-      <div className="lg:col-span-4 space-y-6">
-        
-        {/* Panel de Configuración Temporal */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border dark:border-slate-800">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg shadow-indigo-500/20"><CalendarDays className="w-4 h-4" /></div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white">Fijación de Fecha</h3>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-inner mb-4">
-              <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all flex items-center justify-center gap-2 ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500'}`}>
-                <Calendar className="w-3 h-3" /> CALENDARIO
-              </button>
-              <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all flex items-center justify-center gap-2 ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500'}`}>
-                <Clock className="w-3 h-3" /> GENÉRICO
-              </button>
+      <div className="lg:col-span-3 space-y-6">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border dark:border-slate-800 text-left">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg"><CalendarDays className="w-4 h-4" /></div>
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none">Inicio del crédito</h3>
             </div>
-
-            {dateMode === 'calendar' ? (
-              <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Mes de Inicio</label>
-                  <select 
-                    value={startMonth} 
-                    onChange={(e) => setStartMonth(Number(e.target.value))}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-indigo-500 border dark:border-slate-700 dark:text-white transition-all cursor-pointer"
-                  >
-                    {MESES.map((m, i) => <option key={m} value={i}>{m.toUpperCase()}</option>)}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Año de Inicio</label>
-                  <select 
-                    value={startYear} 
-                    onChange={(e) => setStartYear(Number(e.target.value))}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-indigo-500 border dark:border-slate-700 dark:text-white transition-all cursor-pointer"
-                  >
-                    {YEARS_AHEAD.map(y => <option key={y} value={y}>{y}</option>)}
-                  </select>
-                </div>
+            <div className="group relative">
+              <HelpCircle className="w-4 h-4 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+              <div className="absolute right-0 bottom-full mb-2 w-64 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10  normal-case tracking-normal">
+                {"La fecha de inicio permite sincronizar la primera cuota con el dato de inflación proyectado por el REM para ese mes específico. Esto asegura que la curva de actualización de la UVA sea coherente con el calendario fiscal."}
               </div>
-            ) : (
-              <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl flex items-start gap-3 animate-in fade-in">
-                <Info className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
-                <p className="text-[10px] font-medium text-slate-500 leading-relaxed italic">
-                  El modo genérico es ideal para simulaciones abstractas, pero desactiva la inteligencia del REM.
-                </p>
-              </div>
-            )}
+            </div>
           </div>
+          <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
+            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[10px] font-black rounded-lg ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-sky-400' : 'text-slate-500'}`}>CALENDARIO</button>
+            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[10px] font-black rounded-lg ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-sky-400' : 'text-slate-500'}`}>GENÉRICO</button>
+          </div>
+
+          {/* Cartel titilante solicitado */}
+          {dateMode === 'generic' && (
+            <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl flex items-start gap-3 animate-pulse mb-4">
+              <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+              <p className="text-[10px] font-black uppercase tracking-tighter text-rose-600 leading-tight ">El modo genérico desactiva la conexión con el REM.</p>
+            </div>
+          )}
+
+          {dateMode === 'calendar' && (
+            <div className="grid grid-cols-2 gap-3 animate-in fade-in">
+              <select value={startYear} onChange={(e) => setStartYear(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">{[2026, 2027, 2028].map(y => <option key={y} value={y}>{y}</option>)}</select>
+              <select value={startMonth} onChange={(e) => setStartMonth(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">{MESES.map((m, i) => <option key={m} value={i}>{m.toUpperCase()}</option>)}</select>
+            </div>
+          )}
         </div>
 
-        {/* Panel de Parámetros */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border dark:border-slate-800">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg shadow-indigo-500/20"><Settings2 className="w-4 h-4" /></div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white">Parámetros Críticos</h3>
-          </div>
-          
-          <div className="space-y-6">
-            <CurrencyInput label="Monto del Préstamo" value={amount} onChange={setAmount} sublabel="Monto neto a acreditar." />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800">
-                <label className="text-[10px] font-black text-slate-400 block mb-3 uppercase tracking-widest">Plazo: {years} años</label>
-                <input type="range" min="5" max="30" value={years} onChange={(e)=>setYears(Number(e.target.value))} className="w-full accent-indigo-600 cursor-pointer"/>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800">
-                <label className="text-[10px] font-black text-indigo-500 block mb-2 uppercase tracking-widest text-center">Tasa Anual (%)</label>
-                <input type="text" value={rate} onChange={(e) => handleDecimalInput(e.target.value, setRate)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
-              </div>
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border dark:border-slate-800 space-y-6 text-left">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg"><Settings2 className="w-4 h-4" /></div>
+              <h3 className="text-sm font-black uppercase tracking-widest dark:text-white leading-none">Condiciones del crédito</h3>
             </div>
-
-            <div className="pt-6 border-t dark:border-slate-800">
-              <div className="flex items-center justify-between mb-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <TrendingUp className="w-3 h-3"/> Proyección Inflación
-                </label>
-                <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-inner">
-                  <button 
-                    disabled={dateMode === 'generic'} 
-                    onClick={() => setInflationMode('rem')} 
-                    className={`px-3 py-1 text-[9px] font-black rounded-lg transition-all ${inflationMode === 'rem' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-30 cursor-not-allowed' : ''}`}
-                  >REM</button>
-                  <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg transition-all ${inflationMode === 'manual' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
+            <div className="group relative">
+              <HelpCircle className="w-4 h-4 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+              <div className="absolute right-0 bottom-full mb-2 w-64 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10  normal-case tracking-normal">
+                {"Las condiciones finales las indica cada entidad bancaria. Consultá las webs oficiales (en la sección de abajo tenés algunas), para obtener los datos precisos de tu simulación."}
+              </div>
+            </div>  
+          </div>
+          <CurrencyInput label="Monto del Préstamo" value={amount} onChange={setAmount} />
+          <CurrencyInput label="Sueldo Neto Mensual (Opcional)" value={salary} onChange={setSalary} sublabel="Para calcular la afectación de tus ingresos sobre la cuota (Relación Cuota/Ingreso)." />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
+              <label className="text-[10px] font-black text-indigo-500 block mb-2 uppercase tracking-widest">Plazo (Años)</label>
+              <input type="text" value={years} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setYears(v === '' ? '' : Number(v)); }} onBlur={() => { if (!years || years === 0) setYears(20); }} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
+              <label className="text-[10px] font-black text-indigo-500 block mb-2 uppercase tracking-widest">Tasa (TNA %)</label>
+              <input type="text" value={rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+            </div>
+          </div>
+          <div className="pt-4 border-t dark:border-slate-800">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 block  leading-none flex items-center gap-2">
+              <Percent className="w-3 h-3"/> Gastos Mensuales extra
+              <div className="group relative">
+                <HelpCircle className="w-3 h-3 text-slate-300 cursor-help hover:text-rose-500 transition-colors" />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-52 p-3 bg-slate-900 text-[9px] text-white font-medium rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 normal-case tracking-normal leading-tight  border border-white/10">
+                  {"Incluye seguros (vida, incendio) y mantenimiento de cuenta. Es un valor que debería ser informado por la entidad bancaria. Si no se conoce, dejar en 0%."}
                 </div>
               </div>
-
-              {dateMode === 'generic' && (
-                <p className="text-[8px] font-black text-amber-500 uppercase tracking-tighter mb-4 text-center animate-pulse">
-                  ⚠️ REM desactivado: requiere Modo Calendario
-                </p>
-              )}
-
-              <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 min-h-[80px] border dark:border-slate-800 transition-all">
-                {inflationMode === 'manual' ? (
-                  <div className="animate-in fade-in duration-300">
-                    <div className="flex justify-between items-center mb-3 px-1">
-                      <span className="text-[10px] font-black text-orange-500 uppercase tracking-tighter">Estimación Anual (%)</span>
-                      <input type="text" value={inflation} onChange={(e) => handleDecimalInput(e.target.value, setInflation)} className="w-20 p-1 bg-white dark:bg-slate-700 border dark:border-slate-600 rounded text-right font-mono text-sm font-black text-orange-500 focus:ring-1 focus:ring-orange-500 outline-none" />
-                    </div>
-                    <input type="range" min="0" max="200" step="0.5" value={Number(String(inflation).replace(',', '.')) || 0} onChange={(e)=>setInflation(String(e.target.value).replace('.', ','))} className="w-full accent-orange-500" />
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-4 animate-in fade-in duration-300">
-                    <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3">
-                        <p className="text-[10px] font-black text-indigo-500 flex items-center gap-2 uppercase tracking-tighter">
-                          <Zap className="w-3 h-3"/> Estabilización Residual
-                        </p>
-                        <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg">
-                           <button 
-                            onClick={() => setRemStabilizedMode('auto')} 
-                            className={`px-2 py-0.5 text-[8px] font-black rounded ${remStabilizedMode === 'auto' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600' : 'text-slate-400'}`}
-                          >AUTO</button>
-                           <button 
-                            onClick={() => setRemStabilizedMode('custom')} 
-                            className={`px-2 py-0.5 text-[8px] font-black rounded ${remStabilizedMode === 'custom' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600' : 'text-slate-400'}`}
-                          >MANO</button>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      {remStatus === 'error' ? (
-                         <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-center animate-pulse">
-                            <p className="text-[9px] font-black text-red-500 uppercase">Sin conexión al servidor REM</p>
-                         </div>
-                      ) : remStabilizedMode === 'auto' ? (
-                        <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 shadow-sm">
-                            <p className="text-[9px] text-slate-400 font-bold uppercase mb-1 leading-tight">Inercia Post-REM:</p>
-                            <p className="text-xs font-black dark:text-white leading-relaxed">Tras los 36 meses del REM, se mantiene el último dato oficial ({remData.length > 0 ? remData[remData.length-1].valor : '---'}% mensual).</p>
-                        </div>
-                      ) : (
-                        <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border dark:border-slate-700 shadow-sm">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Post-REM Mensual</span>
-                            <span className="text-[11px] font-mono font-black text-indigo-500">{remStabilizedValue}%</span>
-                          </div>
-                          <input type="range" min="0" max="10" step="0.1" value={Number(String(remStabilizedValue).replace(',', '.')) || 0} onChange={(e)=>setRemStabilizedValue(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="pt-6 border-t dark:border-slate-800">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4">
-                <Scale className="w-3 h-3"/> Método de Amortización
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {['french', 'german'].map(s => (
-                  <button key={s} onClick={() => setSystem(s)} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${system === s ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-500/10' : 'border-transparent bg-slate-50 dark:bg-slate-800'}`}>
-                    <span className={`text-[10px] font-black uppercase ${system === s ? 'text-indigo-600' : 'text-slate-500'}`}>{s === 'french' ? 'Francés' : 'Alemán'}</span>
-                    <span className="text-[8px] text-slate-400 font-medium text-center leading-tight">{s === 'french' ? 'Cuota fija UVA' : 'Capital fijo UVA'}</span>
-                  </button>
-                ))}
-              </div>
+            </label>
+            <div className="bg-slate-50 dark:bg-slate-800/80 p-4 rounded-2xl border dark:border-slate-800">
+              <div className="flex justify-between items-center mb-2"><span className="text-[10px] font-black text-rose-500 uppercase ">{extraRate}% del capital</span></div>
+              <input type="range" min="0" max="0.5" step="0.01" value={extraRate} onChange={(e)=>setExtraRate(e.target.value)} className="w-full accent-rose-500 cursor-pointer"/>
             </div>
           </div>
-        </div>
-
-        {/* Info Box sobre REM */}
-        <div className={`rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group transition-all duration-500 ${remStatus === 'error' ? 'bg-slate-800 shadow-slate-900/40' : 'bg-indigo-600 shadow-indigo-500/20'}`}>
-          <div className="absolute -right-4 -top-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
-            {remStatus === 'error' ? <AlertTriangle className="w-32 h-32" /> : <Zap className="w-32 h-32" />}
-          </div>
-          
-          <div className="relative z-10">
+          <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Activity className={`w-3 h-3 ${remStatus === 'available' ? 'text-emerald-400 animate-pulse' : 'text-slate-400'}`} />
-                <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white/60">Sincronización BCRA</h4>
-              </div>
-              <span className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter ${remStatus === 'available' ? 'bg-emerald-500/20 text-emerald-400' : remStatus === 'loading' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'}`}>
-                {remStatus === 'available' ? 'CONECTADO' : remStatus === 'loading' ? 'SYNC...' : 'OFFLINE'}
-              </span>
-            </div>
-
-            {remStatus === 'error' ? (
-              <div className="animate-in slide-in-from-top-2 duration-500">
-                <h3 className="text-lg font-black leading-tight mb-2 uppercase italic tracking-tighter text-red-400">Datos del Mercado no Disponibles</h3>
-                <p className="text-[11px] leading-relaxed text-slate-300 opacity-90 mb-4">
-                  No hemos podido obtener las expectativas del <strong>Banco Central (BCRA)</strong>. Por favor, utiliza el <strong>Modo Manual</strong> para proyectar la inflación por tu cuenta.
-                </p>
-                <a href="mailto:soporte@hipotecar.ai?subject=Error REM" className="flex items-center justify-center gap-2 w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-[10px] font-black transition-all">
-                  <Mail className="w-3 h-3" /> REPORTAR FALLO
-                </a>
-              </div>
-            ) : (
-              <div>
-                <h3 className="text-lg font-black leading-tight mb-2 uppercase italic tracking-tighter">¿Cómo funciona el REM?</h3>
-                <p className="text-[11px] leading-relaxed text-indigo-50 opacity-90 leading-relaxed mb-3">
-                  El <strong>Relevamiento de Expectativas de Mercado (REM)</strong> es una encuesta mensual realizada por el <strong>Banco Central (BCRA)</strong> que promedia las proyecciones de inflación de los principales analistas económicos del país.
-                </p>
-                <p className="text-[11px] leading-relaxed text-indigo-100 italic">
-                  HipotecAR utiliza este dato para proyectar tus cuotas durante los próximos <strong>36 meses</strong>. Pasado ese tiempo, la simulación continúa según tu configuración de estabilización.
-                </p>
-                <div className="mt-4 pt-4 border-t border-white/10">
-                   <p className="text-[10px] font-black text-indigo-200 uppercase tracking-widest flex items-center gap-2">
-                     <AlertCircle className="w-3 h-3" /> Requisito Temporal
-                   </p>
-                   <p className="text-[10px] text-white/70 mt-1 italic">
-                     El REM requiere activar el <strong>Modo Calendario</strong> para asociar las proyecciones a meses específicos y garantizar la precisión técnica del cálculo.
-                   </p>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest  flex items-center gap-2 leading-none"><Scale className="w-3 h-3"/> Sistema de Amortización</label>
+              <div className="group relative">
+                <HelpCircle className="w-4 h-4 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+                <div className="absolute right-0 bottom-full mb-2 w-64 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10  normal-case tracking-normal">
+                  <b className="text-indigo-400">Francés:</b> Cuota total constante. Al principio pagás más intereses y poco capital. Es el más común en créditos hipotecarios UVA.<br/><br/>
+                  <b className="text-indigo-400">Alemán:</b> Amortización de capital constante. La cuota total empieza más alta pero baja mes a mes.
                 </div>
               </div>
-            )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => setSystem('french')} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${system === 'french' ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-500/10' : 'border-transparent bg-slate-50 dark:bg-slate-800'}`}><span className={`text-xs font-black uppercase ${system === 'french' ? 'text-indigo-600' : 'text-slate-500'}`}>Francés</span></button>
+              <button onClick={() => setSystem('german')} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${system === 'german' ? 'border-amber-400 bg-amber-50 dark:bg-amber-400/10' : 'border-transparent bg-slate-50 dark:bg-slate-800'}`}><span className={`text-xs font-black uppercase ${system === 'german' ? 'text-amber-500' : 'text-slate-500'}`}>Alemán</span></button>
+            </div>
+          </div>
+          <div className="pt-4 border-t dark:border-slate-800">
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest  flex items-center gap-2">
+                <TrendingUp className="w-3 h-3"/> Inflación Proyectada
+                <div className="group relative">
+                  <HelpCircle className="w-3.5 h-3.5 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+                  <div className="absolute left-0 bottom-full mb-2 w-72 p-4 bg-slate-900 text-[10px] text-white font-medium rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 leading-relaxed border border-white/10  normal-case tracking-normal">
+                    <b className="text-indigo-400">REM:</b> Relevamiento de Expectativas de Mercado (BCRA). Utiliza el consenso dinámico de más de 40 consultoras y bancos que estiman un valor distinto para cada mes. El REM provee proyecciones de expertos para los primeros 36 meses. <br/><br/> 
+                    Para el tiempo restante, ProyectAR aplica una "Inercia": podés usar el último dato del REM de forma constante (Modo Auto) o setear un valor propio (Modo Fija). <br/><br/>
+                    <b className="text-indigo-400">Manual:</b> Ignora el mercado y aplica una misma tasa fija todos los meses. Es útil para proyectar escenarios lineales de largo plazo.
+                  </div>
+                </div>
+              </label>
+              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'rem' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>REM</button>
+                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'manual' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
+              </div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
+              {inflationMode === 'manual' ? (
+                <div className="animate-in fade-in space-y-2">
+                    <div className="flex justify-between items-center"><span className="text-[10px] font-black text-indigo-500 uppercase">Tasa fija anual estimada</span><span className="text-[11px] font-mono font-black dark:text-white">{inflation}%</span></div>
+                    <input type="range" min="0" max="100" step="0.5" value={Number(String(inflation).replace(',', '.')) || 0} onChange={(e)=>setInflation(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4 animate-in fade-in">
+                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[10px] font-black text-indigo-500 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'auto' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'custom' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>FIJA</button></div></div>
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[10px] font-black dark:text-white uppercase leading-tight ">
+                    {remStabilizedMode === 'auto' ? `Aplicando ${(remData && remData.length > 0 ? remData[remData.length-1].valor : '---')}% mensual` : 
+                      <div>
+                        <div className="flex justify-between mb-1"><span>Tasa Fija mensual estimada:</span><span>{remStabilizedValue}%</span></div>
+                        <input type="range" min="0" max="10" step="0.1" value={Number(String(remStabilizedValue).replace(',', '.')) || 0} onChange={(e)=>setRemStabilizedValue(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
+                      </div>
+                    }
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Oferta Bancaria */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border dark:border-slate-800 shadow-sm">
-          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Landmark className="w-3 h-3"/> Oferta Bancaria</h4>
-          <p className="text-[9px] text-slate-400 mb-6 italic leading-relaxed font-medium">Accede a las webs oficiales para consultar la Tasa Anual vigente y completa los parámetros superiores.</p>
-          <div className="grid grid-cols-3 gap-3">
-            {banks.map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
-          </div>
-        </div>
-
-        {/* Donaciones */}
-        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden group">
-          <div className="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
-            <Heart className="w-32 h-32 fill-current" />
-          </div>
-          <div className="relative z-10">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100 mb-3 italic">Proyecto Independiente</h4>
-            <p className="text-[11px] leading-relaxed mb-6 opacity-90">
-              HipotecAR es una herramienta <strong>gratuita</strong>. Tu donación nos ayuda a mantener los servidores y seguir desarrollando herramientas financieras de acceso libre.
-            </p>
-            <a href="https://www.mercadopago.com.ar/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 bg-white text-emerald-600 rounded-2xl text-[11px] font-black transition-all shadow-lg hover:scale-[1.03] active:scale-95 group">
-              <Heart className="w-4 h-4 fill-emerald-600 group-hover:animate-pulse" /> COLABORAR CON EL PROYECTO
-            </a>
+        <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-xl space-y-5 text-left text-[11px]">
+          <h4 className="font-black uppercase text-slate-800 dark:text-white flex items-center gap-2"><Globe className="w-3 h-3 text-indigo-500" /> Webs de los principales bancos argentinos</h4>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/bconacion.png" },
+              { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
+              { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" },
+              { n: "Santander", u: "https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
+              { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l: "/logos/bbva.png" },
+              { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" }
+            ].map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
           </div>
         </div>
       </div>
-
-      {/* CONTENIDO PRINCIPAL */}
-      <div className="lg:col-span-8 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <SummaryCard title="Cuota Inicial" value={money(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" subtitle="Primer vencimiento proyectado" />
-          <SummaryCard title="Carga Intereses" value={money(totals.totalInteres)} icon={TrendingUp} colorClass="orange" subtitle={`Total a lo largo de ${years} años`} />
-          <SummaryCard title="Relación C/K" value={`${((totals.cuotaInicial / amount) * 100).toFixed(2)}%`} icon={PieChart} colorClass="emerald" subtitle="Cuota inicial vs Capital" />
+      
+      <div className="lg:col-span-9 space-y-8 min-w-0">
+        <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-4 w-full">
+          <SummaryCard title="Cuota Inicial" value={money(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" subtitle="Vencimiento 1" />
+          <SummaryCard title="Carga Intereses" value={money(totals.totalIntereses)} icon={TrendingUp} colorClass="orange" subtitle="Financiamiento" />
+          <SummaryCard title="Afectación (RCI)" value={salary > 0 ? `${((totals.cuotaInicial / salary) * 100).toFixed(1)}%` : "--- %"} icon={Activity} colorClass={salary > 0 && (totals.cuotaInicial / salary) > 0.3 ? "rose" : "emerald"} subtitle="Puede ser limitada por el banco." />
+          <SummaryCard title="Pago Final" value={money(totals.totalPagadoFinal)} icon={CheckCircle2} colorClass="sky" subtitle="Costo Total" />
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border dark:border-slate-800 shadow-sm relative overflow-visible">
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border dark:border-slate-800 shadow-sm relative overflow-hidden text-left">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <div>
-              <h3 className="font-black text-xl tracking-tighter uppercase italic text-slate-800 dark:text-white">Dinámica de Pagos Proyectada</h3>
-              <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">
-                {inflationMode === 'rem' ? `Basado en REM (BCRA) ${remStabilizedMode === 'auto' ? '+ Inercia' : '+ Estabilización'}` : `Cálculo basado en inflación manual`}
-              </p>
-            </div>
+            <h3 className="font-black text-2xl tracking-tighter uppercase dark:text-white  leading-none">Dinámica de Pagos Proyectada</h3>
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner">
-              {['2y', '5y', '10y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${timeframe === t ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 scale-105' : 'text-slate-400 opacity-60 hover:opacity-100'}`}>
-                  {t === 'all' ? 'FULL' : t.toUpperCase()}
+              {['2y', '3y', '5y', '10y', 'all'].map(t => (
+                <button key={t} onClick={()=>setTimeframe(t)} className={`px-6 py-2 rounded-xl text-[10px] font-black transition-all ${timeframe === t ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                  {t === 'all' ? 'TODO' : t.replace('y', ' AÑOS')}
                 </button>
               ))}
             </div>
           </div>
-          
-          <div className="h-80 w-full mb-8">
-            <CompositionChart data={filteredData} dateMode={dateMode} />
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 pt-6 border-t dark:border-slate-800">
-            <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 bg-indigo-500 rounded-full shadow-sm shadow-indigo-500/50"/><span className="text-[10px] font-black text-slate-500 uppercase">Capital</span></div>
-            <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 bg-orange-400 rounded-full shadow-sm shadow-orange-400/50"/><span className="text-[10px] font-black text-slate-500 uppercase">Interés</span></div>
-          </div>
+          <div className="h-[480px] w-full mb-8"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} /></div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden">
-          <div className="p-6 border-b dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/10 rounded-xl"><FileText className="w-5 h-5 text-indigo-500" /></div>
-              <div>
-                <h3 className="font-black uppercase text-sm tracking-widest dark:text-white">Reporte de Sensibilidad</h3>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter italic">Evolución patrimonial detallada</p>
-              </div>
-            </div>
-            <button onClick={exportarAnalisisExcel} className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3 bg-[#217346] hover:bg-[#1a5c38] text-white rounded-2xl text-[11px] font-black transition-all shadow-lg active:scale-95 group">
-              <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform"/> EXPORTAR (.CSV)
-            </button>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
+          <div className="p-8 flex flex-col sm:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
+            <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2  leading-none"><FileText className="w-4 h-4 text-indigo-500"/> Tabla de Amortización</span>
+            <button onClick={exportToCSV} className="w-full sm:w-auto px-10 py-4 bg-indigo-600 text-white font-black rounded-xl shadow-xl hover:scale-105 transition-all uppercase tracking-widest leading-none"><Download className="inline w-4 h-4 mr-2" /> Exportar CSV</button>
           </div>
-          <div className="max-h-[850px] overflow-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[10px] border-b dark:border-slate-800 z-10">
-                <tr><th className="p-5 text-center">Periodo</th><th className="p-5 text-center">Cuota Total</th><th className="p-5 text-center">Interés</th><th className="p-5 text-center">Capital</th><th className="p-5 text-center">Saldo</th></tr>
+          <div className="max-h-[850px] overflow-auto w-full">
+            <table className="w-full text-left border-collapse min-w-[1000px]">
+              <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[10px] border-b dark:border-slate-800 z-10 shadow-sm">
+                <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Gastos</th><th className="p-4 text-center">Saldo</th></tr>
               </thead>
-              <tbody className="divide-y dark:divide-slate-800">
+              <tbody className="divide-y dark:divide-slate-800 text-center">
                 {schedule.map((d) => (
-                  <tr key={d.mes} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group text-center">
-                    <td className="p-5 font-bold text-slate-800 dark:text-slate-200">{d.label}</td>
-                    <td className="p-5 font-black text-slate-900 dark:text-white">{money(d.cuotaTotal)}</td>
-                    <td className="p-5 text-orange-500 font-bold">{money(d.interes)}</td>
-                    <td className="p-5 text-indigo-500 font-bold">{money(d.principal)}</td>
-                    <td className="p-5 text-slate-400 font-mono italic opacity-70 group-hover:opacity-100">{money(d.saldo)}</td>
+                  <tr key={d.mes} className="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="p-4 font-bold text-slate-800 dark:text-slate-200">{d.label}</td>
+                    <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
+                    <td className="p-4 font-black text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
+                    <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
+                    <td className="p-4 text-indigo-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
+                    <td className="p-4 text-rose-500 font-bold opacity-80 whitespace-nowrap">{money(d.gastos)}</td>
+                    <td className="p-4 text-slate-800 dark:text-slate-100 font-black font-mono  whitespace-nowrap">{money(d.saldo)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -695,184 +461,218 @@ function MortgageCalculator({ dolarOficial, uvaValue }) {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="lg:col-span-12 bg-white dark:bg-slate-900 border-t dark:border-slate-800 mt-20 py-10 rounded-3xl px-10">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8 border-b dark:border-slate-800 pb-8">
-          <div className="flex items-center gap-4">
-            <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl"><Calculator className="w-5 h-5 text-indigo-500" /></div>
-            <div className="flex flex-col">
-              <span className="font-black text-lg tracking-tighter uppercase italic dark:text-white">HipotecAR</span>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Soberanía Financiera</span>
-            </div>
-          </div>
-          <div className="flex gap-6">
-            <a href="#" className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 hover:text-indigo-500 transition-colors"><Twitter className="w-5 h-5" /></a>
-            <a href="#" className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 hover:text-indigo-500 transition-colors"><Globe className="w-5 h-5" /></a>
-            <a href="#" className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 hover:text-indigo-500 transition-colors"><Github className="w-5 h-5" /></a>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 gap-4">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center md:text-left">Argentina 2026 • Libertad Financiera</p>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center md:text-right">© {new Date().getFullYear()} HipotecAR - Todos los derechos reservados</p>
-        </div>
-      </footer>
     </div>
   );
 }
 
-function RentCalculator() {
-  const [rentAmount, setRentAmount] = useState(450000);
-  const [periodicity, setPeriodicity] = useState(3);
-  const [annualInflation, setAnnualInflation] = useState("50"); 
-  const rentSchedule = useMemo(() => {
+// --- VISTA ALQUILERES ---
+function RentCalculator({ remData, remStatus }) {
+  const [rentAmount, setRentAmount] = useState(0);
+  const [expensesAmount, setExpensesAmount] = useState(0); 
+  const [periodicity, setPeriodicity] = useState(4);
+  const [durationYears, setDurationYears] = useState(2); 
+  const [inflationMode, setInflationMode] = useState('rem');
+  const [manualInf, setManualInf] = useState("0"); 
+  const [adjustExpenses, setAdjustExpenses] = useState(true);
+
+  const schedule = useMemo(() => {
+    if (rentAmount === 0 && expensesAmount === 0) return [];
     const data = [];
+    const totalMonths = durationYears * 12;
     let currentRent = rentAmount;
-    const periodRate = Math.pow(1 + (Number(String(annualInflation).replace(',','.'))/100), periodicity/12)-1;
-    for(let i=1; i<=24; i++) {
-      if(i>1 && (i-1)%periodicity === 0) currentRent *= (1+periodRate);
-      data.push({ month: i, rent: currentRent });
+    let currentExpenses = expensesAmount;
+    let accumulatedFactor = 1;
+    const start = new Date();
+    for (let i = 1; i <= totalMonths; i++) {
+      const currentDate = new Date(start.getFullYear(), start.getMonth() + i - 1, 1);
+      let monthlyRate;
+      if (inflationMode === 'rem' && remStatus === 'available') {
+        const match = remData.find(d => d.mes === (currentDate.getMonth() + 1) && d.año === currentDate.getFullYear());
+        monthlyRate = match ? match.valor / 100 : (remData && remData.length > 0 ? remData[remData.length-1]?.valor / 100 : 0.025);
+      } else { 
+        monthlyRate = Math.pow(1 + (Number(manualInf) / 100), 1/12) - 1; 
+      }
+      if (i > 1 && adjustExpenses) { currentExpenses *= (1 + monthlyRate); }
+      accumulatedFactor *= (1 + monthlyRate);
+      if (i > 1 && (i - 1) % periodicity === 0) { currentRent *= accumulatedFactor; accumulatedFactor = 1; }
+      data.push({
+        mes: i, 
+        label: `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}`,
+        shortDate: `${MESES[currentDate.getMonth()]} ${String(currentDate.getFullYear()).slice(-2)}`,
+        cuotaTotal: currentRent + currentExpenses, 
+        principal: currentRent, 
+        interes: currentExpenses, 
+        gastos: 0,
+        source: inflationMode === 'rem' ? 'REM' : 'ALQUILER'
+      });
     }
     return data;
-  }, [rentAmount, periodicity, annualInflation]);
+  }, [rentAmount, expensesAmount, periodicity, durationYears, inflationMode, manualInf, remData, remStatus, adjustExpenses]);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500">
-      <div className="lg:col-span-4 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border dark:border-slate-800 space-y-8">
-        <CurrencyInput label="Alquiler Base" value={rentAmount} onChange={setRentAmount} colorClass="emerald" />
-        <div>
-          <label className="text-[10px] font-black uppercase text-slate-400 mb-3 block tracking-widest">Frecuencia de ajuste (meses)</label>
-          <select value={periodicity} onChange={e => setPeriodicity(Number(e.target.value))} className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl font-bold dark:text-white outline-none focus:ring-2 focus:ring-emerald-500">
-            <option value={3}>3 meses</option><option value={4}>4 meses</option><option value={6}>6 meses</option><option value={12}>Anual</option>
-          </select>
+      <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border dark:border-slate-800 space-y-8 text-left">
+        <CurrencyInput label="Alquiler Inicial" value={rentAmount} onChange={setRentAmount} />
+        <div className="space-y-4">
+          <CurrencyInput label="Expensas Iniciales" value={expensesAmount} onChange={setExpensesAmount} />
+          <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border dark:border-slate-800">
+            <span className="text-[10px] font-black uppercase text-slate-500 ">¿Ajustar Expensas por inflación? (Mensualmente)</span>
+            <button onClick={() => setAdjustExpenses(!adjustExpenses)} className={`w-12 h-6 rounded-full transition-all relative ${adjustExpenses ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}>
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${adjustExpenses ? 'left-7' : 'left-1'}`} />
+            </button>
+          </div>
         </div>
         <div>
-          <label className="text-[10px] font-black uppercase text-slate-400 mb-3 block tracking-widest">Inflación Estimada (%)</label>
-          <input type="range" min="0" max="250" value={annualInflation} onChange={(e) => setAnnualInflation(e.target.value)} className="w-full accent-emerald-500" />
-          <p className="text-right font-mono font-bold text-emerald-500 mt-2">{annualInflation}% Anual</p>
+          <label className="text-[10px] font-black uppercase text-slate-400 mb-4 block  leading-none">Duración del Contrato de alquiler</label>
+          <div className="grid grid-cols-3 gap-2">
+            {[1, 2, 3].map(y => (
+              <button key={y} onClick={() => setDurationYears(y)} className={`py-3 rounded-xl text-xs font-black transition-all ${durationYears === y ? 'bg-emerald-500 text-white shadow-lg' : 'bg-slate-50 dark:bg-slate-800 text-slate-500'}`}>
+                {y} {y===1?'AÑO':'AÑOS'}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="lg:col-span-8 bg-white dark:bg-slate-900 p-8 rounded-3xl border dark:border-slate-800 shadow-sm">
-        <h3 className="font-black text-xl mb-10 uppercase italic dark:text-white">Proyección de Alquiler</h3>
-        <div className="h-80">
-          <CompositionChart 
-            // BUG FIX: Mapping data with 'mes' and a dummy 'uva' to avoid crashes in the shared component
-            data={rentSchedule.map(r => ({ 
-              ...r, 
-              cuotaTotal: r.rent, 
-              principal: r.rent, 
-              interes: 0, 
-              label: `Mes ${r.month}`,
-              mes: r.month,
-              uva: 0 
-            }))} 
-            dateMode="generic" 
-          />
+        <div>
+          <label className="text-[10px] font-black uppercase text-slate-400 mb-4 block  leading-none">Recurrencia del Ajuste del Alquiler (Meses)</label>
+          <div className="grid grid-cols-3 gap-2">
+            {[3, 4, 6].map(m => (
+              <button key={m} onClick={() => setPeriodicity(m)} className={`py-3 rounded-xl text-xs font-black transition-all ${periodicity === m ? 'bg-emerald-500 text-white shadow-lg' : 'bg-slate-50 dark:bg-slate-800 text-slate-500'}`}>
+                {m}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
-  );
-}
+        <div className="pt-6 border-t dark:border-slate-800">
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-[10px] font-black uppercase text-slate-400 ">Inflación Proyectada</label>
+            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+              <button disabled={remStatus === 'error'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded ${inflationMode === 'rem' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>REM</button>
+              <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded ${inflationMode === 'manual' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
+            </div>
+          </div>
 
-function ValuationCalculator({ dolarOficial }) {
-  const [rentARS, setRentARS] = useState(500000);
-  const [propertyUSD, setPropertyUSD] = useState(100000);
-  const yieldP = useMemo(() => ((rentARS / dolarOficial * 12) / propertyUSD) * 100, [rentARS, propertyUSD, dolarOficial]);
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in zoom-in-95 duration-500 max-w-5xl mx-auto">
-      <div className="bg-white dark:bg-slate-900 p-10 rounded-[32px] shadow-xl border dark:border-slate-800 space-y-10">
-        <CurrencyInput label="Alquiler Mensual (ARS)" value={rentARS} onChange={setRentARS} />
-        <div>
-          <label className="text-[10px] font-black uppercase text-slate-400 mb-3 block tracking-widest">Valor Venta (USD)</label>
-          <div className="relative">
-            <input type="number" value={propertyUSD} onChange={e => setPropertyUSD(Number(e.target.value))} className="w-full p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl font-mono text-4xl font-black outline-none dark:text-white" />
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-bold">USD</div>
+          {/* Nota REM solicitada para alquileres */}
+          {inflationMode === 'rem' && (
+            <p className="text-[9px] text-slate-400 mt-2 mb-4  px-1 leading-tight">
+              Nota: El REM proyecta los próximos 36 meses, cubriendo la totalidad de este contrato.
+            </p>
+          )}
+
+          {inflationMode === 'manual' && (
+            <div className="animate-in fade-in space-y-2">
+               <div className="flex justify-between items-center"><span className="text-[10px] font-black text-emerald-500 uppercase">Tasa fija anual estimada</span><span className="text-[11px] font-mono font-black dark:text-white">{manualInf}%</span></div>
+               <input type="range" min="0" max="100" step="1" value={manualInf} onChange={(e)=>setManualInf(e.target.value)} className="w-full accent-emerald-500 cursor-pointer" />
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="lg:col-span-9 space-y-8">
+        <SummaryCard title="Costo Total Contrato" value={money(schedule.reduce((acc,c)=>acc+c.cuotaTotal,0))} icon={CheckCircle2} colorClass="sky" subtitle="Alquiler + Expensas" />
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border dark:border-slate-800 shadow-sm relative overflow-hidden text-left">
+          <h3 className="font-black text-2xl mb-8 uppercase dark:text-white  leading-none">Proyección Alquiler</h3>
+          <div className="h-[450px] w-full">
+            <CompositionChart data={schedule} dateMode="calendar" showRemMarker={inflationMode === 'rem'} isRent={true} />
           </div>
         </div>
       </div>
-      <div className="flex flex-col justify-center items-center p-12 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[32px] shadow-2xl text-white text-center">
-        <h3 className="text-7xl font-black mb-4 tracking-tighter">{yieldP.toFixed(2)}%</h3>
-        <p className="text-xl font-bold uppercase tracking-widest opacity-80">Cap Rate Anual</p>
-      </div>
     </div>
   );
 }
 
+// --- APP COMPONENT PRINCIPAL ---
 export default function App() {
   const [view, setView] = useState('mortgage'); 
   const [darkMode, setDarkMode] = useState(true);
-  const [dolarOficial, setDolarOficial] = useState(1050);
-  const [uvaValue, setUvaValue] = useState(1320);
+  const [dolarOficial, setDolarOficial] = useState(0);
+  const [uvaValue, setUvaValue] = useState(0);
+  const [lastUpdate, setLastUpdate] = useState("");
+  const [remDateLabel, setRemDateLabel] = useState(""); 
+  const [remData, setRemData] = useState([]);
+  const [remStatus, setRemStatus] = useState('loading');
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
+    document.title = "ProyectAR | Soberanía Financiera";
     const fetchData = async () => {
       try {
-        const [resDolar, resUva] = await Promise.all([
-          fetch('https://dolarapi.com/v1/dolares/oficial'),
-          fetch('https://api.argentinadatos.com/v1/finanzas/indices/uva')
-        ]);
-        if (resDolar.ok) {
-          const dataDolar = await resDolar.json();
-          setDolarOficial(dataDolar.venta || 1050);
+        const resMarket = await fetch(`/market/market_status.json?v=${new Date().getTime()}`);
+        if (resMarket.ok) {
+          const m = await resMarket.json();
+          setDolarOficial(m.dolar_oficial); setUvaValue(m.uva_value); setLastUpdate(m.last_update);
         }
-        if (resUva.ok) {
-          const dataUva = await resUva.json();
-          if (Array.isArray(dataUva) && dataUva.length > 0) {
-            setUvaValue(dataUva[dataUva.length - 1].valor || 1320);
-          }
-        }
-      } catch (error) { console.error(error); } finally { setLoading(false); }
+        const resRem = await fetch(`/REM/processed/proyeccion_inflacion.csv?v=${new Date().getTime()}`);
+        if (resRem.ok) {
+          const text = await resRem.text();
+          const rows = text.split('\n').slice(1);
+          const parsed = rows.map(r => r.trim()).filter(r => r.length > 0).map(r => {
+            const [m, a, v] = r.split(';');
+            return { mes: parseInt(m), año: parseInt(a), valor: parseFloat(v.replace(',', '.')) };
+          });
+          setRemData(parsed); setRemStatus('available');
+          if (parsed.length > 0) setRemDateLabel(`${MESES[parsed[0].mes - 1]} ${parsed[0].año}`);
+        } else { setRemStatus('error'); }
+      } catch (e) { console.error(e); setRemStatus('error'); } finally { setLoading(false); }
     };
     fetchData();
   }, []);
-
   return (
     <div className={darkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-500 flex flex-col">
-        
-        {/* Ticker de Mercados */}
-        <div className="bg-slate-900 text-white py-2.5 overflow-hidden border-b border-white/5 relative z-40">
-          <div className="max-w-7xl mx-auto px-6 flex justify-end gap-12 items-center text-[10px] font-black tracking-widest uppercase">
-            <div className="flex items-center gap-3">DÓLAR OFICIAL <span className="text-emerald-400 font-mono text-sm tracking-tighter">${dolarOficial}</span></div>
-            <div className="flex items-center gap-3">UVA <span className="text-indigo-400 font-mono text-sm tracking-tighter">${uvaValue}</span></div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors flex flex-col">
+        <div className="bg-slate-900 text-white py-3 border-b border-white/5 relative z-40 px-6 md:px-10">
+          <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-2 text-[10px] font-black tracking-widest uppercase  text-slate-500">
+            <div className="flex items-center gap-6 leading-none">
+              <div className="flex items-center gap-2">
+                <Globe className="w-3 h-3" /> Fuentes: <a href="https://dolarapi.com" target="_blank" className="hover:text-emerald-400">DolarAPI</a> • <a href="https://argentinadatos.com" target="_blank" className="hover:text-indigo-400">ArgentinaDatos</a>
+              </div>
+              <span className="hidden md:inline text-slate-700">|</span>
+              <span className="hidden sm:inline">REM: {remDateLabel || '---'}</span>
+            </div>
+            <div className="flex gap-12 items-center font-mono leading-none">
+              <div>DÓLAR OFICIAL <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
+              <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
+            </div>
           </div>
         </div>
-
-        {/* Navegación */}
-        <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-b dark:border-slate-800 sticky top-0 z-40 shadow-sm">
-          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-indigo-600 text-white p-2.5 rounded-2xl shadow-xl"><Calculator className="w-6 h-6" /></div>
-              <div className="flex flex-col">
-                <span className="font-black text-2xl tracking-tighter uppercase italic leading-none">HipotecAR</span>
-                <span className="text-[10px] font-black tracking-widest text-indigo-500/70 uppercase">Intelligence v0.2.9</span>
-              </div>
+        <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 h-20 md:h-28 flex items-center justify-between px-6 md:px-10 shadow-sm">
+          <div className="flex items-center gap-3 md:gap-5">
+            <div className="bg-indigo-600 text-white p-3 md:p-4 rounded-2xl shadow-xl shadow-indigo-600/30"><Calculator className="w-6 h-6 md:w-8 md:h-8" /></div>
+            <div className="flex flex-col text-left"><span className="font-black text-xl md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-sky-400">AR</span></span><span className="text-[11px] font-black tracking-[0.2em] text-slate-500 uppercase mt-2 md:mt-3 opacity-60  leading-none">v0.9.6</span></div>
+          </div>
+          <div className="flex items-center gap-3 md:gap-10">
+            <div className="flex gap-2 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-2xl border dark:border-slate-700 shadow-inner">
+              <NavBtn active={view === 'mortgage'} onClick={() => setView('mortgage')} icon={<Home />} label="CRÉDITOS" color="indigo"/>
+              <NavBtn active={view === 'rent'} onClick={() => setView('rent')} icon={<ArrowRightLeft />} label="ALQUILERES" color="emerald"/>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="hidden lg:flex gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner">
-                <NavBtn active={view === 'mortgage'} onClick={() => setView('mortgage')} icon={<Home className="w-4 h-4"/>} label="CRÉDITOS" color="indigo"/>
-                <NavBtn active={view === 'rent'} onClick={() => setView('rent')} icon={<ArrowRightLeft className="w-4 h-4"/>} label="ALQUILERES" color="emerald"/>
-                <NavBtn active={view === 'valuation'} onClick={() => setView('valuation')} icon={<Building2 className="w-4 h-4"/>} label="TASACIONES" color="violet"/>
-              </div>
-              <button onClick={() => setDarkMode(!darkMode)} className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700">
-                {darkMode ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
-              </button>
-            </div>
+            <button onClick={() => setDarkMode(!darkMode)} className="p-3 md:p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 shadow-md active:scale-90">
+              {darkMode ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
+            </button>
           </div>
         </nav>
-
-        {/* Contenido Principal */}
-        <main className="max-w-7xl mx-auto p-6 md:p-10 flex-grow w-full">
+        <main className="max-w-[1800px] mx-auto p-6 md:p-10 flex-grow w-full">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-40 gap-4"><div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Sincronizando mercados...</p></div>
+            <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6">
+              <div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div>
+              <p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse  text-center">Sincronizando Mercados...</p>
+            </div>
           ) : (
-            <div className="animate-in fade-in zoom-in-95 duration-700">
-              {view === 'mortgage' && <MortgageCalculator dolarOficial={dolarOficial} uvaValue={uvaValue} />}
-              {view === 'rent' && <RentCalculator />}
-              {view === 'valuation' && <ValuationCalculator dolarOficial={dolarOficial} />}
+            <div className="animate-in fade-in zoom-in-95 duration-1000">
+              {view === 'mortgage' ? <MortgageCalculator uvaValue={uvaValue} remData={remData} remStatus={remStatus} /> : <RentCalculator remData={remData} remStatus={remStatus} />}
             </div>
           )}
         </main>
+        <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="flex-1 text-center lg:text-left">
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{"República Argentina - 2026"}</p>
+          </div>
+          <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60">
+            <p className="text-[10px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400">
+              <span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR es una herramienta de simulación informativa. Los resultados son proyecciones basadas en datos históricos y estimaciones de mercado (REM - BCRA), no garantizan resultados futuros."}
+            </p>
+          </div>
+          <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[11px] font-bold text-slate-400 uppercase opacity-50 ">
+            <a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors"><Github className="w-4 h-4" /> @MaxiNavarro97</a>
+            <p>@maxinavarro1997@gmail.com</p>
+          </div>
+        </footer>
       </div>
     </div>
   );
