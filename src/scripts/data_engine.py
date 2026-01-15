@@ -5,7 +5,7 @@ import json
 from bs4 import BeautifulSoup
 from pathlib import Path
 import urllib3
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 # Desactivamos advertencias de certificados (el BCRA a veces tiene temas de SSL)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -24,8 +24,12 @@ HEADERS = {
 def fetch_market_data():
     """Captura el Dólar Oficial y el Índice UVA de APIs externas."""
     print("📡 Capturando Dólar y UVA de fuentes externas...")
+    
+    # Definimos el offset de Argentina (UTC-3)
+    tz_arg = timezone(timedelta(hours=-3))
+    
     data = {
-        "last_update": datetime.now().isoformat(),
+        "last_update": datetime.now(tz_arg).isoformat(), # <--- AHORA CON ZONA HORARIA
         "dolar_oficial": 0,
         "uva_value": 0,
         "uva_date": ""
@@ -158,12 +162,16 @@ def parseador_rem_python(df_input):
     return resultado_final
 
 def main():
-    print(f"🚀 Iniciando Data Engine de ProyectAR - {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    # 1. Definimos la zona horaria de Argentina (UTC-3)
+    tz_arg = timezone(timedelta(hours=-3))
     
-    # 1. Mercado (Dólar y UVA) - Siempre intentamos actualizarlo
+    # 2. Aplicamos la zona horaria al print inicial
+    print(f"🚀 Iniciando Data Engine de ProyectAR - {datetime.now(tz_arg).strftime('%d/%m/%Y %H:%M')}")
+    
+    # 3. Mercado (Dólar y UVA) - Siempre intentamos actualizarlo
     fetch_market_data()
     
-    # 2. REM (Inflación Proyectada)
+    # 4. REM (Inflación Proyectada)
     if descargar_rem():
         try:
             df_raw = pd.read_excel(RUTA_RAW, sheet_name="Cuadros de resultados", header=5, nrows=13, usecols="B:M")
