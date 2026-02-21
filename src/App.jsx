@@ -138,7 +138,7 @@ function ChartModal({ isOpen, onClose, children, title }) {
         <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-tighter">{title}</h3>
         <button onClick={onClose} className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"><X className="w-6 h-6" /></button>
       </div>
-      <div className="flex-grow w-full h-full bg-slate-900/50 rounded-3xl border border-white/5 p-4 md:p-8 flex items-center justify-center overflow-hidden">
+      <div className="flex-grow w-full h-full bg-slate-900/50 rounded-3xl border border-white/5 p-4 md:p-8 flex items-center justify-center">
         {children}
       </div>
     </div>
