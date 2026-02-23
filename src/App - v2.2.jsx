@@ -181,10 +181,10 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
            </p>
            
            <div className="flex flex-col gap-3 mb-6">
-              <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              <a href="https://cafecito.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
                   <Coffee className="w-4 h-4"/> Invitar un Cafecito
               </a>
-              <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              <a href="https://link.mercadopago.com.ar/tu_link" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
                   <Handshake className="w-4 h-4"/> Aportar por Mercado Pago
               </a>
            </div>
@@ -1627,8 +1627,8 @@ export default function App() {
               <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mb-2">¿Te sirvió ProyectAR?</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-2xl mx-auto">Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.</p>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
-                 <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
-                 <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
+                 <a href="https://cafecito.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
+                 <a href="https://mercadopago.com.ar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
               </div>
            </div>
         </div>
