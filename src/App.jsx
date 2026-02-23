@@ -1581,6 +1581,20 @@ function FAQ() {
       a: <><p>Son préstamos hipotecarios o personales donde el capital que pedís prestado se convierte a <b>Unidades de Valor Adquisitivo (UVA)</b>. La UVA es una unidad de medida creada por el Banco Central que se actualiza diariamente según el índice de inflación (CER).</p><p>Esto significa que tanto el dinero que debés como tu cuota mensual se ajustan al ritmo de la inflación. La ventaja principal es que la cuota inicial y los requisitos de ingresos suelen ser mucho más bajos que en un crédito tradicional a tasa fija.</p></>
     },
     {
+      q: "¿De dónde sale el valor de la UVA y a qué equivale?",
+      a: <>
+        <p>La <b>UVA (Unidad de Valor Adquisitivo)</b> fue creada por el BCRA en 2016. Su valor inicial se fijó con una equivalencia muy clara: <b>1.000 UVAs representaban el costo promedio de construir 1 m² de vivienda</b> (tomando como referencia precios de Buenos Aires, Córdoba, Rosario, Salta y el Litoral).</p>
+        <p>Hoy en día, el valor de la UVA se ajusta <b>diariamente</b> mediante el índice CER (Coeficiente de Estabilización de Referencia), el cual sigue de cerca a la inflación oficial.</p>
+        <div className="p-4 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800 rounded-xl mt-3 space-y-2">
+          <p className="text-sm"><b>¿Mi cuota en UVAs es siempre la misma?</b></p>
+          <ul className="list-disc pl-5 text-xs md:text-sm">
+            <li><b>Cuota en UVA:</b> Solo se mantiene constante durante todo el crédito si elegís el <b>Sistema Francés</b>. En el Sistema Alemán, tu cuota en UVAs irá bajando mes a mes.</li>
+            <li><b>Cuota en Pesos (ARS):</b> Nunca es constante. Cambia todos los meses porque se calcula multiplicando tu cuota en UVAs por el valor diario de la UVA al momento de pagar.</li>
+          </ul>
+        </div>
+      </>
+    },
+    {
       q: "¿Qué es el REM y por qué se usa para proyectar?",
       a: <><p>El <b>Relevamiento de Expectativas de Mercado (REM)</b> es un informe mensual que publica el Banco Central de la República Argentina (BCRA). En él, se promedian las estimaciones de las principales consultoras y analistas financieros sobre cuál creen que será la inflación en los próximos meses y años.</p><p>En ProyectAR usamos esos datos oficiales para trazar un escenario realista de cómo podrían evolucionar tus cuotas o tu contrato de alquiler a futuro, en lugar de obligarte a adivinar una tasa fija irreal.</p></>
     },
