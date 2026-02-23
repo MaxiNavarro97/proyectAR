@@ -2,8 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ReactGA from "react-ga4"; 
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
 import * as XLSX from 'xlsx';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import { 
   Calculator, DollarSign, Calendar, Percent, 
@@ -236,32 +234,15 @@ function WelcomeModal({ onClose }) {
   )
 }
 
-// --- NUEVO COMPONENTE DE BOTON DE NAVEGACIÓN ---
-function NavBtn({ to, currentPath, icon, label, color }) {
+function NavBtn({ active, onClick, icon, label, color }) {
   const themes = {
     indigo: 'text-indigo-600 dark:text-sky-400 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-sky-500/30 scale-105',
-    emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105',
-    amber: 'text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800 shadow-md border-amber-100 dark:border-amber-500/30 scale-105'
+    emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105'
   };
-  
-  const active = currentPath === to || (to === '/' && currentPath === ''); 
-
   return (
-    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? themes[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+    <button onClick={onClick} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? themes[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
       {React.cloneElement(icon, { className: "w-3.5 h-3.5 md:w-5 md:h-5" })} {label}
-    </Link>
-  );
-}
-
-// --- NUEVO MENU DE NAVEGACIÓN ---
-function NavigationMenu() {
-  const location = useLocation();
-  return (
-    <div className="flex gap-1.5 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner overflow-x-auto no-scrollbar max-w-full">
-      <NavBtn currentPath={location.pathname} to="/calculadora-creditos-uva" icon={<Home />} label="CRÉDITOS" color="indigo"/>
-      <NavBtn currentPath={location.pathname} to="/calculadora-alquileres" icon={<ArrowRightLeft />} label="ALQUILERES" color="emerald"/>
-      <NavBtn currentPath={location.pathname} to="/faq" icon={<HelpCircle />} label="FAQ" color="amber"/>
-    </div>
+    </button>
   );
 }
 
@@ -1547,98 +1528,11 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
   );
 }
 
-// --- VISTA PREGUNTAS FRECUENTES (FAQ) ---
-function FAQItem({ question, children, isOpen, onClick }) {
-  return (
-    <div className={`border dark:border-slate-800 rounded-3xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-white dark:bg-slate-800 shadow-xl border-amber-500/30 dark:border-amber-500/30' : 'bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/80'}`}>
-      <button onClick={onClick} className="w-full text-left p-5 md:p-6 flex justify-between items-center gap-4 outline-none">
-        <h4 className="font-black text-sm md:text-base uppercase tracking-tight text-slate-800 dark:text-white leading-none">{question}</h4>
-        <div className={`p-2 rounded-full transition-all duration-300 shrink-0 ${isOpen ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rotate-180' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-        </div>
-      </button>
-      <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-        <div className="overflow-hidden">
-          <div className="p-5 md:p-6 pt-0 text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-4">
-            {children}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FAQ() {
-  const [openIndex, setOpenIndex] = useState(0);
-
-  const toggle = (index) => {
-    setOpenIndex(openIndex === index ? -1 : index);
-  };
-
-  const faqs = [
-    {
-      q: "¿Qué son los Créditos UVA?",
-      a: <><p>Son préstamos hipotecarios o personales donde el capital que pedís prestado se convierte a <b>Unidades de Valor Adquisitivo (UVA)</b>. La UVA es una unidad de medida creada por el Banco Central que se actualiza diariamente según el índice de inflación (CER).</p><p>Esto significa que tanto el dinero que debés como tu cuota mensual se ajustan al ritmo de la inflación. La ventaja principal es que la cuota inicial y los requisitos de ingresos suelen ser mucho más bajos que en un crédito tradicional a tasa fija.</p></>
-    },
-    {
-      q: "¿Qué es el REM y por qué se usa para proyectar?",
-      a: <><p>El <b>Relevamiento de Expectativas de Mercado (REM)</b> es un informe mensual que publica el Banco Central de la República Argentina (BCRA). En él, se promedian las estimaciones de las principales consultoras y analistas financieros sobre cuál creen que será la inflación en los próximos meses y años.</p><p>En ProyectAR usamos esos datos oficiales para trazar un escenario realista de cómo podrían evolucionar tus cuotas o tu contrato de alquiler a futuro, en lugar de obligarte a adivinar una tasa fija irreal.</p></>
-    },
-    {
-      q: "¿Cómo se calcula exactamente la cuota del crédito?",
-      a: <><p>Para calcular lo que vas a pagar mes a mes, el banco primero calcula la cuota en UVAs puros. Esa cuota se compone de una parte que devuelve el capital prestado y otra parte que paga los intereses.</p><p>Luego, para saber cuántos pesos tenés que sacar de tu bolsillo, se aplica esta fórmula sobre la cuota de ese mes:</p>
-      <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
-        Cuota = (Capital UVA + Interés UVA) × Valor UVA + Gastos ARS
-      </div>
-      <p>Los <b>Gastos Extra</b> (seguros de vida, incendio, etc.) generalmente se calculan como un porcentaje fijo sobre el saldo de capital y suelen cobrarse directamente en pesos.</p></>
-    },
-    {
-      q: "¿Cuál es la diferencia entre el Sistema Francés y el Alemán?",
-      a: <><p>Son dos formas distintas de devolver el préstamo:</p><ul className="list-disc pl-5 space-y-2 mt-2"><li><b>Sistema Francés (El más común):</b> La cuota total en UVAs se mantiene constante a lo largo de todo el crédito. Al principio, la mayor parte de tu cuota se destina a pagar intereses y muy poco a devolver el capital.</li><li><b>Sistema Alemán:</b> Lo que se mantiene constante es la cantidad de capital (en UVAs) que devolvés por mes. Como al principio el saldo deudor es alto, los intereses son altísimos, haciendo que la cuota inicial sea más cara. Sin embargo, la cuota va bajando mes a mes a medida que debés menos.</li></ul></>
-    },
-    {
-      q: "¿Qué significa 'Capital' e 'Interés'?",
-      a: <><p><b>Capital:</b> Es el dinero puro y duro que el banco te prestó. Cada vez que pagás capital, estás achicando tu deuda real.</p><p><b>Interés:</b> Es el "alquiler" del dinero. Es el costo que te cobra el banco por haberte prestado ese capital a lo largo del tiempo. Es ganancia pura para el banco.</p></>
-    },
-    {
-      q: "¿Por qué hay que ajustar las expensas por inflación?",
-      a: <><p>Las expensas de un edificio cubren gastos corrientes como el sueldo del encargado, el mantenimiento de los ascensores, los artículos de limpieza y los servicios de las áreas comunes (luz, agua). Todos estos costos en Argentina suben de la mano con la inflación general (y a veces más).</p><p>Si al simular un contrato de alquiler asumís que vas a pagar las mismas expensas durante dos años, estás engañando a tu bolsillo. Ajustarlas por inflación te da una imagen mucho más fiel del costo total de vivir en esa propiedad.</p></>
-    }
-  ];
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500 max-w-full">
-      <div className="lg:col-span-12 space-y-8">
-        <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-3xl border dark:border-slate-800 shadow-sm relative z-10 text-left">
-          <div className="flex flex-col mb-10 gap-2">
-            <h2 className="font-black text-3xl md:text-4xl uppercase tracking-tighter dark:text-white flex items-center gap-3">
-              <HelpCircle className="w-8 h-8 md:w-10 md:h-10 text-amber-500" />
-              Preguntas Frecuentes
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Conceptos básicos, fórmulas y teoría detrás de las simulaciones.</p>
-          </div>
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <FAQItem 
-                key={index} 
-                question={faq.q} 
-                isOpen={openIndex === index} 
-                onClick={() => toggle(index)}
-              >
-                {faq.a}
-              </FAQItem>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // --- APP COMPONENT PRINCIPAL ---
 const GA_MEASUREMENT_ID = 'G-J583LM6P5W'; 
 
 export default function App() {
+  const [view, setView] = useState('mortgage'); 
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('proyectar_dark');
     return saved !== null ? JSON.parse(saved) : true;
@@ -1666,6 +1560,7 @@ export default function App() {
   const handleCloseWelcome = () => { localStorage.setItem('proyectar_welcome_beta_v3_1', 'true'); setShowWelcome(false); };
 
   useEffect(() => {
+    document.title = "ProyectAR | Soberanía Financiera";
     const fetchData = async () => {
       try {
         const resMarket = await fetch(`/market/market_status.json?v=${new Date().getTime()}`);
@@ -1682,108 +1577,68 @@ export default function App() {
   }, []);
 
   return (
-    <HelmetProvider>
-      <Router>
-        <div className={darkMode ? 'dark' : ''}>
-          <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative">
-            
-            {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
+    <div className={darkMode ? 'dark' : ''}>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative">
+        
+        {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
-            <div className="bg-slate-900 text-white py-3 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
-              <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-3 md:gap-2 text-[10px] font-black tracking-widest uppercase text-slate-500 leading-none">
-                <div className="flex items-center gap-3 sm:gap-6 leading-none">
-                  <div className="flex items-center gap-2"><Globe className="w-3 h-3" /> Fuentes: <a href="https://dolarapi.com" target="_blank" className="hover:text-emerald-400">DolarAPI</a></div>
-                  <span className="hidden md:inline text-slate-700">|</span>
-                  <div className="flex items-center gap-2 text-slate-400"><Clock className="w-3 h-3 text-indigo-500" /> <span>ACTUALIZADO: {formatDateTime(lastUpdate)}</span></div>
-                  <span className="hidden lg:inline text-slate-700">|</span><span className="hidden sm:inline">REM: {remDateLabel || '---'}</span>
-                </div>
-                <div className="flex gap-4 sm:gap-12 items-center font-mono leading-none">
-                  <div>DÓLAR OFICIAL <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
-                  <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
-                </div>
-              </div>
+        <div className="bg-slate-900 text-white py-3 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
+          <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-3 md:gap-2 text-[10px] font-black tracking-widest uppercase text-slate-500 leading-none">
+            <div className="flex items-center gap-3 sm:gap-6 leading-none">
+              <div className="flex items-center gap-2"><Globe className="w-3 h-3" /> Fuentes: <a href="https://dolarapi.com" target="_blank" className="hover:text-emerald-400">DolarAPI</a></div>
+              <span className="hidden md:inline text-slate-700">|</span>
+              <div className="flex items-center gap-2 text-slate-400"><Clock className="w-3 h-3 text-indigo-500" /> <span>ACTUALIZADO: {formatDateTime(lastUpdate)}</span></div>
+              <span className="hidden lg:inline text-slate-700">|</span><span className="hidden sm:inline">REM: {remDateLabel || '---'}</span>
             </div>
-
-            <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 shadow-sm leading-none">
-              <div className="flex items-center gap-3 md:gap-5">
-                <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-md" />
-                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-violet-500">AR</span></span><span className="text-[9px] md:text-[11px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v0.9.4</span></div>
-              </div>
-              <div className="flex items-center gap-2 md:gap-10 w-full md:w-auto justify-between md:justify-end">
-                <NavigationMenu />
-                <button onClick={() => setDarkMode(!darkMode)} className="p-2.5 md:p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 shadow-md active:scale-90">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
-              </div>
-            </nav>
-
-            <main className="max-w-[1800px] mx-auto p-6 md:p-10 flex-grow w-full">
-              {loading ? (
-                <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse text-center">Sincronizando Mercados...</p></div>
-              ) : (
-                <div className="animate-in fade-in zoom-in-95 duration-1000">
-                  <Routes>
-                    {/* REDIRECCIÓN: Si entran a la home vacía, los mandamos a los créditos */}
-                    <Route path="/" element={<Navigate to="/calculadora-creditos-uva" replace />} />
-
-                    {/* RUTA 1: HIPOTECAS (NUEVA URL) */}
-                    <Route path="/calculadora-creditos-uva" element={
-                      <>
-                        <Helmet>
-                          <title>ProyectAR | Calculadora de Créditos UVA </title>
-                          <meta name="description" content="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Analizá el impacto del sistema francés y alemán." />
-                        </Helmet>
-                        <MortgageCalculator uvaValue={uvaValue} remData={remData} remStatus={remStatus} dolarOficial={dolarOficial} />
-                      </>
-                    } />
-
-                    {/* RUTA 2: ALQUILERES (QUEDA IGUAL) */}
-                    <Route path="/calculadora-alquileres" element={
-                      <>
-                        <Helmet>
-                          <title>ProyectAR | Calculadora de Alquileres </title>
-                          <meta name="description" content="Calculá la actualización de tu contrato de alquiler, expensas e inflación. Ideal para inquilinos y propietarios en Argentina." />
-                        </Helmet>
-                        <RentCalculator remData={remData} remStatus={remStatus} dolarOficial={dolarOficial} />
-                      </>
-                    } />
-
-                    {/* RUTA 3: FAQ */}
-                    <Route path="/faq" element={
-                      <>
-                        <Helmet>
-                          <title>ProyectAR | FAQ </title>
-                          <meta name="description" content="Resolvemos tus dudas sobre créditos UVA, inflación REM, sistemas de amortización y cómo calculamos todo." />
-                        </Helmet>
-                        <FAQ />
-                      </>
-                    } />
-
-
-
-                  </Routes>
-                </div>
-              )}
-            </main>
-
-            <div className="max-w-[1800px] mx-auto px-6 md:px-10 mt-10">
-               <div className="bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 dark:from-indigo-500/5 dark:to-emerald-500/5 rounded-3xl p-8 md:p-12 text-center border border-indigo-500/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12"><HeartHandshake className="w-40 h-40 text-indigo-500" /></div>
-                  <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mb-2">¿Te sirvió ProyectAR?</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-2xl mx-auto">Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.</p>
-                  <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
-                     <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
-                     <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
-                  </div>
-               </div>
+            <div className="flex gap-4 sm:gap-12 items-center font-mono leading-none">
+              <div>DÓLAR OFICIAL <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
+              <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
             </div>
-
-            <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col lg:flex-row justify-between items-center gap-10">
-              <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{"República Argentina - 2026"}</p></div>
-              <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[10px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
-              <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[11px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><p className="leading-none">@maxinavarro1997@gmail.com</p></div>
-            </footer>
           </div>
         </div>
-      </Router>
-    </HelmetProvider>
+
+        <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 shadow-sm leading-none">
+          <div className="flex items-center gap-3 md:gap-5">
+            <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-md" />
+            <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-violet-500">AR</span></span><span className="text-[9px] md:text-[11px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v0.9.4</span></div>
+          </div>
+          <div className="flex items-center gap-2 md:gap-10 w-full md:w-auto justify-between md:justify-end">
+            <div className="flex gap-1.5 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner">
+              <NavBtn active={view === 'mortgage'} onClick={() => setView('mortgage')} icon={<Home />} label="CRÉDITOS" color="indigo"/>
+              <NavBtn active={view === 'rent'} onClick={() => setView('rent')} icon={<ArrowRightLeft />} label="ALQUILERES" color="emerald"/>
+            </div>
+            <button onClick={() => setDarkMode(!darkMode)} className="p-2.5 md:p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 shadow-md active:scale-90">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
+          </div>
+        </nav>
+
+        <main className="max-w-[1800px] mx-auto p-6 md:p-10 flex-grow w-full">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse text-center">Sincronizando Mercados...</p></div>
+          ) : (
+            <div className="animate-in fade-in zoom-in-95 duration-1000">
+              {view === 'mortgage' ? <MortgageCalculator uvaValue={uvaValue} remData={remData} remStatus={remStatus} dolarOficial={dolarOficial} /> : <RentCalculator remData={remData} remStatus={remStatus} dolarOficial={dolarOficial} />}
+            </div>
+          )}
+        </main>
+
+        <div className="max-w-[1800px] mx-auto px-6 md:px-10 mt-10">
+           <div className="bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 dark:from-indigo-500/5 dark:to-emerald-500/5 rounded-3xl p-8 md:p-12 text-center border border-indigo-500/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12"><HeartHandshake className="w-40 h-40 text-indigo-500" /></div>
+              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mb-2">¿Te sirvió ProyectAR?</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-2xl mx-auto">Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.</p>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
+                 <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
+                 <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
+              </div>
+           </div>
+        </div>
+
+        <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{"República Argentina - 2026"}</p></div>
+          <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[10px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
+          <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[11px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><p className="leading-none">@maxinavarro1997@gmail.com</p></div>
+        </footer>
+      </div>
+    </div>
   );
 }
