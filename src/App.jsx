@@ -6,14 +6,14 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } f
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import { 
-  Calculator, DollarSign, Calendar, 
-  TrendingUp, Info, Globe, Home, ArrowRightLeft,
+  Calculator, DollarSign,
+  TrendingUp, Globe, Home, ArrowRightLeft,
   Landmark, FileText, Zap, Settings2, 
   CalendarDays, AlertTriangle, Scale, Activity, 
   Github, Clock, Wallet, CheckCircle2,
   Download, Sun, Moon, ExternalLink, ShieldAlert,
   HelpCircle, Rocket, X, Sparkles, Coffee, HeartHandshake,
-  FileSpreadsheet, Flag, Handshake, RotateCcw, MessageCircle, Check, Flame, Maximize2, Mail
+  FileSpreadsheet, Flag, Handshake, RotateCcw, MessageCircle, Check, Flame, Maximize2, Mail, Smartphone
 } from 'lucide-react';
 
 // --- CONSTANTES GLOBALES ---
@@ -85,6 +85,9 @@ function Tooltip({ children, iconClass = "w-3.5 h-3.5 text-slate-400", color = "
 }
 
 // --- ESTILOS PDF ---
+// Borde compartido por columnas de tabla PDF
+const PDF_BORDER = { borderStyle: "solid", borderColor: '#e2e8f0', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0 };
+
 const pdfStyles = StyleSheet.create({
   page: { padding: 30, fontFamily: 'Roboto', backgroundColor: '#f8fafc' },
   header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', paddingBottom: 10 },
@@ -95,8 +98,8 @@ const pdfStyles = StyleSheet.create({
   disclaimerText: { fontSize: 7, color: '#475569', textAlign: 'center' },
   table: { display: "flex", flexDirection: "column", width: "100%", borderStyle: "solid", borderColor: '#e2e8f0', borderWidth: 1, borderRightWidth: 0, borderBottomWidth: 0 },
   tableRow: { flexDirection: "row" },
-  tableColHeader: { width: "14.28%", borderStyle: "solid", borderColor: '#e2e8f0', borderBottomColor: '#4f46e5', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0, backgroundColor: '#eef2ff' },
-  tableCol: { width: "14.28%", borderStyle: "solid", borderColor: '#e2e8f0', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0 },
+  tableColHeader: { ...PDF_BORDER, width: "14.28%", borderBottomColor: '#4f46e5', backgroundColor: '#eef2ff' },
+  tableCol: { ...PDF_BORDER, width: "14.28%" },
   tableCellHeader: { margin: 5, fontSize: 8, fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', textAlign: 'center' },
   tableCell: { margin: 5, fontSize: 8, color: '#334155', textAlign: 'center' },
   footer: { position: 'absolute', bottom: 20, left: 30, right: 30, textAlign: 'center', fontSize: 7, color: '#94a3b8', borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 10 }
@@ -181,16 +184,76 @@ const RentPDFDocument = ({ data, summary, role }) => (
 
 // --- COMPONENTES AUXILIARES ---
 
+const EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+const TRANSITION = `transform 0.4s ${EASE}, width 0.4s ${EASE}, height 0.4s ${EASE}`;
+
+function useFullscreenOrientation(isOpen) {
+  const [landscape, setLandscape] = useState(true);
+  useEffect(() => { if (isOpen) setLandscape(true); }, [isOpen]);
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const isMobilePortrait = vw < vh && vw < 768;
+  const contentStyle = (isMobilePortrait && landscape) ? {
+    position: 'absolute', top: '50%', left: '50%',
+    width: `${vh}px`, height: `${vw}px`,
+    transform: 'translate(-50%, -50%) rotate(-90deg)',
+    transition: TRANSITION,
+  } : {
+    position: 'absolute', top: '50%', left: '50%',
+    width: `${vw}px`, height: `${vh}px`,
+    transform: 'translate(-50%, -50%) rotate(0deg)',
+    transition: TRANSITION,
+  };
+  return { landscape, setLandscape, isMobilePortrait, contentStyle };
+}
+
 function ChartModal({ isOpen, onClose, children, title }) {
+  const { landscape, setLandscape, isMobilePortrait, contentStyle } = useFullscreenOrientation(isOpen);
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[150] bg-slate-950/90 backdrop-blur-xl flex flex-col p-4 md:p-10 animate-in fade-in duration-300">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-tighter">{title}</h3>
-        <button onClick={onClose} className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"><X className="w-6 h-6" /></button>
+    <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden animate-in fade-in duration-300">
+      <div style={contentStyle} className="flex flex-col overflow-hidden">
+        <div className="flex justify-between items-center px-5 py-4 shrink-0">
+          <h3 className="text-white font-black text-base md:text-2xl uppercase tracking-tighter truncate mr-3">{title}</h3>
+          <div className="flex items-center gap-2 shrink-0">
+            {isMobilePortrait && (
+              <button onClick={() => setLandscape(l => !l)} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90" title={landscape ? "Cambiar a vertical" : "Cambiar a horizontal"}>
+                <Smartphone className="w-4 h-4" style={{ transition: `transform 0.4s ${EASE}`, transform: landscape ? 'rotate(-90deg)' : 'rotate(0deg)' }} />
+              </button>
+            )}
+            <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"><X className="w-5 h-5" /></button>
+          </div>
+        </div>
+        <div className="flex-1 min-h-0 px-5 pb-5 flex items-center justify-center overflow-hidden">
+          <div style={{ width: '100%', aspectRatio: '1000/320', maxHeight: '100%' }}>
+            {children}
+          </div>
+        </div>
       </div>
-      <div className="flex-grow w-full h-full bg-slate-900/50 rounded-3xl border border-white/5 p-4 md:p-8 flex items-center justify-center">
-        {children}
+    </div>
+  );
+}
+
+function TableModal({ isOpen, onClose, children, title }) {
+  const { landscape, setLandscape, isMobilePortrait, contentStyle } = useFullscreenOrientation(isOpen);
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden animate-in fade-in duration-300">
+      <div style={contentStyle} className="flex flex-col">
+        <div className="flex justify-between items-center px-5 py-4 shrink-0 border-b border-white/10">
+          <h3 className="text-white font-black text-base md:text-xl uppercase tracking-tighter truncate mr-3">{title}</h3>
+          <div className="flex items-center gap-2 shrink-0">
+            {isMobilePortrait && (
+              <button onClick={() => setLandscape(l => !l)} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90" title={landscape ? "Cambiar a vertical" : "Cambiar a horizontal"}>
+                <Smartphone className="w-4 h-4" style={{ transition: `transform 0.4s ${EASE}`, transform: landscape ? 'rotate(-90deg)' : 'rotate(0deg)' }} />
+              </button>
+            )}
+            <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"><X className="w-5 h-5" /></button>
+          </div>
+        </div>
+        <div className="flex-1 min-h-0 overflow-auto no-scrollbar p-4">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -285,24 +348,23 @@ function WelcomeModal({ onClose }) {
   )
 }
 
-// --- NUEVO COMPONENTE DE BOTON DE NAVEGACIÓN ---
-const NavBtn = React.memo(function NavBtn({ to, currentPath, icon, label, color }) {
-  const themes = {
-    indigo: 'text-indigo-600 dark:text-sky-400 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-sky-500/30 scale-105',
-    emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105',
-    amber: 'text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800 shadow-md border-amber-100 dark:border-amber-500/30 scale-105'
-  };
-  
-  const active = currentPath === to || (to === '/' && currentPath === ''); 
+// --- COMPONENTE DE BOTON DE NAVEGACIÓN ---
+const NAV_THEMES = {
+  indigo: 'text-indigo-600 dark:text-sky-400 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-sky-500/30 scale-105',
+  emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105',
+  amber: 'text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800 shadow-md border-amber-100 dark:border-amber-500/30 scale-105',
+};
 
+const NavBtn = React.memo(function NavBtn({ to, currentPath, icon, label, color }) {
+  const active = currentPath === to || (to === '/' && currentPath === '');
   return (
-    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? themes[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? NAV_THEMES[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
       {React.cloneElement(icon, { className: "w-3.5 h-3.5 md:w-5 md:h-5" })} {label}
     </Link>
   );
 });
 
-// --- NUEVO MENU DE NAVEGACIÓN ---
+// --- MENU DE NAVEGACIÓN ---
 function NavigationMenu() {
   const location = useLocation();
   return (
@@ -344,13 +406,18 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent }) {
   );
 }
 
-const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, colorClass, sticky, tooltip }) {
-  const colorMap = { 
-    indigo: 'bg-indigo-500/10 text-indigo-500', orange: 'bg-orange-500/10 text-orange-500', 
-    emerald: 'bg-emerald-500/10 text-emerald-500', rose: 'bg-rose-500/10 text-rose-500',
-    sky: 'bg-sky-500/10 text-sky-500', amber: 'bg-amber-500/10 text-amber-500', slate: 'bg-slate-500/10 text-slate-500'
-  };
+// Fuera del componente: no cambia nunca, no tiene sentido recrearlo en cada render
+const SUMMARY_COLOR_MAP = {
+  indigo: 'bg-indigo-500/10 text-indigo-500',
+  orange: 'bg-orange-500/10 text-orange-500',
+  emerald: 'bg-emerald-500/10 text-emerald-500',
+  rose: 'bg-rose-500/10 text-rose-500',
+  sky: 'bg-sky-500/10 text-sky-500',
+  amber: 'bg-amber-500/10 text-amber-500',
+  slate: 'bg-slate-500/10 text-slate-500',
+};
 
+const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, colorClass, sticky, tooltip }) {
   const [displayValue, setDisplayValue] = useState(value);
   const [animating, setAnimating] = useState(false);
 
@@ -363,8 +430,8 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
   }, [value]);
 
   return (
-    <div className={`bg-white dark:bg-slate-900 p-3 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-2.5 transition-all min-w-0 flex-1 relative ${sticky ? 'sticky top-[85px] md:top-[128px] z-30 hover:z-[60] shadow-xl border-indigo-500/30 dark:border-sky-500/30' : 'hover:-translate-y-0.5 hover:shadow-md hover:z-[60]'}`}>
-      <div className={`p-2 rounded-xl shrink-0 ${colorMap[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
+    <div className={`bg-white dark:bg-slate-900 p-3 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-2.5 transition-all min-w-0 flex-1 relative hover:-translate-y-0.5 ${sticky ? 'sticky top-[85px] md:top-[128px] z-30 hover:z-[60] shadow-xl border-indigo-500/30 dark:border-sky-500/30' : 'hover:shadow-md hover:z-[60]'}`}>
+      <div className={`p-2 rounded-xl shrink-0 ${SUMMARY_COLOR_MAP[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
       <div className="min-w-0 text-left flex-1 relative"> 
         <div className="flex items-center justify-between gap-1 mb-0.5">
           <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{title}</p>
@@ -394,8 +461,46 @@ const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
 });
 
 // --- VISUALIZACIÓN DE DATOS ---
+function TooltipContent({ data, isRent }) {
+  return (
+    <>
+      <div className="flex items-center justify-between mb-2.5 border-b border-white/10 pb-2.5">
+        <p className="text-[12px] font-black text-indigo-400 uppercase tracking-widest">{data.label}</p>
+        <span className={`text-[9px] px-2 py-0.5 rounded font-black ${data.source === 'IPC' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : data.source === 'REM' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/10 text-slate-300 border border-white/10'}`}>{data.source}</span>
+      </div>
+      <div className="space-y-2 text-[13px] mb-3 border-b border-white/10 pb-3">
+        <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 uppercase tracking-wide">Total:</span><span className="font-black text-white">{money(data.cuotaTotal)}</span></div>
+        <div className="flex justify-between items-center gap-4 text-indigo-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-indigo-500" /><span className="uppercase">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
+        <div className="flex justify-between items-center gap-4 text-orange-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="uppercase">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
+      </div>
+      <div className="space-y-1.5 text-[12px]">
+        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Mensual:</span><span className={`font-black ${data.varMensual > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varMensual > 0 ? '+' : ''}{data.varMensual.toFixed(1)}%</span></div>
+        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Acumulado YTD:</span><span className={`font-black ${data.varYTD > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varYTD > 0 ? '+' : ''}{data.varYTD.toFixed(1)}%</span></div>
+        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Total:</span><span className={`font-black ${data.varTotal > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varTotal > 0 ? '+' : ''}{data.varTotal.toFixed(1)}%</span></div>
+      </div>
+    </>
+  );
+}
+
 function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
   const [hovered, setHovered] = useState(null);
+  const touchTimer = useRef(null);
+
+  const clearTouch = () => {
+    if (touchTimer.current) clearTimeout(touchTimer.current);
+    touchTimer.current = null;
+  };
+
+  const handleTouchStart = (d) => (e) => {
+    e.preventDefault();
+    clearTouch();
+    setHovered({ data: d, touch: true });
+  };
+
+  const handleTouchEnd = () => {
+    clearTouch();
+    touchTimer.current = setTimeout(() => setHovered(null), 2500);
+  };
 
   if (!data || data.length === 0) {
     return (
@@ -412,43 +517,46 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
   const sampled = data.filter((_, i) => i % step === 0);
 
   return (
-    <div className="relative w-full h-full">
-      {hovered && (
-        <div 
-          className="absolute z-[100] pointer-events-none bg-slate-900/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-5 min-w-[220px]" 
-          style={{ 
-            left: `${(hovered.x / w) * 100}%`, 
-            top: `${(hovered.y / h) * 100}%`, 
-            transform: `translate(${hovered.x > (w * 0.8) ? '-100%' : (hovered.x < (w * 0.2) ? '0%' : '-50%')}, -110%)` 
+    <div className="relative w-full h-full overflow-hidden">
+      
+      {/* TOOLTIP DESKTOP: sigue al mouse con posición fixed */}
+      {hovered && !hovered.touch && (
+        <div
+          className="fixed z-[200] pointer-events-none bg-slate-900/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-5 w-[240px]"
+          style={{
+            left: `${Math.max(8, Math.min(window.innerWidth - 256, hovered.cx - 120))}px`,
+            top: hovered.cy > window.innerHeight * 0.55
+              ? `${Math.max(8, hovered.cy - 310)}px`
+              : `${Math.min(window.innerHeight - 310, hovered.cy + 12)}px`,
           }}
         >
-          <div className="flex items-center justify-between mb-2.5 border-b border-white/10 pb-2.5">
-              <p className="text-[12px] font-black text-indigo-400 uppercase tracking-widest">{hovered.data.label}</p>
-              <span className={`text-[9px] px-2 py-0.5 rounded font-black ${hovered.data.source === 'IPC' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : hovered.data.source === 'REM' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/10 text-slate-300 border border-white/10'}`}>{hovered.data.source}</span>
-          </div>
-          <div className="space-y-2 text-[13px] mb-3 border-b border-white/10 pb-3">
-            <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 uppercase tracking-wide">Total:</span><span className="font-black text-white">{money(hovered.data.cuotaTotal)}</span></div>
-            <div className="flex justify-between items-center gap-4 text-indigo-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-indigo-500" /><span className="uppercase">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(hovered.data.principal)}</span></div>
-            <div className="flex justify-between items-center gap-4 text-orange-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="uppercase">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(hovered.data.interes)}</span></div>
-          </div>
-          
-          <div className="space-y-1.5 text-[12px]">
-            <div className="flex justify-between items-center">
-               <span className="text-slate-400 font-bold uppercase tracking-wide">Var. Mensual:</span>
-               <span className={`font-black ${hovered.data.varMensual > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{hovered.data.varMensual > 0 ? '+' : ''}{hovered.data.varMensual.toFixed(1)}%</span>
+          <TooltipContent data={hovered.data} isRent={isRent} />
+        </div>
+      )}
+
+      {/* TOOLTIP MOBILE: panel fijo en la parte inferior, no depende de coordenadas */}
+      {hovered && hovered.touch && (
+        <div
+          className="absolute bottom-0 left-0 right-0 z-[200] bg-slate-900/98 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-4 mx-1 mb-1"
+          onClick={() => setHovered(null)}
+        >
+          <div className="flex justify-between items-start gap-2">
+            <div className="flex-1 min-w-0">
+              <TooltipContent data={hovered.data} isRent={isRent} />
             </div>
-            <div className="flex justify-between items-center">
-               <span className="text-slate-400 font-bold uppercase tracking-wide">Acumulado YTD:</span>
-               <span className={`font-black ${hovered.data.varYTD > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{hovered.data.varYTD > 0 ? '+' : ''}{hovered.data.varYTD.toFixed(1)}%</span>
-            </div>
-            <div className="flex justify-between items-center">
-               <span className="text-slate-400 font-bold uppercase tracking-wide">Var. Total:</span>
-               <span className={`font-black ${hovered.data.varTotal > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{hovered.data.varTotal > 0 ? '+' : ''}{hovered.data.varTotal.toFixed(1)}%</span>
-            </div>
+            <button className="shrink-0 p-1 text-slate-500 hover:text-white" onClick={() => setHovered(null)}>
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       )}
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full overflow-visible select-none" preserveAspectRatio="none">
+
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="w-full h-full overflow-visible select-none"
+        preserveAspectRatio="none"
+        onMouseLeave={() => !hovered?.touch && setHovered(null)}
+      >
         {[0, 0.25, 0.5, 0.75, 1].map(p => (
           <g key={p}>
             <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
@@ -462,7 +570,15 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
           const hInt = (d.interes / maxVal) * (h - padB - padT);
           const hPri = (d.principal / maxVal) * (h - padB - padT);
           return (
-            <g key={i} onMouseEnter={() => setHovered({ x: x + barW / 2, y: h - padB - hInt - hPri, data: d })} onMouseLeave={() => setHovered(null)} className="group cursor-pointer">
+            <g
+              key={i}
+              onMouseEnter={(e) => setHovered({ cx: e.clientX, cy: e.clientY, data: d, touch: false })}
+              onMouseMove={(e) => setHovered(prev => prev && !prev.touch ? { ...prev, cx: e.clientX, cy: e.clientY } : prev)}
+              onMouseLeave={() => setHovered(null)}
+              onTouchStart={handleTouchStart(d)}
+              onTouchEnd={handleTouchEnd}
+              className="group cursor-pointer"
+            >
               <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill={isRent ? "#10b981" : "#6366f1"} rx="1.5" className="transition-all group-hover:brightness-110"/>
               <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill={isRent ? "#f59e0b" : "#fb923c"} rx="1.5" className="transition-all group-hover:brightness-110"/>
               {(i % Math.ceil(sampled.length/10) === 0) && (
@@ -492,14 +608,6 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
           return null;
         })()}
       </svg>
-      {/* Leyenda */}
-      {showRemMarker && (
-        <div className="flex items-center justify-center gap-4 mt-2 text-[11px] font-bold text-slate-400">
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> IPC (real)</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> REM (proyectado)</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block"></span> Inercia</span>
-        </div>
-      )}
     </div>
   );
 }
@@ -524,7 +632,7 @@ const copyShareUrl = (params, setCopied) => {
 };
 
 // --- VISTA CALCULADORA HIPOTECARIA ---
-function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
+function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const hoyRef = useRef(new Date());
   const hoy = hoyRef.current;
    
@@ -554,6 +662,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
   const [exportType, setExportType] = useState('pdf');
   const [copiedWP, setCopiedWP] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isTableFullscreen, setIsTableFullscreen] = useState(false);
   const [showGastosBanner, setShowGastosBanner] = useState(true);
 
   const [yearsFocused, setYearsFocused] = useState(false);
@@ -587,15 +696,8 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
     im: inflationMode, inf: inflation, lt: loanType, sm: startMonth, sy: startYear
   });
 
-  const [confirmReset, setConfirmReset] = useState(false);
   const handleReset = () => {
-      if (!confirmReset) {
-        setConfirmReset(true);
-        setTimeout(() => setConfirmReset(false), 2500);
-        return;
-      }
       setAmount(0); setSalary(0); setYears(0); setRate("0"); setInflation("0"); setRemInstallments(0);
-      setConfirmReset(false);
   };
 
   useEffect(() => { try { localStorage.setItem('proyectar_tf_mortgage', timeframe); } catch { /* ignorar */ } }, [timeframe]);
@@ -609,7 +711,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
   }, [loanType]);
 
   useEffect(() => {
-    if (dateMode === 'generic') { setLoanType('new'); }
+    if (dateMode === 'generic') { setLoanType('new'); setInflationMode('manual'); }
   }, [dateMode]);
 
   useEffect(() => {
@@ -618,10 +720,6 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
       setRemStabilizedValue(String(lastValue).replace('.', ','));
     }
   }, [remData]);
-
-  useEffect(() => {
-    if (dateMode === 'generic') { setInflationMode('manual'); }
-  }, [dateMode]);
 
   const schedule = useMemo(() => {
     if (!amount || amount === 0) return [];
@@ -718,9 +816,14 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
       lastMonthVal = cuotaTotal;
       if (currentDate.getMonth() === 11) { lastDecVal = cuotaTotal; }
 
-      let currentMonthInf = (dateMode === 'generic') ? manualMonthlyInf : (inflationMode === 'rem' ? (inflMatch ? inflMatch.valor / 100 : remStabMon) : manualMonthlyInf);
+      let currentMonthInf;
+      if (dateMode === 'generic' || inflationMode !== 'rem') {
+        currentMonthInf = manualMonthlyInf;
+      } else {
+        currentMonthInf = inflMatch ? inflMatch.valor / 100 : remStabMon;
+      }
       projUva *= (1 + currentMonthInf);
-      currentDate.setMonth(currentDate.getMonth() + 1); 
+      currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
   }, [amount, years, rate, system, inflation, inflationMode, remStabilizedMode, remStabilizedValue, uvaValue, dateMode, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
@@ -747,18 +850,32 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
   const exportToCSV = () => {
     if (schedule.length === 0) return;
     const headers = ["Mes", "Cuota Total", "Interes", "Capital", "Saldo Pendiente", "Origen"];
-    const rows = schedule.map(d => [d.label, Math.round(d.cuotaTotal), Math.round(d.interes), Math.round(d.principal), Math.round(d.saldo), d.source]);
-    let csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
-    const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `ProyectAR_Hipotecas_${new Date().getTime()}.csv`);
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    const rows = schedule.map(d => [
+      d.label, Math.round(d.cuotaTotal), Math.round(d.interes),
+      Math.round(d.principal), Math.round(d.saldo), d.source
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `ProyectAR_Hipotecas_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const exportToExcel = () => {
     if (schedule.length === 0) return;
     const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({
-        "Periodo": d.label, "Cuota Total": Math.round(d.cuotaTotal), "Interés": Math.round(d.interes), "Capital": Math.round(d.principal), "Saldo Pendiente": Math.round(d.saldo), "Origen": d.source
+      "Periodo": d.label,
+      "Cuota Total": Math.round(d.cuotaTotal),
+      "Interés": Math.round(d.interes),
+      "Capital": Math.round(d.principal),
+      "Saldo Pendiente": Math.round(d.saldo),
+      "Origen": d.source
     })));
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Proyeccion"); XLSX.writeFile(wb, `ProyectAR_Hipotecas_${new Date().getTime()}.xlsx`);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Proyeccion");
+    XLSX.writeFile(wb, `ProyectAR_Hipotecas_${new Date().getTime()}.xlsx`);
   };
 
   const handleExportClick = (type) => {
@@ -802,6 +919,28 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
           <CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} />
       </ChartModal>
 
+      <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
+        <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 700 }}>
+          <thead className="sticky top-0 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none">
+            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
+          </thead>
+          <tbody className="divide-y divide-white/5 text-center">
+            {schedule.map((d) => (
+              <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? 'bg-sky-900/20 border-l-4 border-sky-500' : 'hover:bg-white/5'}`}>
+                <td className="p-4 font-bold text-slate-200 flex items-center justify-center gap-2">
+                  {d.label} {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
+                </td>
+                <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
+                <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
+                <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
+                <td className="p-4 text-indigo-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
+                <td className="p-4 text-slate-100 font-black font-mono whitespace-nowrap">{money(d.saldo)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </TableModal>
+
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
       <div className="lg:col-span-3 space-y-4">
         
@@ -818,7 +957,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
                 </Tooltip>
               </h3>
             </div>
-            <button onClick={handleReset} title={confirmReset ? "¿Seguro? Tocá de nuevo" : "Limpiar todo"} className={`p-2 rounded-lg transition-colors ${confirmReset ? 'text-rose-500 bg-rose-50 dark:bg-rose-900/20 animate-pulse' : 'text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-slate-800'}`} aria-label="Limpiar formulario">{confirmReset ? <AlertTriangle className="w-4 h-4" /> : <RotateCcw className="w-4 h-4" />}</button>
+            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-lg transition-colors text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
           </div>
           
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
@@ -1080,13 +1219,16 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
-            <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> TABLA DE AMORTIZACIÓN</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> TABLA DE AMORTIZACIÓN</span>
+              <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
+            </div>
             
             <div className="flex w-full lg:w-auto gap-2">
-              <button onClick={() => handleExportClick('excel')} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
                  <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
               </button>
-              <button onClick={() => handleExportClick('csv')} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl shadow-sm hover:scale-105 transition-all uppercase tracking-widest leading-none">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl shadow-sm hover:scale-105 transition-all uppercase tracking-widest leading-none">
                  <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
               </button>
               <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl shadow-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
@@ -1095,7 +1237,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
               <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl shadow-sm transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
                  {copiedWP ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
               </button>
-              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-indigo-500'} font-black rounded-xl shadow-sm transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
+              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl shadow-sm transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
                  {copiedShare ? <Check className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -1130,7 +1272,7 @@ function MortgageCalculator({ uvaValue, remData, remStatus, dolarOficial }) {
 }
 
 // --- VISTA ALQUILERES (INTEGRADA) ---
-function RentCalculator({ remData, remStatus, dolarOficial }) {
+function RentCalculator({ remData, dolarOficial }) {
   const hoyRef = useRef(new Date());
   const hoy = hoyRef.current;
   const [rentType, setRentType] = useState('new'); 
@@ -1159,6 +1301,7 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
   const [exportType, setExportType] = useState('pdf');
   const [copiedWP, setCopiedWP] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isTableFullscreen, setIsTableFullscreen] = useState(false);
   const [timeframe, setTimeframe] = useState('all');
 
   const [amountFocused, setAmountFocused] = useState(false);
@@ -1196,15 +1339,8 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
     rr: rentRole, rt: rentType, im: inflationMode, mi: manualInf, sm: startMonth, sy: startYear
   });
 
-  const [confirmReset, setConfirmReset] = useState(false);
   const handleReset = () => {
-    if (!confirmReset) {
-      setConfirmReset(true);
-      setTimeout(() => setConfirmReset(false), 2500);
-      return;
-    }
     setRentAmount(0); setExpensesAmount(0); setPropertyValueUsd(0); setSalary(0); setDurationMonths(0); setAdjustPeriod(0); setMonthsSinceLastAdjust(0); setManualInf("0");
-    setConfirmReset(false);
   };
 
   useEffect(() => {
@@ -1216,7 +1352,7 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
   }, [rentType]);
 
   useEffect(() => {
-    if (dateMode === 'generic') { setRentType('new'); }
+    if (dateMode === 'generic') { setRentType('new'); setInflationMode('manual'); }
   }, [dateMode]);
 
   useEffect(() => {
@@ -1225,13 +1361,6 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
       setRemStabilizedValue(String(lastValue).replace('.', ','));
     }
   }, [remData]);
-
-  useEffect(() => {
-    if (dateMode === 'generic') { 
-      setInflationMode('manual'); 
-      setRentType('new'); 
-    }
-  }, [dateMode]);
 
   const schedule = useMemo(() => {
     if (rentAmount === 0 && expensesAmount === 0) return [];
@@ -1287,9 +1416,12 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
         }
       }
 
-      let monthlyRate = (dateMode === 'generic') 
-        ? manualMonthlyInf 
-        : (inflationMode === 'rem' ? (inflMatch ? inflMatch.valor / 100 : remStabMon) : manualMonthlyInf);
+      let monthlyRate;
+      if (dateMode === 'generic' || inflationMode !== 'rem') {
+        monthlyRate = manualMonthlyInf;
+      } else {
+        monthlyRate = inflMatch ? inflMatch.valor / 100 : remStabMon;
+      }
 
       if (i > 1 && adjustExpenses) { currentExpenses *= (1 + monthlyRate); }
       accumulatedFactor *= (1 + monthlyRate);
@@ -1376,16 +1508,30 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
   const exportToCSV = () => {
     if (schedule.length === 0) return;
     const headers = ["Periodo", "Total Mes", "Alquiler", "Expensas", "Origen"];
-    const rows = schedule.map(d => [d.label, Math.round(d.cuotaTotal), Math.round(d.principal), Math.round(d.interes), d.source]);
-    let csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
-    const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `ProyectAR_Alquiler_${new Date().getTime()}.csv`);
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    const rows = schedule.map(d => [
+      d.label, Math.round(d.cuotaTotal), Math.round(d.principal), Math.round(d.interes), d.source
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `ProyectAR_Alquiler_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const exportToExcel = () => {
     if (schedule.length === 0) return;
-    const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({ "Periodo": d.label, "Total Mes": Math.round(d.cuotaTotal), "Alquiler": Math.round(d.principal), "Expensas": Math.round(d.interes), "Origen Info": d.source })));
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Alquileres"); XLSX.writeFile(wb, `ProyectAR_Alquiler_${new Date().getTime()}.xlsx`);
+    const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({
+      "Periodo": d.label,
+      "Total Mes": Math.round(d.cuotaTotal),
+      "Alquiler": Math.round(d.principal),
+      "Expensas": Math.round(d.interes),
+      "Origen Info": d.source
+    })));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Alquileres");
+    XLSX.writeFile(wb, `ProyectAR_Alquiler_${new Date().getTime()}.xlsx`);
   };
 
   const handleExportClick = (type) => {
@@ -1425,6 +1571,25 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
           <CompositionChart data={schedule} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} />
       </ChartModal>
 
+      <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Pagos Mensuales">
+        <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 600 }}>
+          <thead className="sticky top-0 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none">
+            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
+          </thead>
+          <tbody className="divide-y divide-white/5 text-center">
+            {schedule.map((d) => (
+              <tr key={d.mes} className="transition-colors hover:bg-white/5">
+                <td className="p-4 font-bold text-slate-200">{d.label}</td>
+                <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
+                <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
+                <td className="p-4 text-indigo-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
+                <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </TableModal>
+
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
       <div className="lg:col-span-3 space-y-4">
         
@@ -1441,7 +1606,7 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
                   </Tooltip>
               </h3>
             </div>
-            <button onClick={handleReset} title={confirmReset ? "¿Seguro? Tocá de nuevo" : "Limpiar todo"} className={`p-2 rounded-lg transition-colors ${confirmReset ? 'text-rose-500 bg-rose-50 dark:bg-rose-900/20 animate-pulse' : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800'}`} aria-label="Limpiar formulario">{confirmReset ? <AlertTriangle className="w-4 h-4" /> : <RotateCcw className="w-4 h-4" />}</button>
+            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-lg transition-colors text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
           </div>
           
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
@@ -1681,13 +1846,16 @@ function RentCalculator({ remData, remStatus, dolarOficial }) {
         {/* TABLA DE ALQUILERES */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
-            <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> TABLA DE PAGOS MENSUALES</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> TABLA DE PAGOS MENSUALES</span>
+              <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
+            </div>
             
             <div className="flex w-full lg:w-auto gap-2">
-              <button onClick={() => handleExportClick('excel')} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
                  <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
               </button>
-              <button onClick={() => handleExportClick('csv')} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl shadow-sm hover:scale-105 transition-all uppercase tracking-widest leading-none">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl shadow-sm hover:scale-105 transition-all uppercase tracking-widest leading-none">
                  <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
               </button>
               <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl shadow-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
@@ -1949,13 +2117,22 @@ export default function App() {
         if (resMarket.ok) { const m = await resMarket.json(); setDolarOficial(m.dolar_oficial); setUvaValue(m.uva_value); setLastUpdate(m.last_update); }
         const resInflacion = await fetch(`/REM/processed/inflacion_unificada.csv?v=${new Date().getTime()}`);
         if (resInflacion.ok) {
-          const text = await resInflacion.text(); const rows = text.split('\n').slice(1);
-          const parsed = rows.map(r => r.trim()).filter(r => r.length > 0).map(r => { 
-            const parts = r.split(';'); 
-            return { mes: parseInt(parts[0]), año: parseInt(parts[1]), valor: parseFloat(parts[2].replace(',', '.')), origen: (parts[4] || 'REM').trim() }; 
-          });
-          setRemData(parsed); setRemStatus('available'); 
-          // Label del primer dato REM (no IPC) para mostrar en el header
+          const text = await resInflacion.text();
+          const rows = text.split('\n').slice(1);
+          const parsed = rows
+            .map(r => r.trim())
+            .filter(r => r.length > 0)
+            .map(r => {
+              const parts = r.split(';');
+              return {
+                mes: parseInt(parts[0]),
+                año: parseInt(parts[1]),
+                valor: parseFloat(parts[2].replace(',', '.')),
+                origen: (parts[4] || 'REM').trim()
+              };
+            });
+          setRemData(parsed);
+          setRemStatus('available');
           const firstRem = parsed.find(d => d.origen === 'REM');
           if (firstRem) setRemDateLabel(`${MESES[firstRem.mes - 1]} ${firstRem.año}`);
           else if (parsed.length > 0) setRemDateLabel(`${MESES[parsed[0].mes - 1]} ${parsed[0].año}`);
@@ -2031,7 +2208,7 @@ export default function App() {
                             "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
-                        <MortgageCalculator uvaValue={uvaValue} remData={remData} remStatus={remStatus} dolarOficial={dolarOficial} />
+                        <MortgageCalculator uvaValue={uvaValue} remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
 
@@ -2053,7 +2230,7 @@ export default function App() {
                             "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
-                        <RentCalculator remData={remData} remStatus={remStatus} dolarOficial={dolarOficial} />
+                        <RentCalculator remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
 
