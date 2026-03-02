@@ -18,7 +18,7 @@ import {
 
 // --- CONSTANTES GLOBALES ---
 const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.1.0";
 const CURRENT_YEAR = new Date().getFullYear();
 
 Font.register({
@@ -27,6 +27,13 @@ Font.register({
 });
 
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
+
+const moneyCompact = (v) => {
+  const abs = Math.abs(v);
+  if (abs >= 1_000_000_000) return `$ ${(v / 1_000_000_000).toFixed(1).replace('.', ',')} MM`;
+  if (abs >= 1_000_000) return `$ ${(v / 1_000_000).toFixed(1).replace('.', ',')} M`;
+  return money(v);
+};
 
 const formatDateTime = (dateStr) => {
   if (!dateStr) return '---';
@@ -208,24 +215,17 @@ function useFullscreenOrientation(isOpen) {
 }
 
 function ChartModal({ isOpen, onClose, children, title }) {
-  const { landscape, setLandscape, isMobilePortrait, contentStyle } = useFullscreenOrientation(isOpen);
+  const { contentStyle } = useFullscreenOrientation(isOpen);
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden animate-in fade-in duration-300">
-      <div style={contentStyle} className="flex flex-col overflow-hidden">
-        <div className="flex justify-between items-center px-5 py-4 shrink-0">
+      <div style={contentStyle} className="flex flex-col">
+        <div className="flex justify-between items-center px-5 py-3 shrink-0">
           <h3 className="text-white font-black text-base md:text-2xl uppercase tracking-tighter truncate mr-3">{title}</h3>
-          <div className="flex items-center gap-2 shrink-0">
-            {isMobilePortrait && (
-              <button onClick={() => setLandscape(l => !l)} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90" title={landscape ? "Cambiar a vertical" : "Cambiar a horizontal"}>
-                <Smartphone className="w-4 h-4" style={{ transition: `transform 0.4s ${EASE}`, transform: landscape ? 'rotate(-90deg)' : 'rotate(0deg)' }} />
-              </button>
-            )}
-            <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"><X className="w-5 h-5" /></button>
-          </div>
+          <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90 shrink-0"><X className="w-5 h-5" /></button>
         </div>
-        <div className="flex-1 min-h-0 px-5 pb-5 flex items-center justify-center overflow-hidden">
-          <div style={{ width: '100%', aspectRatio: '1000/320', maxHeight: '100%' }}>
+        <div className="flex-1 min-h-0 px-5 pb-3 flex items-center justify-center relative">
+          <div style={{ width: '100%', height: '100%', maxHeight: '100%', position: 'relative' }}>
             {children}
           </div>
         </div>
@@ -239,7 +239,7 @@ function TableModal({ isOpen, onClose, children, title }) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden animate-in fade-in duration-300">
-      <div style={contentStyle} className="flex flex-col">
+      <div style={contentStyle} className="flex flex-col h-full">
         <div className="flex justify-between items-center px-5 py-4 shrink-0 border-b border-white/10">
           <h3 className="text-white font-black text-base md:text-xl uppercase tracking-tighter truncate mr-3">{title}</h3>
           <div className="flex items-center gap-2 shrink-0">
@@ -251,7 +251,7 @@ function TableModal({ isOpen, onClose, children, title }) {
             <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"><X className="w-5 h-5" /></button>
           </div>
         </div>
-        <div className="flex-1 min-h-0 overflow-auto no-scrollbar p-4">
+        <div className="flex-1 min-h-0 overflow-auto no-scrollbar">
           {children}
         </div>
       </div>
@@ -335,8 +335,9 @@ function WelcomeModal({ onClose }) {
              Seguimos mejorando ProyectAR para que tengas la mejor experiencia de análisis financiero:
            </p>
            <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg text-indigo-600 dark:text-indigo-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Modo Cine</h4><p className="text-[10px] text-slate-400">Ahora podés expandir los gráficos a pantalla completa para un análisis detallado.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400 shrink-0"><ShieldAlert className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Notas de Riesgo</h4><p className="text-[10px] text-slate-400">Sumamos advertencias sobre la afectación de ingresos vs inflación.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[10px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Más Bancos</h4><p className="text-[10px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-lg text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Modo Cine Mejorado</h4><p className="text-[10px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
            </div>
            <button onClick={onClose} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 group">
              <span>¡A simular!</span> <Sparkles className="w-3 h-3 text-indigo-300 group-hover:text-white transition-colors"/>
@@ -491,10 +492,10 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
     touchTimer.current = null;
   };
 
-  const handleTouchStart = (d) => (e) => {
+  const handleTouchStart = (d, pct) => (e) => {
     e.preventDefault();
     clearTouch();
-    setHovered({ data: d, touch: true });
+    setHovered({ data: d, pct });
   };
 
   const handleTouchEnd = () => {
@@ -504,9 +505,9 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50 gap-3">
-        <Calculator className="w-10 h-10 text-slate-300 dark:text-slate-700" />
-        <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">Completá el monto y el plazo para ver tu proyección</p>
+      <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50 gap-3 p-4">
+        <Calculator className="w-8 h-8 md:w-10 md:h-10 text-slate-300 dark:text-slate-700" />
+        <p className="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-slate-400 text-center">Completá el monto y el plazo para ver tu proyección</p>
       </div>
     );
   }
@@ -517,46 +518,30 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
   const sampled = data.filter((_, i) => i % step === 0);
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full overflow-visible">
       
-      {/* TOOLTIP DESKTOP: sigue al mouse con posición fixed */}
-      {hovered && !hovered.touch && (
+      {/* TOOLTIP: se mueve horizontalmente según la barra seleccionada */}
+      {hovered && (
         <div
-          className="fixed z-[200] pointer-events-none bg-slate-900/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-5 w-[240px]"
-          style={{
-            left: `${Math.max(8, Math.min(window.innerWidth - 256, hovered.cx - 120))}px`,
-            top: hovered.cy > window.innerHeight * 0.55
-              ? `${Math.max(8, hovered.cy - 310)}px`
-              : `${Math.min(window.innerHeight - 310, hovered.cy + 12)}px`,
-          }}
+          className="absolute top-0 z-[200] bg-slate-900/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-3 sm:p-4 w-[220px] sm:w-[240px] pointer-events-none"
+          style={{ left: `clamp(0px, calc(${hovered.pct}% - 110px), calc(100% - 220px))` }}
+          onClick={() => setHovered(null)}
         >
+          <button className="absolute top-2 right-2 p-0.5 text-slate-500 hover:text-white sm:hidden" onClick={() => setHovered(null)}>
+            <X className="w-3 h-3" />
+          </button>
           <TooltipContent data={hovered.data} isRent={isRent} />
         </div>
       )}
 
-      {/* TOOLTIP MOBILE: panel fijo en la parte inferior, no depende de coordenadas */}
-      {hovered && hovered.touch && (
-        <div
-          className="absolute bottom-0 left-0 right-0 z-[200] bg-slate-900/98 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-4 mx-1 mb-1"
-          onClick={() => setHovered(null)}
-        >
-          <div className="flex justify-between items-start gap-2">
-            <div className="flex-1 min-w-0">
-              <TooltipContent data={hovered.data} isRent={isRent} />
-            </div>
-            <button className="shrink-0 p-1 text-slate-500 hover:text-white" onClick={() => setHovered(null)}>
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
-
       <svg
-        viewBox={`0 0 ${w} ${h}`}
-        className="w-full h-full overflow-visible select-none"
-        preserveAspectRatio="none"
-        onMouseLeave={() => !hovered?.touch && setHovered(null)}
+      viewBox={`0 0 ${w} ${h}`}
+      className="w-full h-full overflow-visible select-none"
+      preserveAspectRatio="xMidYMax meet"
+      onMouseLeave={() => setHovered(null)}
+      onTouchStart={() => setHovered(null)}
       >
+
         {[0, 0.25, 0.5, 0.75, 1].map(p => (
           <g key={p}>
             <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
@@ -569,13 +554,13 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
           const x = padL + i * barAreaW;
           const hInt = (d.interes / maxVal) * (h - padB - padT);
           const hPri = (d.principal / maxVal) * (h - padB - padT);
+          const pct = ((padL + i * barAreaW + barW / 2) / w) * 100;
           return (
             <g
               key={i}
-              onMouseEnter={(e) => setHovered({ cx: e.clientX, cy: e.clientY, data: d, touch: false })}
-              onMouseMove={(e) => setHovered(prev => prev && !prev.touch ? { ...prev, cx: e.clientX, cy: e.clientY } : prev)}
-              onMouseLeave={() => setHovered(null)}
-              onTouchStart={handleTouchStart(d)}
+              onMouseEnter={() => setHovered({ data: d, pct })}
+              onMouseMove={() => setHovered(prev => prev ? { ...prev, data: d, pct } : { data: d, pct })}
+              onTouchStart={handleTouchStart(d, pct)}
               onTouchEnd={handleTouchEnd}
               className="group cursor-pointer"
             >
@@ -921,7 +906,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
         <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 700 }}>
-          <thead className="sticky top-0 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none">
+          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
             <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-center">
@@ -1098,9 +1083,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
           
           <div className="pt-4 border-t dark:border-slate-800">
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <TrendingUp className="w-3 h-3"/> INFLACIÓN PROYECTADA
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0">
+                <TrendingUp className="w-3 h-3 shrink-0"/> INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
@@ -1114,7 +1099,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   </div>
                 </Tooltip>
               </label>
-              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0">
                 <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'rem' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
                 <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'manual' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
               </div>
@@ -1168,17 +1153,23 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
         </div>
 
-        {/* BANCOS */}
+          {/* BANCOS */}
         <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl border dark:border-slate-800 shadow-xl space-y-4 text-left text-[11px]">
           <h4 className="font-black uppercase text-slate-800 dark:text-white flex items-center gap-2 leading-none"><Globe className="w-3 h-3 text-indigo-500" /> Webs de los principales bancos argentinos</h4>
-          <div className="grid grid-cols-6 lg:grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2">
             {[
               { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/bconacion.png" },
-              { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
-              { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" },
+              { n: "Bco. Provincia", u: "https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l: "/logos/provincia.png" },
+              { n: "Galicia", u: "https://www.galicia.ar/personas/prestamos/hipotecarios", l: "/logos/galicia.png" },
               { n: "Santander", u: "https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
+              { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" },
               { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l: "/logos/bbva.png" },
-              { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" }
+              { n: "Credicoop", u: "https://www.bancocredicoop.coop/personas/asalariados/creditos-para-la-vivienda/compra-uvas", l: "/logos/credicoop.png" },
+              { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
+              { n: "ICBC", u: "https://www.icbc.com.ar/personas/productos-servicios/prestamos/hipotecarios", l: "/logos/icbc.png" },
+              { n: "Supervielle", u: "https://www.supervielle.com.ar/personas/prestamos/hipotecarios", l: "/logos/supervielle.png" },
+              { n: "Patagonia", u: "https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios", l: "/logos/patagonia.png" },
+              { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" }
             ].map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
           </div>
         </div>
@@ -1187,10 +1178,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       {/* --- COLUMNA DERECHA: RESULTADOS --- */}
       <div ref={resultsRef} className="lg:col-span-9 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={loanType === 'new' ? "Cuota Inicial" : "Próxima Cuota"} value={money(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
-          <SummaryCard title="Carga Intereses" value={money(totals.totalIntereses)} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital." />
-          <SummaryCard title={loanType === 'new' ? "Pago Final Est." : "Restante a Pagar"} value={money(totals.totalPagadoFinal)} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda." />
-          <SummaryCard title="Costo Financiero" value={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Relación entre el Pago Final y el Monto/Saldo original. Ej: '2.0x' significa que terminás pagando el doble de pesos nominales de los que debías hoy." />
+          <SummaryCard title={loanType === 'new' ? "Cuota Inicial" : "Próxima Cuota"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
+          <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital." />
+          <SummaryCard title={loanType === 'new' ? "Pago Final Est." : "Restante a Pagar"} value={moneyCompact(totals.totalPagadoFinal)} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda." />
+          <SummaryCard title="Relacion costo" value={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Relación entre el Pago Final y el Monto/Saldo original. Ej: '2.0x' significa que terminás pagando el doble de pesos nominales de los que debías hoy." />
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
@@ -1214,7 +1205,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <button onClick={() => setShowGastosBanner(false)} className="text-amber-400 hover:text-amber-600 transition-colors shrink-0" aria-label="Cerrar aviso"><X className="w-3.5 h-3.5" /></button>
             </div>
           )}
-          <div className="h-[220px] md:h-[350px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} /></div>
+          <div className="h-[160px] md:h-[350px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} /></div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
@@ -1573,7 +1564,7 @@ function RentCalculator({ remData, dolarOficial }) {
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Pagos Mensuales">
         <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 600 }}>
-          <thead className="sticky top-0 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none">
+          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
             <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-center">
@@ -1712,8 +1703,8 @@ function RentCalculator({ remData, dolarOficial }) {
           </div>
           
           <div className="pt-4 border-t dark:border-slate-800">
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0">
                 INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="emerald">
                     <div className="mb-4">
@@ -1728,7 +1719,7 @@ function RentCalculator({ remData, dolarOficial }) {
                   </div>
                 </Tooltip>
               </label>
-              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0">
                 <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'rem' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
                 <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'manual' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
               </div>
@@ -1808,13 +1799,13 @@ function RentCalculator({ remData, dolarOficial }) {
       {/* --- COLUMNA DERECHA: RESULTADOS ALQUILERES --- */}
       <div ref={resultsRef} className="lg:col-span-9 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ? "Primer Ingreso" : "Primer Alquiler") : "Alquiler Actual"} value={money(totals.alquilerInicial)} icon={Wallet} colorClass={rentRole === 'owner' ? 'emerald' : 'indigo'} sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
-          <SummaryCard title="Total Expensas Est." value={money(totals.totalExpensas)} icon={TrendingUp} colorClass="orange" tooltip="Proyección de todas las expensas sumadas a lo largo de la simulación, asumiendo que acompañan la inflación mensual." />
-          <SummaryCard title={rentRole === 'owner' ? "Ingreso Bruto Est." : "Costo Total Contrato"} value={money(totals.totalContrato)} icon={CheckCircle2} colorClass="sky" tooltip="La suma de todos los alquileres y expensas a pagar (o cobrar, si sos dueño) mes a mes hasta el final del contrato." />
+          <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ? "Primer Ingreso" : "Primer Pago") : "Alquiler Actual"} value={moneyCompact(totals.alquilerInicial)} icon={Wallet} colorClass={rentRole === 'owner' ? 'emerald' : 'indigo'} sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
+          <SummaryCard title="Expensas" value={moneyCompact(totals.totalExpensas)} icon={TrendingUp} colorClass="orange" tooltip="Proyección de todas las expensas sumadas a lo largo de la simulación." />
+          <SummaryCard title={rentRole === 'owner' ? "Ingreso Est." : " Total"} value={moneyCompact(totals.totalContrato)} icon={CheckCircle2} colorClass="sky" tooltip="La suma de todos los alquileres y expensas a pagar (o cobrar, si sos dueño) mes a mes hasta el final del contrato." />
           
           {rentRole === 'owner' ? (
              <SummaryCard 
-                title="Rentabilidad (Yield)" 
+                title="Rentabilidad" 
                 value={propertyValueUsd > 0 ? `${grossYield.toFixed(1)}%` : "---"} 
                 icon={yieldIcon} 
                 colorClass={yieldColor} 
@@ -1822,7 +1813,7 @@ function RentCalculator({ remData, dolarOficial }) {
                 
              />
           ) : (
-             <SummaryCard title="Multiplicador" value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Compara lo que pagás realmente contra lo que pagarías si no hubiera inflación. Ej: '1.3x' significa que la inflación acumulada encarece el contrato un 30% respecto a pagar siempre el mismo monto." />
+             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Compara lo que pagás realmente contra lo que pagarías si no hubiera inflación. Ej: '1.3x' significa que la inflación acumulada encarece el contrato un 30% respecto a pagar siempre el mismo monto." />
           )}
         </div>
 
@@ -1840,7 +1831,7 @@ function RentCalculator({ remData, dolarOficial }) {
               ))}
             </div>
           </div>
-          <div className="h-[220px] md:h-[350px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} /></div>
+          <div className="h-[160px] md:h-[350px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} /></div>
         </div>
 
         {/* TABLA DE ALQUILERES */}
@@ -2155,16 +2146,11 @@ export default function App() {
             
             {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
-            <div className="bg-slate-900 text-white py-3 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
-              <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row justify-between items-center gap-3 md:gap-2 text-[10px] font-black tracking-widest uppercase text-slate-500 leading-none">
-                <div className="flex items-center gap-3 sm:gap-6 leading-none">
-                  <div className="flex items-center gap-2"><Globe className="w-3 h-3" /> Fuentes: <a href="https://dolarapi.com" target="_blank" className="hover:text-emerald-400">DolarAPI</a></div>
-                  <span className="hidden md:inline text-slate-700">|</span>
-                  <div className="flex items-center gap-2 text-slate-400"><Clock className="w-3 h-3 text-indigo-500" /> <span>ACTUALIZADO: {formatDateTime(lastUpdate)}</span></div>
-                  <span className="hidden lg:inline text-slate-700">|</span><span className="hidden sm:inline">REM: {remDateLabel || '---'}</span>
-                </div>
-                <div className="flex gap-4 sm:gap-12 items-center font-mono leading-none">
-                  <div>DÓLAR OFICIAL <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
+            <div className="bg-slate-900 text-white py-2.5 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
+              <div className="max-w-[1800px] mx-auto flex justify-between items-center text-[10px] font-black tracking-widest uppercase text-slate-500 leading-none">
+                <div className="flex items-center gap-2 text-slate-400"> <span>ÚLT. ACT.</span> {formatDateTime(lastUpdate)}</div>
+                <div className="flex gap-4 sm:gap-8 items-center leading-none">
+                  <div>DÓLAR <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
                   <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
                 </div>
               </div>
@@ -2273,10 +2259,22 @@ export default function App() {
                </div>
             </div>
 
-            <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col lg:flex-row justify-between items-center gap-10">
-              <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
-              <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[10px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
-              <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[11px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
+            <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col gap-8">
+              <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
+                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
+                <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[10px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
+                <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[11px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
+              </div>
+              <div className="border-t dark:border-slate-800 pt-6 text-center">
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 opacity-40 mb-3">Fuentes de datos · Últ. act. {formatDateTime(lastUpdate)}</p>
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] font-bold text-slate-400 opacity-50">
+                  <a href="https://www.bcra.gob.ar" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">BCRA (REM / UVA)</a>
+                  <span className="text-slate-700">·</span>
+                  <a href="https://api.argentinadatos.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">ArgentinaDatos API</a>
+                  <span className="text-slate-700">·</span>
+                  <a href="https://dolarapi.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">DolarAPI</a>
+                </div>
+              </div>
             </footer>
           </div>
         </div>
