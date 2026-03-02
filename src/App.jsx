@@ -170,7 +170,7 @@ const RentPDFDocument = ({ data, summary, role }) => (
       </View>
       <View style={pdfStyles.table}>
         <View style={pdfStyles.tableRow}>
-          {["Periodo", "Origen Info", "Total Mes", "Alquiler", "Expensas"].map(h => (
+          {["Periodo", "Inflación", "Total Mes", "Alquiler", "Expensas"].map(h => (
             <View style={{...pdfStyles.tableColHeader, width: "20%"}} key={h}><Text style={pdfStyles.tableCellHeader}>{h}</Text></View>
           ))}
         </View>
@@ -478,7 +478,7 @@ function TooltipContent({ data, isRent }) {
       </div>
       <div className="space-y-2 text-[13px] mb-3 border-b border-white/10 pb-3">
         <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 uppercase tracking-wide">Total:</span><span className="font-black text-white">{money(data.cuotaTotal)}</span></div>
-        <div className="flex justify-between items-center gap-4 text-indigo-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-indigo-500" /><span className="uppercase">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
+        <div className={`flex justify-between items-center gap-4 font-bold uppercase tracking-wide ${isRent ? 'text-emerald-400' : 'text-indigo-400'}`}><div className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${isRent ? 'bg-emerald-500' : 'bg-indigo-500'}`} /><span className="uppercase">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
         <div className="flex justify-between items-center gap-4 text-orange-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="uppercase">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
       </div>
       <div className="space-y-1.5 text-[12px]">
@@ -837,7 +837,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const exportToCSV = () => {
     if (schedule.length === 0) return;
-    const headers = ["Mes", "Cuota Total", "Interes", "Capital", "Saldo Pendiente", "Origen"];
+    const headers = ["Mes", "Cuota Total", "Interes", "Capital", "Saldo Pendiente", "Inflación"];
     const rows = schedule.map(d => [
       d.label, Math.round(d.cuotaTotal), Math.round(d.interes),
       Math.round(d.principal), Math.round(d.saldo), d.source
@@ -859,7 +859,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       "Interés": Math.round(d.interes),
       "Capital": Math.round(d.principal),
       "Saldo Pendiente": Math.round(d.saldo),
-      "Origen": d.source
+      "Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Proyeccion");
@@ -910,7 +910,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
         <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 700 }}>
           <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
-            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
+            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-center">
             {schedule.map((d) => (
@@ -1075,8 +1075,14 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <div className="flex items-center justify-between mb-4">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 leading-none"><Scale className="w-3 h-3"/> SISTEMA DE AMORTIZACIÓN</label>
               <Tooltip iconClass="w-4 h-4 text-slate-300" color="indigo">
-                  <b className="text-indigo-400">Francés:</b> Cuota total constante. Al principio pagás más intereses y poco capital. Es el más común en créditos hipotecarios UVA.<br/><br/>
-                  <b className="text-amber-400">Alemán:</b> Amortización de capital constante. La cuota total empieza más alta pero baja mes a mes.
+                  <p className="mb-3"><b className="text-indigo-400">🔵 SISTEMA FRANCÉS</b> (Más común)</p>
+                  <p className="mb-2 ml-4">• Cuota fija todos los meses</p>
+                  <p className="mb-2 ml-4">• Al principio pagás más intereses</p>
+                  <p className="mb-4 ml-4">• Ideal si preferís cuotas predecibles</p>
+                  <p className="mb-3"><b className="text-amber-400">🟡 SISTEMA ALEMÁN</b></p>
+                  <p className="mb-2 ml-4">• Cuota decreciente (baja con el tiempo)</p>
+                  <p className="mb-2 ml-4">• Pagás menos intereses totales</p>
+                  <p className="ml-4">• Ideal si podés pagar más al principio</p>
                 </Tooltip>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -1090,6 +1096,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
                 <TrendingUp className="w-3 h-3 shrink-0"/> INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
+                    <p className="mb-3 text-indigo-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
                       <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-indigo-300">mes a mes</span> automáticamente.</p>
@@ -1136,12 +1143,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               label="SUELDO NETO MENSUAL (OPCIONAL)" 
               value={salary} 
               onChange={setSalary} 
-              sublabel="Para calcular la afectación de tu primera cuota (RCI)." 
+              sublabel="Para calcular qué porcentaje de tu sueldo se va en la primera cuota (RCI)." 
             />
             {salary > 0 && totals.cuotaInicial > 0 && (
               <div className="space-y-3 mt-4">
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
-                  Nota: Este cálculo es respecto a la cuota inicial. Si tu sueldo no se ajusta por inflación de forma recurrente, el peso de la cuota sobre tus ingresos aumentará mes a mes.
+                  ⚠️ Importante: Este cálculo es del primer mes. Si tu sueldo sube menos que la cuota, el impacto sobre tu bolsillo será mayor con el tiempo.
                 </p>
                 <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                   (totals.cuotaInicial / salary) > 0.3 
@@ -1240,7 +1247,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <div className="inline-block min-w-full align-middle">
               <table className="w-full text-left border-collapse min-w-[700px] md:min-w-[900px]">
                 <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[10px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
-                  <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
+                  <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
                 </thead>
                 <tbody className="divide-y dark:divide-slate-800 text-center">
                   {schedule.map((d) => (
@@ -1504,7 +1511,7 @@ function RentCalculator({ remData, dolarOficial }) {
 
   const exportToCSV = () => {
     if (schedule.length === 0) return;
-    const headers = ["Periodo", "Total Mes", "Alquiler", "Expensas", "Origen"];
+    const headers = ["Periodo", "Total Mes", "Alquiler", "Expensas", "Inflación"];
     const rows = schedule.map(d => [
       d.label, Math.round(d.cuotaTotal), Math.round(d.principal), Math.round(d.interes), d.source
     ]);
@@ -1524,7 +1531,7 @@ function RentCalculator({ remData, dolarOficial }) {
       "Total Mes": Math.round(d.cuotaTotal),
       "Alquiler": Math.round(d.principal),
       "Expensas": Math.round(d.interes),
-      "Origen Info": d.source
+      "Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Alquileres");
@@ -1571,7 +1578,7 @@ function RentCalculator({ remData, dolarOficial }) {
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Pagos Mensuales">
         <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 600 }}>
           <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
-            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
+            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-center">
             {schedule.map((d) => (
@@ -1579,7 +1586,7 @@ function RentCalculator({ remData, dolarOficial }) {
                 <td className="p-4 font-bold text-slate-200">{d.label}</td>
                 <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
                 <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
-                <td className="p-4 text-indigo-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
+                <td className="p-4 text-emerald-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
                 <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
               </tr>
             ))}
@@ -1713,6 +1720,7 @@ function RentCalculator({ remData, dolarOficial }) {
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
                 INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="emerald">
+                    <p className="mb-3 text-emerald-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu alquiler mes a mes.</p>
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
                       <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-emerald-300">mes a mes</span> automáticamente como proxy del IPC/IPC.</p>
@@ -1781,13 +1789,13 @@ function RentCalculator({ remData, dolarOficial }) {
                   label="SUELDO NETO MENSUAL (OPCIONAL)" 
                   value={salary} 
                   onChange={setSalary} 
-                  sublabel="Para calcular la afectación de tu primer alquiler + expensas (RCI)."
+                  sublabel="Para calcular qué porcentaje de tu sueldo se va en el primer alquiler + expensas (RCI)."
                   color="emerald"
                 />
                 {salary > 0 && totals.cuotaTotalInicial > 0 && (
                   <div className="space-y-3 mt-4">
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
-                      Nota: Este cálculo es respecto al mes inicial. Si tu sueldo no se ajusta a la par del alquiler y las expensas, el peso sobre tus ingresos aumentará.
+                      ⚠️ Importante: Este cálculo es del primer mes. Si tu sueldo sube menos que el alquiler, el impacto sobre tu bolsillo será mayor con el tiempo.
                     </p>
                     <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                       (totals.cuotaTotalInicial / salary) > 0.3 
@@ -1821,7 +1829,7 @@ function RentCalculator({ remData, dolarOficial }) {
                   <span className="text-lg leading-none">{grossYield.toFixed(1)}%</span>
                 </div>
                 <p className="text-[9px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
-                  Rentabilidad calculada sobre el ingreso del primer alquiler, sin contar expensas, impuestos, mantenimiento, seguros ni demás gastos. Se toma el valor del USD oficial a día de la fecha como constante. 
+                  Rentabilidad bruta anual. Solo cuenta el alquiler en dólares (oficial de hoy), sin gastos extras como impuestos o mantenimiento. 
                 </p>
               </div>
             )}
@@ -1845,7 +1853,7 @@ function RentCalculator({ remData, dolarOficial }) {
                 tooltip="Período de Recuperación de la Inversión (PRI). Años estimados para recuperar la inversión inicial solo con el ingreso del alquiler, sin expensas ni gastos extra." 
              />
           ) : (
-             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Compara lo que pagás realmente contra lo que pagarías si no hubiera inflación. Ej: '1.3x' significa que la inflación acumulada encarece el contrato un 30% respecto a pagar siempre el mismo monto." />
+             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
           )}
         </div>
 
@@ -1896,7 +1904,7 @@ function RentCalculator({ remData, dolarOficial }) {
             <div className="inline-block min-w-full align-middle">
               <table className="w-full text-left border-collapse min-w-[700px] md:min-w-[900px]">
                 <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[10px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
-                  <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Origen</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
+                  <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
                 </thead>
                 <tbody className="divide-y dark:divide-slate-800 text-center">
                   {schedule.map((d) => (
@@ -1904,7 +1912,7 @@ function RentCalculator({ remData, dolarOficial }) {
                       <td className="p-4 font-bold text-slate-800 dark:text-slate-200">{d.label}</td>
                       <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
                       <td className="p-4 font-black text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
-                      <td className="p-4 text-indigo-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
+                      <td className="p-4 text-emerald-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
                       <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
                     </tr>
                   ))}
