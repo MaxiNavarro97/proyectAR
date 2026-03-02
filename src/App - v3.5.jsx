@@ -1480,12 +1480,9 @@ function RentCalculator({ remData, dolarOficial }) {
     prevScheduleLen.current = schedule.length;
   }, [schedule.length]);
 
-  // CALCULO RENTABILIDAD (YIELD) - Solo alquiler, SIN expensas
-  const annualRentUsd = dolarOficial > 0 ? (rentAmount * 12) / dolarOficial : 0;
+  // CALCULO RENTABILIDAD (YIELD)
+  const annualRentUsd = dolarOficial > 0 ? (totals.alquilerInicial * 12) / dolarOficial : 0;
   const grossYield = propertyValueUsd > 0 ? (annualRentUsd / propertyValueUsd) * 100 : 0;
-  
-  // CALCULO PRI (Período de Recuperación de la Inversión)
-  const pri = grossYield > 0 ? 100 / grossYield : 0;
   let yieldColor = "slate";
   let yieldIcon = Activity;
   if (propertyValueUsd > 0) {
@@ -1752,6 +1749,7 @@ function RentCalculator({ remData, dolarOficial }) {
               <div className="group text-left">
                 <label className="text-[10px] font-black text-slate-400 block mb-2 uppercase tracking-widest">
                   VALOR DE LA PROPIEDAD (USD)
+                  <span className="text-[8px] text-slate-400 font-medium lowercase ml-1">(Para calcular el Yield)</span>
                 </label>
                 <div className="relative">
                   <input
@@ -1764,9 +1762,6 @@ function RentCalculator({ remData, dolarOficial }) {
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-black text-xs dark:text-slate-400">USD</div>
                 </div>
-                <p className="text-[9px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
-                  Para calcular la Rentabilidad Bruta Anual (Gross Yield) de manera aproximada.
-                </p>
               </div>
             ) : (
               <div>
@@ -1793,30 +1788,6 @@ function RentCalculator({ remData, dolarOficial }) {
                 )}
               </div>
             )}
-            
-            {/* Yield abajo de los inputs en modo propietario */}
-            {rentRole === 'owner' && propertyValueUsd > 0 && rentAmount > 0 && (
-              <div className="mt-4">
-                <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
-                  yieldColor === 'rose' 
-                    ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800'
-                    : yieldColor === 'orange'
-                    ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
-                    : yieldColor === 'emerald'
-                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
-                    : 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-900/20 dark:border-sky-800'
-                }`}>
-                  <span className="flex items-center gap-2">
-                    {React.createElement(yieldIcon, { className: "w-4 h-4" })}
-                    Rentabilidad Anual
-                  </span>
-                  <span className="text-lg leading-none">{grossYield.toFixed(1)}%</span>
-                </div>
-                <p className="text-[9px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
-                  Rentabilidad calculada sobre el ingreso del primer alquiler, sin contar expensas, impuestos, mantenimiento, seguros ni demás gastos. Se toma el valor del USD oficial a día de la fecha como constante. 
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -1830,11 +1801,12 @@ function RentCalculator({ remData, dolarOficial }) {
           
           {rentRole === 'owner' ? (
              <SummaryCard 
-                title="PRI" 
-                value={propertyValueUsd > 0 && pri > 0 ? `${pri.toFixed(1)} años` : "---"} 
-                icon={Clock} 
-                colorClass={pri > 0 && pri <= 12.5 ? 'emerald' : pri > 12.5 && pri <= 20 ? 'orange' : pri > 20 && pri <= 33 ? 'amber' : 'rose'} 
-                tooltip="Período de Recuperación de la Inversión (PRI). Años estimados para recuperar la inversión inicial solo con el ingreso del alquiler, sin expensas ni gastos extra." 
+                title="Rentabilidad" 
+                value={propertyValueUsd > 0 ? `${grossYield.toFixed(1)}%` : "---"} 
+                icon={yieldIcon} 
+                colorClass={yieldColor} 
+                tooltip="Rentabilidad Bruta Anual (Yield). Se calcula anualizando el primer alquiler en dólares sobre el valor de la propiedad." 
+                
              />
           ) : (
              <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Compara lo que pagás realmente contra lo que pagarías si no hubiera inflación. Ej: '1.3x' significa que la inflación acumulada encarece el contrato un 30% respecto a pagar siempre el mismo monto." />
@@ -2292,9 +2264,9 @@ export default function App() {
               <div className="border-t dark:border-slate-800 pt-6 text-center">
                 <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 opacity-40 mb-3">Fuentes de datos · Últ. act. {formatDateTime(lastUpdate)}</p>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] font-bold text-slate-400 opacity-50">
-                  <a href="https://www.bcra.gob.ar/relevamiento-expectativas-mercado-rem/" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">BCRA (REM {remDateLabel || '---'})</a>
+                  <a href="https://www.bcra.gob.ar" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">BCRA (REM / UVA)</a>
                   <span className="text-slate-700">·</span>
-                  <a href="https://argentinadatos.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">ArgentinaDatos API</a>
+                  <a href="https://api.argentinadatos.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">ArgentinaDatos API</a>
                   <span className="text-slate-700">·</span>
                   <a href="https://dolarapi.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">DolarAPI</a>
                 </div>
