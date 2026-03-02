@@ -1723,7 +1723,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     <p className="mb-3 text-emerald-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu alquiler mes a mes.</p>
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
-                      <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-emerald-300">mes a mes</span> automáticamente.</p>
+                      <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-emerald-300">mes a mes</span> automáticamente como proxy del IPC/IPC.</p>
                       <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[11px] leading-snug"><span className="text-emerald-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
                     <div className="h-px w-full bg-white/5 mb-3"></div>
                     <div>
