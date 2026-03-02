@@ -1080,7 +1080,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           
           <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
                 <TrendingUp className="w-3 h-3 shrink-0"/> INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                     <div className="mb-4">
@@ -1700,7 +1700,7 @@ function RentCalculator({ remData, dolarOficial }) {
           
           <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
                 INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="emerald">
                     <div className="mb-4">
