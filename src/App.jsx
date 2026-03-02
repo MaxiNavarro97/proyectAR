@@ -38,7 +38,7 @@ const moneyCompact = (v) => {
 const formatDateTime = (dateStr) => {
   if (!dateStr) return '---';
   const d = new Date(dateStr);
-  return d.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) + ' HS';
+  return d.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
 };
 
 // --- TOOLTIP COMPONENT (mobile-friendly, click to toggle, viewport-safe) ---
@@ -483,7 +483,7 @@ function TooltipContent({ data, isRent }) {
   );
 }
 
-function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
+function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fullscreen = false }) {
   const [hovered, setHovered] = useState(null);
   const touchTimer = useRef(null);
 
@@ -518,26 +518,22 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false }) {
   const sampled = data.filter((_, i) => i % step === 0);
 
   return (
-    <div className="relative w-full h-full overflow-visible">
+    <div className="relative w-full h-full">
       
-      {/* TOOLTIP: se mueve horizontalmente según la barra seleccionada */}
+      {/* TOOLTIP: fijo en esquina superior derecha */}
       {hovered && (
         <div
-          className="absolute top-0 z-[200] bg-slate-900/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-3 sm:p-4 w-[220px] sm:w-[240px] pointer-events-none"
-          style={{ left: `clamp(0px, calc(${hovered.pct}% - 110px), calc(100% - 220px))` }}
-          onClick={() => setHovered(null)}
+          className="absolute top-1 z-[200] bg-slate-900/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-3 sm:p-4 w-[220px] sm:w-[240px] pointer-events-none"
+          style={{ right: `clamp(0px, calc(${100 - hovered.pct}% - 110px), calc(100% - 220px))` }}
         >
-          <button className="absolute top-2 right-2 p-0.5 text-slate-500 hover:text-white sm:hidden" onClick={() => setHovered(null)}>
-            <X className="w-3 h-3" />
-          </button>
           <TooltipContent data={hovered.data} isRent={isRent} />
         </div>
       )}
 
       <svg
       viewBox={`0 0 ${w} ${h}`}
-      className="w-full h-full overflow-visible select-none"
-      preserveAspectRatio="xMidYMax meet"
+      className="w-full h-full select-none"
+      preserveAspectRatio={fullscreen ? "xMidYMid meet" : "xMinYMid meet"}
       onMouseLeave={() => setHovered(null)}
       onTouchStart={() => setHovered(null)}
       >
@@ -901,7 +897,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del crédito">
-          <CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} />
+          <CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} fullscreen />
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
@@ -1006,9 +1002,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
                   <label className="text-[11px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
-                    TASA (TNA %)
+                    TNA (%)
                     <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
-                        Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
+                        Tasa Nominal Anual. Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
                       </Tooltip>
                   </label>
                   <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
@@ -1057,7 +1053,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
                   {/* Cambiado de <label> a <div> */}
                   <div className="text-[11px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
-                    TASA (TNA %)
+                    TNA (%)
                     <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
                         Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
                       </Tooltip>
@@ -1090,7 +1086,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
                       <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-indigo-300">mes a mes</span> automáticamente.</p>
-                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[9px] leading-snug"><span className="text-indigo-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
+                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[11px] leading-snug"><span className="text-indigo-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
                     <div className="h-px w-full bg-white/5 mb-3"></div>
                     <div>
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Modo Manual</b></div>
@@ -1178,10 +1174,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       {/* --- COLUMNA DERECHA: RESULTADOS --- */}
       <div ref={resultsRef} className="lg:col-span-9 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={loanType === 'new' ? "Cuota Inicial" : "Próxima Cuota"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
+          <SummaryCard title={loanType === 'new' ? "Inicio" : "Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
           <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital." />
-          <SummaryCard title={loanType === 'new' ? "Pago Final Est." : "Restante a Pagar"} value={moneyCompact(totals.totalPagadoFinal)} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda." />
-          <SummaryCard title="Relacion costo" value={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Relación entre el Pago Final y el Monto/Saldo original. Ej: '2.0x' significa que terminás pagando el doble de pesos nominales de los que debías hoy." />
+          <SummaryCard title={loanType === 'new' ? "Total" : "Restante"} value={moneyCompact(totals.totalPagadoFinal)} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda." />
+          <SummaryCard title="Cociente" value={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Relación entre el Pago Final y el Monto/Saldo original. Ej: '2.0x' significa que terminás pagando el doble de pesos nominales de los que debías hoy." />
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
@@ -1191,9 +1187,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                <button onClick={() => setIsFullscreen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver en Pantalla Completa" aria-label="Ver en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner overflow-x-auto max-w-full no-scrollbar">
-              {['2y', '3y', '5y', '10y', 'all'].map(t => (
+              {['1y', '2y', '3y', '10y', 'all'].map(t => (
                 <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400'}`}>
-                  {t === 'all' ? 'TODO' : t.replace('y', ' AÑOS')}
+                  {t === 'all' ? 'TODO' : t === '1y' ? '1 AÑO' : t.replace('y', ' AÑOS')}
                 </button>
               ))}
             </div>
@@ -1205,7 +1201,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <button onClick={() => setShowGastosBanner(false)} className="text-amber-400 hover:text-amber-600 transition-colors shrink-0" aria-label="Cerrar aviso"><X className="w-3.5 h-3.5" /></button>
             </div>
           )}
-          <div className="h-[160px] md:h-[350px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} /></div>
+          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} /></div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
@@ -1559,7 +1555,7 @@ function RentCalculator({ remData, dolarOficial }) {
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del alquiler">
-          <CompositionChart data={schedule} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} />
+          <CompositionChart data={schedule} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} fullscreen />
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Pagos Mensuales">
@@ -1831,7 +1827,7 @@ function RentCalculator({ remData, dolarOficial }) {
               ))}
             </div>
           </div>
-          <div className="h-[160px] md:h-[350px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} /></div>
+          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} /></div>
         </div>
 
         {/* TABLA DE ALQUILERES */}
@@ -2148,8 +2144,8 @@ export default function App() {
 
             <div className="bg-slate-900 text-white py-2.5 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
               <div className="max-w-[1800px] mx-auto flex justify-between items-center text-[10px] font-black tracking-widest uppercase text-slate-500 leading-none">
-                <div className="flex items-center gap-2 text-slate-400"> <span>ÚLT. ACT.</span> {formatDateTime(lastUpdate)}</div>
-                <div className="flex gap-4 sm:gap-8 items-center leading-none">
+                <div className="flex items-center gap-1.5 text-slate-400"><Clock className="w-3 h-3 text-indigo-500 shrink-0" /><span className="text-[8px] sm:text-[10px]">{formatDateTime(lastUpdate)}</span></div>
+                <div className="flex gap-3 sm:gap-8 items-center font-mono leading-none text-[8px] sm:text-[10px]">
                   <div>DÓLAR <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
                   <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
                 </div>
