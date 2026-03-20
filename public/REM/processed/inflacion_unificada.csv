@@ -1,5 +1,4 @@
 ﻿mes;año;valor_mensual;periodo;origen
-2;2025;2.4;feb-25;IPC
 3;2025;3.7;mar-25;IPC
 4;2025;2.8;abr-25;IPC
 5;2025;1.5;may-25;IPC
@@ -11,7 +10,7 @@
 11;2025;2.5;nov-25;IPC
 12;2025;2.8;dic-25;IPC
 1;2026;2.9;ene-26;IPC
-2;2026;2.690410151713714;feb-26;REM
+2;2026;2.9;feb-26;IPC
 3;2026;2.5;mar-26;REM
 4;2026;2.19;abr-26;REM
 5;2026;1.86;may-26;REM
