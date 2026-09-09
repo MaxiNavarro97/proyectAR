@@ -636,16 +636,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [salary, setSalary] = useState(0); 
   const [years, setYears] = useState(0);
   const [rate, setRate] = useState("0");
-  const [inflation, setInflation] = useState("0");
-  const [inflationMode, setInflationMode] = useState('rem'); 
   const [remStabilizedMode, setRemStabilizedMode] = useState('auto');
   const [remStabilizedValue, setRemStabilizedValue] = useState("0");
   const [timeframe, setTimeframe] = useState(() => {
     try { return localStorage.getItem('proyectar_tf_mortgage') || 'all'; } catch { return 'all'; }
   });
-  const [dateMode, setDateMode] = useState('calendar'); 
-  const [startMonth, setStartMonth] = useState(hoy.getMonth());
-  const [startYear, setStartYear] = useState(hoy.getFullYear());
+  // El credito siempre arranca hoy: sin fecha libre, la proyeccion queda
+  // siempre enganchada al calendario de IPC + REM.
+  const startMonth = hoy.getMonth();
+  const startYear = hoy.getFullYear();
 
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [exportType, setExportType] = useState('pdf');
@@ -668,11 +667,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         if (decoded.a) setAmount(decoded.a);
         if (decoded.y) setYears(decoded.y);
         if (decoded.r) setRate(String(decoded.r));
-        if (decoded.im) setInflationMode(decoded.im);
-        if (decoded.inf) setInflation(String(decoded.inf));
         if (decoded.lt) setLoanType(decoded.lt);
-        if (decoded.sm !== undefined) setStartMonth(decoded.sm);
-        if (decoded.sy) setStartYear(decoded.sy);
         // Limpiar la URL después de cargar
         window.history.replaceState({}, '', window.location.pathname);
       }
@@ -680,27 +675,14 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   }, []);
 
   const getShareParams = () => ({
-    t: 'mortgage', a: amount, y: years, r: rate,
-    im: inflationMode, inf: inflation, lt: loanType, sm: startMonth, sy: startYear
+    t: 'mortgage', a: amount, y: years, r: rate, lt: loanType
   });
 
   const handleReset = () => {
-      setAmount(0); setSalary(0); setYears(0); setRate("0"); setInflation("0"); setRemInstallments(0);
+      setAmount(0); setSalary(0); setYears(0); setRate("0"); setRemInstallments(0);
   };
 
   useEffect(() => { try { localStorage.setItem('proyectar_tf_mortgage', timeframe); } catch { /* ignorar */ } }, [timeframe]);
-
-  useEffect(() => {
-    if (loanType === 'ongoing') {
-      setDateMode('calendar');
-      setStartMonth(hoy.getMonth());
-      setStartYear(hoy.getFullYear());
-    }
-  }, [loanType]);
-
-  useEffect(() => {
-    if (dateMode === 'generic') { setLoanType('new'); setInflationMode('manual'); }
-  }, [dateMode]);
 
   useEffect(() => {
     if (remData && remData.length > 0) {
@@ -717,8 +699,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     
     const currentUva = uvaValue || 1;
     const rateNum = (Number(String(rate).replace(',', '.')) || 0) / 100;
-    const inflationNum = Number(String(inflation).replace(',', '.')) || 0;
-    const manualMonthlyInf = Math.pow(1 + inflationNum / 100, 1 / 12) - 1;
     let remStabMon = (remStabilizedMode === 'auto' && remData && remData.length > 0) 
       ? remData[remData.length - 1].valor / 100 
       : (Number(String(remStabilizedValue).replace(',', '.')) || 0) / 100;
@@ -731,7 +711,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     }
 
     // Map unificado de inflación (IPC pasado + REM futuro ya mergeados)
-    const inflacionMap = (dateMode === 'calendar' && inflationMode === 'rem' && remData && remData.length > 0)
+    const inflacionMap = (remData && remData.length > 0)
       ? new Map(remData.map(d => [d.mes + '-' + d.año, d]))
       : new Map();
 
@@ -755,14 +735,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       const balanceUva = fila.saldo;
 
       const inflMatch = inflacionMap.get((currentDate.getMonth() + 1) + '-' + currentDate.getFullYear()) ?? null;
-      let sourceName = 'MANUAL';
-      if (inflationMode === 'rem') {
-        if (inflMatch) {
-          sourceName = inflMatch.origen === 'IPC' ? 'IPC' : 'REM';
-        } else {
-          sourceName = 'INERCIA';
-        }
-      }
+      const sourceName = inflMatch ? (inflMatch.origen === 'IPC' ? 'IPC' : 'REM') : 'INERCIA';
 
       let isHalfWay = false;
       if (!halfWayTriggered && balanceUva <= capitalUvaInicial / 2) {
@@ -784,7 +757,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
       data.push({
         mes: i,
-        label: dateMode === 'calendar' ? `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}` : `Mes ${i}`,
+        label: `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}`,
         shortDate: `${MESES[currentDate.getMonth()]} ${String(currentDate.getFullYear()).slice(-2)}`,
         interes: interestUva * projUva, 
         principal: principalUva * projUva, 
@@ -800,17 +773,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       lastMonthVal = cuotaTotal;
       if (currentDate.getMonth() === 11) { lastDecVal = cuotaTotal; }
 
-      let currentMonthInf;
-      if (dateMode === 'generic' || inflationMode !== 'rem') {
-        currentMonthInf = manualMonthlyInf;
-      } else {
-        currentMonthInf = inflMatch ? inflMatch.valor / 100 : remStabMon;
-      }
+      const currentMonthInf = inflMatch ? inflMatch.valor / 100 : remStabMon;
       projUva *= (1 + currentMonthInf);
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [amount, years, rate, inflation, inflationMode, remStabilizedMode, remStabilizedValue, uvaValue, dateMode, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
+  }, [amount, years, rate, remStabilizedMode, remStabilizedValue, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
   const totals = useMemo(() => ({
       totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
@@ -900,7 +868,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del crédito">
-          <CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} fullscreen />
+          <CompositionChart data={filteredData} dateMode="calendar" showRemMarker fullscreen />
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
@@ -928,61 +896,30 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
       <div className="lg:col-span-3 space-y-4">
         
-        {/* BLOQUE INICIO CRÉDITO (INTEGRADO) */}
+        {/* BLOQUE TIPO DE CRÉDITO */}
         <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl shadow-xl border dark:border-slate-800 text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg"><CalendarDays className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none flex items-center gap-2">
-                INICIO Y TIPO
+                TIPO DE CRÉDITO
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-400">
-                  <p className="mb-3"><b className="text-indigo-400 font-bold">Fecha Exacta:</b> Si sabés en qué mes vas a pagar, elegí esta opción. Nos permite sincronizar tu cuota con la inflación oficial (IPC real + REM proyectado) para ese mes puntual.</p>
-                  <p><b className="text-emerald-400 font-bold">Sin Fecha Fija:</b> Ideal si recién estás averiguando y querés hacer una proyección estimada. Al no haber un mes específico, usás una inflación manual.</p>
+                  <p className="mb-3"><b className="text-indigo-400 font-bold">Nuevo:</b> Todavía no lo sacaste. Simulás desde cero con el monto, el plazo y la tasa que te ofrece el banco.</p>
+                  <p><b className="text-emerald-400 font-bold">En curso:</b> Ya lo tenés. Proyectás desde tu saldo deudor actual y las cuotas que te quedan por pagar.</p>
                 </Tooltip>
               </h3>
             </div>
             <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-lg transition-colors text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
           </div>
-          
-          <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
-            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-sky-400' : 'text-slate-500'}`}>FECHA EXACTA</button>
-            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-sky-400' : 'text-slate-500'}`}>SIN FECHA FIJA</button>
+
+          <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
+            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
+            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>EN CURSO</button>
           </div>
 
-          {dateMode === 'calendar' && (
-             <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-               <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
-               <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all flex items-center justify-center gap-1 ${loanType === 'ongoing' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>
-                 EN CURSO 
-               </button>
-             </div>
-          )}
-          
-          {dateMode === 'generic' && (
-            <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl flex items-start gap-3 animate-pulse mb-4">
-              <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-              <p className="text-[10px] font-black uppercase tracking-tighter text-rose-600 leading-tight">Sin fecha fija, usás inflación manual y no se conecta al calendario REM.</p>
-            </div>
-          )}
-
-          {dateMode === 'calendar' && (
-             loanType === 'new' ? (
-                <div className="grid grid-cols-2 gap-3 animate-in fade-in">
-                  <select value={startYear} onChange={(e) => setStartYear(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">
-                    {[CURRENT_YEAR, CURRENT_YEAR + 1, CURRENT_YEAR + 2].map(y => <option key={y} value={y}>{y}</option>)}
-                  </select>
-                  <select value={startMonth} onChange={(e) => setStartMonth(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">
-                    {MESES.map((m, i) => (
-                      <option key={m} value={i} disabled={startYear === hoy.getFullYear() && i < hoy.getMonth()}>{m.toUpperCase()}</option>
-                    ))}
-                  </select>
-                </div>
-             ) : (
-                <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-200 dark:border-indigo-800 text-center animate-in fade-in">
-                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
-                </div>
-             )
-          )}
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-200 dark:border-indigo-800 text-center">
+            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
+          </div>
         </div>
 
          {/* BLOQUE DATOS DEL CRÉDITO */}
@@ -1074,30 +1011,16 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                     <p className="mb-3 text-indigo-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
                     <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
-                      <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-indigo-300">mes a mes</span> automáticamente.</p>
-                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[11px] leading-snug"><span className="text-indigo-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
-                    <div className="h-px w-full bg-white/5 mb-3"></div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Modo Manual</b></div>
-                      <p><span className="text-white font-bold">Control total.</span> Definí una tasa fija para todo el crédito. Ideal para simular escenarios propios.</p>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Primeros meses (Oficial)</b></div>
+                      <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. ProyectAR mapea esos datos <span className="text-indigo-300">mes a mes</span> automáticamente.</p>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Resto del crédito</b></div>
+                      <p>El REM llega hasta unos dos años. De ahí en adelante se aplica el <span className="text-white">último valor disponible</span> (Auto) o la <span className="text-white">tasa que elijas vos</span> (Fija).</p>
                     </div>
-                  </div>
                 </Tooltip>
               </label>
-              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0">
-                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'rem' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
-                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'manual' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
-              </div>
             </div>
             
             <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
-              {inflationMode === 'manual' ? (
-                <div className="animate-in fade-in space-y-2">
-                    <div className="flex justify-between items-center"><span className="text-[10px] font-black text-indigo-500 uppercase leading-none">Tasa fija anual estimada</span><span className="text-[11px] font-mono font-black dark:text-white leading-none">{inflation}%</span></div>
-                    <input type="range" min="0" max="100" step="0.5" value={Number(String(inflation).replace(',', '.')) || 0} onChange={(e)=>setInflation(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
-                </div>
-              ) : (
                 <div className="flex flex-col gap-4 animate-in fade-in">
                   <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[10px] font-black text-indigo-500 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'auto' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'custom' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>FIJA</button></div></div>
                   <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[10px] font-black dark:text-white uppercase leading-tight ">
@@ -1109,7 +1032,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                     }
                   </div>
                 </div>
-              )}
             </div>
           </div>
           
@@ -1191,7 +1113,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <button onClick={() => setShowGastosBanner(false)} className="text-amber-400 hover:text-amber-600 transition-colors shrink-0" aria-label="Cerrar aviso"><X className="w-3.5 h-3.5" /></button>
             </div>
           )}
-          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} /></div>
+          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker /></div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
