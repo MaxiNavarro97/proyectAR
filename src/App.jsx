@@ -29,6 +29,17 @@ Font.register({
   src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf'
 });
 
+// Escenarios de inflacion anual para los meses que quedan despues del REM.
+// El REM del BCRA cubre alrededor de dos anios; de ahi en adelante hay que
+// elegir un supuesto, y estos tres son los que se ofrecen como atajo.
+const CONVERGENCIA = {
+  optimista: { label: 'Optimista', anual: 5 },
+  base:      { label: 'Base',      anual: 10 },
+  pesimista: { label: 'Pesimista', anual: 20 },
+};
+
+const anualAMensual = (anual) => Math.pow(1 + anual / 100, 1 / 12) - 1;
+
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
 
 const moneyCompact = (v) => {
@@ -603,6 +614,79 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
   );
 }
 
+// Cuanto de tus ingresos se lleva la cuota, mes a mes. Depende del escenario de
+// inflacion a largo plazo y de cuanto le gana (o le pierde) tu sueldo a los precios.
+function IncomeRatioChart({ data }) {
+  if (!data || data.length === 0) return null;
+
+  const w = 1000, h = 260, padL = 55, padB = 40, padT = 20;
+  const step = Math.max(1, Math.ceil(data.length / 200));
+  const puntos = data.filter((_, i) => i % step === 0);
+
+  const maxRci = Math.max(...puntos.map(d => d.rci), 40) * 1.1;
+  const x = (i) => padL + (i / Math.max(1, puntos.length - 1)) * (w - padL - 10);
+  const y = (rci) => h - padB - (rci / maxRci) * (h - padB - padT);
+
+  const linea = puntos.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)} ${y(d.rci).toFixed(1)}`).join(' ');
+  const area = `${linea} L ${x(puntos.length - 1).toFixed(1)} ${h - padB} L ${padL} ${h - padB} Z`;
+
+  const inicial = data[0].rci;
+  const final = data[data.length - 1].rci;
+  const pico = Math.max(...data.map(d => d.rci));
+
+  return (
+    <div className="w-full">
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        {[
+          { t: 'Primera cuota', v: inicial },
+          { t: 'Máximo', v: pico },
+          { t: 'Última cuota', v: final },
+        ].map(k => (
+          <div key={k.t} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-3 border dark:border-slate-800 text-center">
+            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1.5">{k.t}</p>
+            <p className={`text-lg font-black font-mono leading-none ${k.v > 30 ? 'text-rose-500' : 'text-emerald-500'}`}>{k.v.toFixed(1)}%</p>
+          </div>
+        ))}
+      </div>
+
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[180px] md:h-[240px]" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="rciFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+
+        {[0, 0.25, 0.5, 0.75, 1].map(f => {
+          const val = maxRci * f;
+          return (
+            <g key={f}>
+              <line x1={padL} y1={y(val)} x2={w - 10} y2={y(val)} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeWidth="1" />
+              <text x={padL - 8} y={y(val) + 4} textAnchor="end" className="text-[13px] fill-slate-400 font-bold">{val.toFixed(0)}%</text>
+            </g>
+          );
+        })}
+
+        {/* Umbral del 30%: el limite que suelen mirar los bancos para aprobar */}
+        {maxRci > 30 && (
+          <g>
+            <line x1={padL} y1={y(30)} x2={w - 10} y2={y(30)} stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.7" />
+            <text x={w - 14} y={y(30) - 6} textAnchor="end" className="text-[13px] fill-rose-500 font-black">Límite 30%</text>
+          </g>
+        )}
+
+        <path d={area} fill="url(#rciFill)" />
+        <path d={linea} fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinejoin="round" />
+
+        {puntos.filter((_, i) => i % Math.max(1, Math.ceil(puntos.length / 8)) === 0).map((d, i, arr) => {
+          const idx = puntos.indexOf(d);
+          return <text key={d.mes} x={x(idx)} y={h - padB + 24} textAnchor={i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle'} className="text-[13px] fill-slate-500 font-black uppercase">{d.shortDate}</text>;
+        })}
+      </svg>
+    </div>
+  );
+}
+
 // --- UTILIDADES DE COMPARTIR POR URL ---
 const encodeParams = (params) => {
   const encoded = btoa(JSON.stringify(params));
@@ -638,8 +722,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [salary, setSalary] = useState(0); 
   const [years, setYears] = useState(0);
   const [rate, setRate] = useState("0");
-  const [remStabilizedMode, setRemStabilizedMode] = useState('auto');
-  const [remStabilizedValue, setRemStabilizedValue] = useState("0");
+  const [convergenceMode, setConvergenceMode] = useState('base');
+  const [convergenceAnnual, setConvergenceAnnual] = useState("10");
+  // Cuantos puntos por anio le saca (o le pierde) tu sueldo a la inflacion.
+  const [incomeGrowth, setIncomeGrowth] = useState(0);
   const [timeframe, setTimeframe] = useState(() => {
     try { return localStorage.getItem('proyectar_tf_mortgage') || 'all'; } catch { return 'all'; }
   });
@@ -685,13 +771,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   useEffect(() => { try { localStorage.setItem('proyectar_tf_mortgage', timeframe); } catch { /* ignorar */ } }, [timeframe]);
 
-  useEffect(() => {
-    if (remData && remData.length > 0) {
-      const lastValue = remData[remData.length - 1].valor;
-      setRemStabilizedValue(String(lastValue).replace('.', ','));
-    }
-  }, [remData]);
-
   const schedule = useMemo(() => {
     if (!amount || amount === 0) return [];
     
@@ -700,9 +779,13 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     
     const currentUva = uvaValue || 1;
     const rateNum = (Number(String(rate).replace(',', '.')) || 0) / 100;
-    let remStabMon = (remStabilizedMode === 'auto' && remData && remData.length > 0) 
-      ? remData[remData.length - 1].valor / 100 
-      : (Number(String(remStabilizedValue).replace(',', '.')) || 0) / 100;
+    // Inflacion mensual para los meses posteriores al REM.
+    const convAnual = convergenceMode === 'custom'
+      ? (Number(String(convergenceAnnual).replace(',', '.')) || 0)
+      : CONVERGENCIA[convergenceMode].anual;
+    const convMensual = anualAMensual(convAnual);
+    // Cuanto crecen los ingresos por encima de la inflacion, mes a mes.
+    const incomeMensual = anualAMensual(incomeGrowth);
     
     let capitalUvaInicial;
     if (loanType === 'new') {
@@ -722,6 +805,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
     const data = [];
     let projUva = currentUva;
+    let projIngreso = salary;
     let currentDate = new Date(startYear, startMonth, 1);
     let halfWayTriggered = false;
 
@@ -764,6 +848,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         principal: principalUva * projUva, 
         cuotaTotal: cuotaTotal, 
         saldo: balanceUva * projUva, 
+        ingreso: projIngreso,
+        rci: projIngreso > 0 ? (cuotaTotal / projIngreso) * 100 : 0,
         source: sourceName,
         isHalfWay: isHalfWay,
         varMensual: varMensual || 0,
@@ -774,12 +860,13 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       lastMonthVal = cuotaTotal;
       if (currentDate.getMonth() === 11) { lastDecVal = cuotaTotal; }
 
-      const currentMonthInf = inflMatch ? inflMatch.valor / 100 : remStabMon;
+      const currentMonthInf = inflMatch ? inflMatch.valor / 100 : convMensual;
       projUva *= (1 + currentMonthInf);
+      projIngreso *= (1 + currentMonthInf) * (1 + incomeMensual);
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [amount, years, rate, remStabilizedMode, remStabilizedValue, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
+  }, [amount, years, rate, convergenceMode, convergenceAnnual, incomeGrowth, salary, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
   const totals = useMemo(() => ({
       totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
@@ -789,6 +876,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   }), [schedule, amount, loanType, balanceCurrency, uvaValue]);
 
   const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
+
+  // Cuantos meses de la proyeccion tienen dato oficial (IPC o REM) detras.
+  const mesesOficiales = schedule.filter(d => d.source !== 'INERCIA').length;
 
   // Cuanto se aparta la simulacion de lo que el banco cobra de verdad.
   const gapAbs = (bankInstallment > 0 && totals.cuotaInicial > 0) ? bankInstallment - totals.cuotaInicial : 0;
@@ -1043,29 +1133,63 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
                 <TrendingUp className="w-3 h-3 shrink-0"/> INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
-                    <p className="mb-3 text-indigo-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
+                    <p className="mb-3 text-indigo-300 font-bold">💡 La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Primeros meses (Oficial)</b></div>
-                      <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. ProyectAR mapea esos datos <span className="text-indigo-300">mes a mes</span> automáticamente.</p>
+                      <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. Eso no se toca: viene de la fuente oficial.</p>
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Resto del crédito</b></div>
-                      <p>El REM llega hasta unos dos años. De ahí en adelante se aplica el <span className="text-white">último valor disponible</span> (Auto) o la <span className="text-white">tasa que elijas vos</span> (Fija).</p>
+                      <p>El REM llega hasta unos dos años. Para los años que siguen no hay dato oficial de nadie, así que hay que elegir un supuesto: a qué valor creés que se estabiliza la inflación.</p>
                     </div>
                 </Tooltip>
               </label>
             </div>
-            
-            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
-                <div className="flex flex-col gap-4 animate-in fade-in">
-                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[10px] font-black text-indigo-500 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'auto' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'custom' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}>FIJA</button></div></div>
-                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[10px] font-black dark:text-white uppercase leading-tight ">
-                    {remStabilizedMode === 'auto' ? `Aplicando el último dato oficial (${(remData && remData.length > 0 ? remData[remData.length-1].valor : '---')}%) para los meses restantes.` : 
-                      <div>
-                        <div className="flex justify-between mb-1"><span>Tasa Fija mensual estimada para los meses restantes:</span><span>{remStabilizedValue}%</span></div>
-                        <input type="range" min="0" max="10" step="0.1" value={Number(String(remStabilizedValue).replace(',', '.')) || 0} onChange={(e)=>setRemStabilizedValue(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
-                      </div>
-                    }
-                  </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800 space-y-4">
+              <div className="flex items-center justify-between gap-2 pb-3 border-b dark:border-slate-700">
+                <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase flex items-center gap-1.5 leading-none"><Zap className="w-3 h-3" /> Primeros meses</p>
+                <span className="text-[9px] font-black uppercase tracking-tighter text-slate-400 text-right leading-tight">
+                  {mesesOficiales > 0 ? `${mesesOficiales} meses de IPC + REM` : 'IPC + REM oficial'}
+                </span>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-black text-indigo-500 uppercase mb-2.5 leading-none">Inflación a largo plazo</p>
+                <div className="grid grid-cols-3 gap-1.5 mb-2">
+                  {Object.entries(CONVERGENCIA).map(([key, esc]) => (
+                    <button key={key} onClick={() => setConvergenceMode(key)} className={`py-2 px-1 text-[9px] font-black rounded-lg transition-all leading-tight ${convergenceMode === key ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
+                      {esc.label}<br/><span className="opacity-70 font-mono">{esc.anual}%</span>
+                    </button>
+                  ))}
                 </div>
+                <button onClick={() => setConvergenceMode('custom')} className={`w-full py-2 text-[9px] font-black rounded-lg transition-all ${convergenceMode === 'custom' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>OTRO VALOR</button>
+                {convergenceMode === 'custom' && (
+                  <div className="mt-3 animate-in fade-in">
+                    <div className="flex justify-between items-center mb-1 text-[10px] font-black uppercase dark:text-white leading-none">
+                      <span className="text-slate-500">Anual</span><span className="font-mono">{convergenceAnnual}%</span>
+                    </div>
+                    <input type="range" min="0" max="100" step="0.5" value={Number(String(convergenceAnnual).replace(',', '.')) || 0} onChange={(e)=>setConvergenceAnnual(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
+                  </div>
+                )}
+                <p className="text-[9px] text-slate-400 font-medium leading-tight mt-2.5">Se aplica a los meses que quedan después del REM.</p>
+              </div>
+
+              <div className="pt-3 border-t dark:border-slate-700">
+                <div className="flex justify-between items-center mb-2 leading-none">
+                  <div className="text-[10px] font-black text-indigo-500 uppercase flex items-center gap-1.5">
+                    Tus ingresos
+                    <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
+                      ¿Tu sueldo le gana o le pierde a la inflación? En cero, tu sueldo sube exactamente lo mismo que los precios y tu cuota se mantiene estable como porcentaje de lo que ganás. En negativo, la cuota te pesa cada vez más.
+                    </Tooltip>
+                  </div>
+                  <span className="text-[10px] font-mono font-black dark:text-white">{incomeGrowth > 0 ? '+' : ''}{incomeGrowth} pp</span>
+                </div>
+                <input type="range" min="-10" max="10" step="0.5" value={incomeGrowth} onChange={(e)=>setIncomeGrowth(Number(e.target.value))} className="w-full accent-indigo-500" />
+                <p className="text-[9px] text-slate-400 font-medium leading-tight mt-2">
+                  {incomeGrowth === 0 ? 'Tu sueldo sigue a la inflación, ni más ni menos.'
+                    : incomeGrowth > 0 ? `Tu sueldo le gana ${incomeGrowth} puntos por año a la inflación.`
+                    : `Tu sueldo le pierde ${Math.abs(incomeGrowth)} puntos por año a la inflación.`}
+                </p>
+              </div>
             </div>
           </div>
           
@@ -1075,12 +1199,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               label="SUELDO NETO MENSUAL (OPCIONAL)" 
               value={salary} 
               onChange={setSalary} 
-              sublabel="Para calcular qué porcentaje de tu sueldo se va en la primera cuota (RCI)." 
+              sublabel="Para ver qué porcentaje de tu sueldo se lleva la cuota, ahora y a lo largo del crédito." 
             />
             {salary > 0 && totals.cuotaInicial > 0 && (
               <div className="space-y-3 mt-4">
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
-                  ⚠️ Importante: Este cálculo es del primer mes. Si tu sueldo sube menos que la cuota, el impacto sobre tu bolsillo será mayor con el tiempo.
+                  Este número es el de la primera cuota. Cómo evoluciona después lo ves en el gráfico "Cuota sobre tus ingresos".
                 </p>
                 <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                   (totals.cuotaInicial / salary) > 0.3 
@@ -1146,6 +1270,18 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
           <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker /></div>
         </div>
+
+        {salary > 0 && schedule.length > 0 && (
+          <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-sm text-left animate-in fade-in">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-5">
+              <h3 className="font-black text-lg md:text-xl tracking-tight uppercase dark:text-white leading-none">Cuota sobre tus ingresos</h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight md:text-right">
+                Qué porcentaje de tu sueldo se lleva la cuota, mes a mes.
+              </p>
+            </div>
+            <IncomeRatioChart data={filteredData} />
+          </div>
+        )}
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
