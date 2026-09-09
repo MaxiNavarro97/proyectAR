@@ -652,7 +652,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [copiedWP, setCopiedWP] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTableFullscreen, setIsTableFullscreen] = useState(false);
-  const [showGastosBanner, setShowGastosBanner] = useState(true);
 
   const [yearsFocused, setYearsFocused] = useState(false);
   const [rateFocused, setRateFocused] = useState(false);
@@ -1140,13 +1139,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               ))}
             </div>
           </div>
-          {showGastosBanner && (
-            <div className="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-2.5 mb-4">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-              <p className="text-[11px] text-amber-600 dark:text-amber-400/80 font-medium leading-tight flex-1">Tu banco puede sumar seguros y gastos administrativos al CFT. Consultá con tu entidad para el costo final exacto.</p>
-              <button onClick={() => setShowGastosBanner(false)} className="text-amber-400 hover:text-amber-600 transition-colors shrink-0" aria-label="Cerrar aviso"><X className="w-3.5 h-3.5" /></button>
-            </div>
-          )}
+          <div className="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-2.5 mb-4">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <p className="text-[11px] text-amber-600 dark:text-amber-400/80 font-medium leading-tight flex-1">No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.</p>
+          </div>
           <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker /></div>
         </div>
 
