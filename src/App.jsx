@@ -629,6 +629,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [loanType, setLoanType] = useState('new'); 
   const [balanceCurrency, setBalanceCurrency] = useState('ars'); 
   const [remInstallments, setRemInstallments] = useState(0);
+  const [bankInstallment, setBankInstallment] = useState(0);
   const [remFocused, setRemFocused] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
 
@@ -679,7 +680,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   });
 
   const handleReset = () => {
-      setAmount(0); setSalary(0); setYears(0); setRate("0"); setRemInstallments(0);
+      setAmount(0); setSalary(0); setYears(0); setRate("0"); setRemInstallments(0); setBankInstallment(0);
   };
 
   useEffect(() => { try { localStorage.setItem('proyectar_tf_mortgage', timeframe); } catch { /* ignorar */ } }, [timeframe]);
@@ -788,6 +789,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   }), [schedule, amount, loanType, balanceCurrency, uvaValue]);
 
   const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
+
+  // Cuanto se aparta la simulacion de lo que el banco cobra de verdad.
+  const gapAbs = (bankInstallment > 0 && totals.cuotaInicial > 0) ? bankInstallment - totals.cuotaInicial : 0;
+  const gapPct = totals.cuotaInicial > 0 ? (gapAbs / totals.cuotaInicial) * 100 : 0;
 
   const resultsRef = useRef(null);
   const prevScheduleLen = useRef(0);
@@ -1001,6 +1006,35 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
                 </div>
               </div>
+
+              <div className="pt-4 border-t dark:border-slate-800">
+                <CurrencyInput
+                  label="CUOTA QUE TE COBRA EL BANCO (OPCIONAL)"
+                  value={bankInstallment}
+                  onChange={setBankInstallment}
+                  sublabel="El total de tu último resumen. Sirve para ver cuánto se aparta la simulación de lo que pagás de verdad."
+                />
+                {bankInstallment > 0 && totals.cuotaInicial > 0 && (
+                  <div className={`mt-4 p-4 rounded-2xl border-2 space-y-2 animate-in fade-in ${
+                    Math.abs(gapPct) <= 5
+                      ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
+                      : 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800'
+                  }`}>
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      <span>Cuota simulada</span><span className="font-mono">{money(totals.cuotaInicial)}</span>
+                    </div>
+                    <div className={`flex items-center justify-between text-[10px] font-black uppercase tracking-widest ${Math.abs(gapPct) <= 5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                      <span className="flex items-center gap-2"><ArrowRightLeft className="w-3.5 h-3.5"/> Diferencia</span>
+                      <span className="text-base leading-none font-mono">{gapPct > 0 ? '+' : ''}{gapPct.toFixed(1)}%</span>
+                    </div>
+                    <p className="text-[10px] leading-tight font-medium text-slate-500 dark:text-slate-400 pt-1">
+                      {Math.abs(gapPct) <= 5
+                        ? 'La simulación coincide con tu resumen. Lo que queda de diferencia suelen ser los seguros y gastos administrativos.'
+                        : `Tu banco cobra ${money(Math.abs(gapAbs))} ${gapAbs > 0 ? 'más' : 'menos'} por mes. Puede ser por seguros y gastos, o porque aplica otro criterio de recálculo que el sistema francés puro que usa esta simulación.`}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
