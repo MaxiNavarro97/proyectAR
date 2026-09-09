@@ -5,13 +5,13 @@ import * as XLSX from 'xlsx';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
-import { cuadroFrances, cuadroAleman } from './lib/amortizacion.js';
+import { cuadroFrances } from './lib/amortizacion.js';
 
 import { 
   Calculator, DollarSign,
   TrendingUp, Globe, Home, ArrowRightLeft,
   Landmark, FileText, Zap, Settings2, 
-  CalendarDays, AlertTriangle, Scale, Activity, 
+  CalendarDays, AlertTriangle, Activity, 
   Github, Clock, Wallet, CheckCircle2,
   Download, Sun, Moon, ExternalLink, ShieldAlert,
   HelpCircle, Rocket, X, Sparkles, Coffee, HeartHandshake,
@@ -637,7 +637,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [years, setYears] = useState(0);
   const [rate, setRate] = useState("0");
   const [inflation, setInflation] = useState("0");
-  const [system, setSystem] = useState('french'); 
   const [inflationMode, setInflationMode] = useState('rem'); 
   const [remStabilizedMode, setRemStabilizedMode] = useState('auto');
   const [remStabilizedValue, setRemStabilizedValue] = useState("0");
@@ -669,7 +668,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         if (decoded.a) setAmount(decoded.a);
         if (decoded.y) setYears(decoded.y);
         if (decoded.r) setRate(String(decoded.r));
-        if (decoded.s) setSystem(decoded.s);
         if (decoded.im) setInflationMode(decoded.im);
         if (decoded.inf) setInflation(String(decoded.inf));
         if (decoded.lt) setLoanType(decoded.lt);
@@ -682,7 +680,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   }, []);
 
   const getShareParams = () => ({
-    t: 'mortgage', a: amount, y: years, r: rate, s: system,
+    t: 'mortgage', a: amount, y: years, r: rate,
     im: inflationMode, inf: inflation, lt: loanType, sm: startMonth, sy: startYear
   });
 
@@ -739,9 +737,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
     // El cuadro de marcha se calcula entero en UVA (sin inflación) y recién después
     // se recorre aplicando el valor proyectado de la UVA mes a mes.
-    const cuadro = system === 'french'
-      ? cuadroFrances(capitalUvaInicial, rateNum, totalMonths)
-      : cuadroAleman(capitalUvaInicial, rateNum, totalMonths);
+    const cuadro = cuadroFrances(capitalUvaInicial, rateNum, totalMonths);
 
     const data = [];
     let projUva = currentUva;
@@ -814,7 +810,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [amount, years, rate, system, inflation, inflationMode, remStabilizedMode, remStabilizedValue, uvaValue, dateMode, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
+  }, [amount, years, rate, inflation, inflationMode, remStabilizedMode, remStabilizedValue, uvaValue, dateMode, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
   const totals = useMemo(() => ({
       totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
@@ -1070,26 +1066,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               </div>
             </div>
           )}
-          
-          <div className="pt-4 border-t dark:border-slate-800">
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 leading-none"><Scale className="w-3 h-3"/> SISTEMA DE AMORTIZACIÓN</label>
-              <Tooltip iconClass="w-4 h-4 text-slate-300" color="indigo">
-                  <p className="mb-3"><b className="text-indigo-400">🔵 SISTEMA FRANCÉS</b> (Más común)</p>
-                  <p className="mb-2 ml-4">• Cuota fija todos los meses</p>
-                  <p className="mb-2 ml-4">• Al principio pagás más intereses</p>
-                  <p className="mb-4 ml-4">• Ideal si preferís cuotas predecibles</p>
-                  <p className="mb-3"><b className="text-amber-400">🟡 SISTEMA ALEMÁN</b></p>
-                  <p className="mb-2 ml-4">• Cuota decreciente (baja con el tiempo)</p>
-                  <p className="mb-2 ml-4">• Pagás menos intereses totales</p>
-                  <p className="ml-4">• Ideal si podés pagar más al principio</p>
-                </Tooltip>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => setSystem('french')} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${system === 'french' ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-400/10' : 'border-transparent bg-slate-50 dark:bg-slate-800'}`}><span className={`text-xs font-black uppercase ${system === 'french' ? 'text-indigo-500 dark:text-indigo-400' : 'text-slate-500'}`}>Francés</span></button>
-              <button onClick={() => setSystem('german')} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${system === 'german' ? 'border-amber-400 bg-amber-50 dark:bg-amber-400/10' : 'border-transparent bg-slate-50 dark:bg-slate-800'}`}><span className={`text-xs font-black uppercase ${system === 'german' ? 'text-amber-500 dark:text-amber-400' : 'text-slate-500'}`}>Alemán</span></button>
-            </div>
-          </div>
           
           <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between gap-3 mb-4">
@@ -2221,13 +2197,13 @@ export default function App() {
                       <>
                         <Helmet>
                           <title>ProyectAR | Calculadora de Créditos UVA </title>
-                          <meta name="description" content="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Analizá el impacto del sistema francés y alemán." />
+                          <meta name="description" content="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Proyectá cuánto sube tu cuota mes a mes con el sistema francés en UVA." />
                           <script type="application/ld+json">{JSON.stringify({
                             "@context": "https://schema.org",
                             "@type": "WebApplication",
                             "name": "ProyectAR - Calculadora de Créditos UVA",
                             "url": "https://proyectar.io/calculadora-creditos-uva",
-                            "description": "Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés y alemán, exportación a PDF/Excel.",
+                            "description": "Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés, exportación a PDF/Excel.",
                             "applicationCategory": "FinanceApplication",
                             "operatingSystem": "Web",
                             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
