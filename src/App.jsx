@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } f
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import { cuadroFrances } from './lib/amortizacion.js';
+import { faqsOperativas } from './content/faqs.jsx';
 
 import { 
   Calculator, DollarSign,
@@ -1883,122 +1884,8 @@ function FAQ() {
     setOpenIndex(openIndex === index ? -1 : index);
   };
 
-  const faqs = [
-    {
-      q: "¿Qué son los Créditos UVA?",
-      a: <><p>Son préstamos hipotecarios donde el capital se expresa en <b>Unidades de Valor Adquisitivo (UVA)</b>, una unidad creada por el BCRA que se actualiza diariamente según la inflación (índice CER). Tu deuda y tu cuota se ajustan al ritmo de la inflación.</p><p>La ventaja es que la cuota inicial suele ser mucho más baja que en un crédito tradicional a tasa fija, lo que permite acceder con menores ingresos. La contrapartida es que si la inflación sube mucho, la cuota en pesos también lo hace.</p></>
-    },
-    {
-      q: "¿De dónde sale el valor de la UVA?",
-      a: <>
-        <p>La UVA fue creada en 2016 con una equivalencia clara: <b>1.000 UVAs = costo promedio de 1 m² de construcción</b>. Hoy se ajusta diariamente por el CER (Coeficiente de Estabilización de Referencia), que sigue a la inflación oficial del INDEC.</p>
-        <div className="p-4 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800 rounded-xl mt-3 space-y-2">
-          <p className="text-sm font-bold">¿Mi cuota en UVAs cambia?</p>
-          <p className="text-xs md:text-sm"><b>En Sistema Francés:</b> la cuota en UVAs es constante todo el crédito. <b>En Alemán:</b> baja mes a mes. Pero la cuota en pesos siempre cambia porque se multiplica por el valor diario de la UVA.</p>
-        </div>
-      </>
-    },
-    {
-      q: "¿Qué es el IPC y qué es el REM? ¿Cómo los usamos?",
-      a: <>
-        <p>ProyectAR combina <b>dos fuentes oficiales</b> de datos de inflación para armar un timeline unificado:</p>
-        <div className="space-y-3 mt-3">
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-emerald-500 mr-2 align-middle"></span><b>IPC (Índice de Precios al Consumidor)</b> — Dato real, cerrado. Lo publica el INDEC una vez al mes. Usamos los últimos 12 meses como dato histórico confirmado. Siempre tiene prioridad.</p>
-          </div>
-          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-xl">
-            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-indigo-500 mr-2 align-middle"></span><b>REM (Relevamiento de Expectativas de Mercado)</b> — Proyección. El BCRA encuesta a las principales consultoras y bancos sobre cuánto creen que va a ser la inflación futura. Usamos la mediana de esas estimaciones.</p>
-          </div>
-        </div>
-        <p className="mt-3">Cuando un mes tiene dato IPC (real) y REM (proyectado), siempre priorizamos el IPC. Para los meses futuros donde solo hay REM, usamos esa proyección. Si se agotan ambas fuentes, aplicamos <b>inercia</b>: repetimos el último valor disponible del REM.</p>
-      </>
-    },
-    {
-      q: "¿Cómo se calcula la inflación mensual a partir del REM anual?",
-      a: <>
-        <p>El REM publica estimaciones mensuales para los próximos meses y una estimación interanual (i.a.) para los años venideros. Cuando solo tenemos el dato anual, lo convertimos a mensual con esta fórmula:</p>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
-          Inflación mensual = (1 + Inflación anual / 100) ^ (1/12) − 1
-        </div>
-        <p>Por ejemplo, si el REM proyecta 25% anual, la tasa mensual equivalente sería: (1.25)^(1/12) − 1 ≈ 1,88% mensual. Es una <b>tasa geométrica</b>, no una simple división por 12, para que al acumularla 12 meses dé exactamente el valor anual.</p>
-      </>
-    },
-    {
-      q: "¿Cómo se calcula la cuota del crédito UVA?",
-      a: <>
-        <p>Primero el banco calcula tu cuota en UVAs puras (sin inflación). Esa cuota tiene dos partes: devolución de capital + intereses. Dependiendo del sistema:</p>
-        <div className="space-y-3 mt-3">
-          <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl">
-            <p className="text-sm font-bold mb-2">Sistema Francés (cuota constante en UVAs):</p>
-            <div className="overflow-x-auto text-center text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
-              PMT = Saldo × r / (1 − (1 + r) ^ −n)
-            </div>
-            <p className="text-xs mt-2 text-slate-500">Donde r = TNA/12 (tasa mensual) y n = cuotas restantes.</p>
-          </div>
-          <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl">
-            <p className="text-sm font-bold mb-2">Sistema Alemán (amortización constante):</p>
-            <div className="overflow-x-auto text-center text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
-              Amortización = Capital total / n &nbsp;&nbsp;|&nbsp;&nbsp; Cuota = Amortización + Saldo × r
-            </div>
-            <p className="text-xs mt-2 text-slate-500">La cuota en UVAs baja cada mes porque el saldo sobre el que calculás intereses se va reduciendo.</p>
-          </div>
-        </div>
-        <p className="mt-3">Para convertir a pesos:</p>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-2 text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
-          Cuota en $ = Cuota en UVAs × Valor UVA del día de pago
-        </div>
-        <p>Como el valor de la UVA sube con la inflación, tu cuota en pesos sube mes a mes aunque la cuota en UVAs sea fija.</p>
-      </>
-    },
-    {
-      q: "¿Cuál es la diferencia entre el Sistema Francés y el Alemán?",
-      a: <><p>Son dos formas de devolver el préstamo con características opuestas:</p><ul className="list-disc pl-5 space-y-2 mt-2"><li><b>Francés (el más común):</b> Cuota en UVAs constante. Al inicio pagás mucho interés y poco capital. Es más fácil de calificar porque la cuota inicial es más baja.</li><li><b>Alemán:</b> Amortización de capital constante. La cuota arranca más alta pero baja cada mes. Pagás menos intereses totales a lo largo del crédito.</li></ul><p className="mt-2">En la práctica, la mayoría de los bancos argentinos ofrecen exclusivamente Sistema Francés para créditos UVA.</p></>
-    },
-    {
-      q: "¿Qué es el Yield (rentabilidad bruta) y cómo se calcula?",
-      a: <>
-        <p>Es una métrica estándar del mercado inmobiliario que indica cuánto rinde una propiedad por año en relación a su valor. Se calcula así:</p>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-emerald-600 dark:text-emerald-400 font-mono font-bold text-xs md:text-sm">
-          Yield = (Alquiler mensual × 12 / Dólar oficial) / Valor propiedad USD × 100
-        </div>
-        <p>Es una medida <b>bruta</b> (no descuenta impuestos, vacancia, mantenimiento). En el mercado argentino, los rangos típicos son:</p>
-        <ul className="list-disc pl-5 space-y-1 mt-2 text-sm">
-          <li><b className="text-rose-500">Menor a 3%:</b> Rendimiento bajo. La propiedad se valoriza más por plusvalía que por renta.</li>
-          <li><b className="text-orange-500">3% a 5%:</b> Rango normal del mercado argentino actual.</li>
-          <li><b className="text-emerald-500">5% a 8%:</b> Buen rendimiento. Propiedad rentable.</li>
-          <li><b className="text-sky-500">Más de 8%:</b> Excelente y poco frecuente. Suele darse en zonas emergentes o propiedades comerciales.</li>
-        </ul>
-      </>
-    },
-    {
-      q: "¿Cómo funciona el ajuste de alquileres?",
-      a: <>
-        <p>La ley vigente permite que propietarios e inquilinos acuerden libremente la frecuencia y el índice de ajuste. En ProyectAR simulamos esto así:</p>
-        <ol className="list-decimal pl-5 space-y-2 mt-2 text-sm">
-          <li>Se define cada cuántos meses se ajusta (ej: cada 4 meses).</li>
-          <li>Durante esos meses, se <b>acumula la inflación mensual</b> (IPC real o REM proyectado).</li>
-          <li>Al llegar al mes de ajuste, el alquiler base se multiplica por ese factor acumulado.</li>
-        </ol>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-emerald-600 dark:text-emerald-400 font-mono font-bold text-xs md:text-sm">
-          Factor = (1 + inf₁) × (1 + inf₂) × ... × (1 + infₙ)
-          <br/>Nuevo alquiler = Alquiler anterior × Factor
-        </div>
-        <p>Para <b>alquileres en curso</b>, el sistema pre-acumula la inflación pasada (IPC) desde el último ajuste hasta hoy, para proyectar correctamente desde tu situación actual.</p>
-      </>
-    },
-    {
-      q: "¿Qué significa 'Inercia' en el origen de la inflación?",
-      a: <><p>Cuando se agotan los datos del REM (que típicamente cubre 12-18 meses hacia adelante), la proyección necesita seguir. La <b>inercia</b> toma el último valor mensual disponible del REM y lo repite para los meses restantes.</p><p>Es la opción por defecto (modo "Auto"). Si preferís, podés cambiar a modo "Fija" e ingresar manualmente una tasa mensual que consideres más realista para el largo plazo.</p></>
-    },
-    {
-      q: "¿Por qué ajustar las expensas por inflación?",
-      a: <><p>Las expensas de un edificio cubren costos que suben con la inflación: sueldo del encargado, mantenimiento, servicios, limpieza. Si simulás un contrato asumiendo expensas congeladas durante dos años, el resultado subestima fuertemente el costo real de vivir en esa propiedad.</p><p>ProyectAR aplica la misma tasa de inflación mensual a las expensas para darte una imagen más fiel del gasto total.</p></>
-    },
-    {
-      q: "¿Los datos de ProyectAR son exactos?",
-      a: <><p>ProyectAR es una <b>herramienta de simulación</b>, no un oráculo. Usamos las mejores fuentes públicas disponibles (IPC-INDEC, REM-BCRA, UVA-BCRA, Dólar-BCRA), pero toda proyección a futuro es inherentemente incierta.</p><p>La inflación real puede diferir de las estimaciones del REM, los bancos pueden modificar sus tasas, y las condiciones macroeconómicas pueden cambiar. Usá los resultados como referencia para tomar decisiones informadas, no como una promesa de lo que va a pasar.</p><p>Ante cualquier decisión financiera importante, consultá siempre con un profesional idóneo.</p></>
-    }
-  ];
+  const faqs = faqsOperativas;
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500 max-w-full">
@@ -2009,7 +1896,7 @@ function FAQ() {
               <HelpCircle className="w-8 h-8 md:w-10 md:h-10 text-amber-500" />
               Preguntas Frecuentes
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Conceptos básicos, fórmulas y teoría detrás de las simulaciones.</p>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Cómo leer los resultados y de dónde sale cada número de la proyección.</p>
           </div>
           <div className="space-y-4">
             {faqs.map((faq, index) => (
@@ -2193,15 +2080,16 @@ export default function App() {
                       <>
                         <Helmet>
                           <title>ProyectAR | FAQ - Preguntas Frecuentes</title>
-                          <meta name="description" content="Todo sobre créditos UVA, inflación IPC/REM, fórmulas de cálculo, sistemas de amortización y cómo funciona ProyectAR." />
+                          <meta name="description" content="Por qué sube tu cuota UVA, de dónde sale la inflación proyectada (IPC + REM del BCRA) y qué no incluye la simulación." />
+                          {/* El structured data se arma con las mismas preguntas que se muestran en pantalla. */}
                           <script type="application/ld+json">{JSON.stringify({
                             "@context": "https://schema.org",
                             "@type": "FAQPage",
-                            "mainEntity": [
-                              {"@type": "Question", "name": "¿Qué son los Créditos UVA?", "acceptedAnswer": {"@type": "Answer", "text": "Son préstamos donde el capital se expresa en UVAs, una unidad que se ajusta diariamente por inflación (CER). La cuota en pesos sube con la inflación, pero el acceso inicial es más fácil."}},
-                              {"@type": "Question", "name": "¿Qué es el REM?", "acceptedAnswer": {"@type": "Answer", "text": "El Relevamiento de Expectativas de Mercado es una encuesta del BCRA a consultoras sobre inflación futura. ProyectAR usa la mediana de esas estimaciones para proyectar cuotas."}},
-                              {"@type": "Question", "name": "¿Cómo se calcula la cuota UVA?", "acceptedAnswer": {"@type": "Answer", "text": "La cuota en UVAs se calcula con la fórmula PMT estándar (sistema francés) o amortización constante (alemán). Luego se multiplica por el valor diario de la UVA para obtener pesos."}}
-                            ]
+                            "mainEntity": faqsOperativas.map(f => ({
+                              "@type": "Question",
+                              "name": f.q,
+                              "acceptedAnswer": { "@type": "Answer", "text": f.resumen }
+                            }))
                           })}</script>
                         </Helmet>
                         <FAQ />
