@@ -5,6 +5,8 @@ import * as XLSX from 'xlsx';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
+import { cuadroFrances, cuadroAleman } from './lib/amortizacion.js';
+
 import { 
   Calculator, DollarSign,
   TrendingUp, Globe, Home, ArrowRightLeft,
@@ -718,7 +720,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     const currentUva = uvaValue || 1;
     const rateNum = (Number(String(rate).replace(',', '.')) || 0) / 100;
     const inflationNum = Number(String(inflation).replace(',', '.')) || 0;
-    const monthlyRate = rateNum / 12;
     const manualMonthlyInf = Math.pow(1 + inflationNum / 100, 1 / 12) - 1;
     let remStabMon = (remStabilizedMode === 'auto' && remData && remData.length > 0) 
       ? remData[remData.length - 1].valor / 100 
@@ -736,28 +737,27 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       ? new Map(remData.map(d => [d.mes + '-' + d.año, d]))
       : new Map();
 
-    let balanceUva = capitalUvaInicial;
+    // El cuadro de marcha se calcula entero en UVA (sin inflación) y recién después
+    // se recorre aplicando el valor proyectado de la UVA mes a mes.
+    const cuadro = system === 'french'
+      ? cuadroFrances(capitalUvaInicial, rateNum, totalMonths)
+      : cuadroAleman(capitalUvaInicial, rateNum, totalMonths);
+
     const data = [];
     let projUva = currentUva;
     let currentDate = new Date(startYear, startMonth, 1);
-    const constantAmortizationUva = capitalUvaInicial / totalMonths;
     let halfWayTriggered = false;
 
     let lastMonthVal = 0;
     let lastDecVal = 0;
     let firstVal = 0;
 
-    for (let i = 1; i <= totalMonths; i++) {
-      if (balanceUva <= 0) break;
-      let interestUva = balanceUva * monthlyRate;
-      let principalUva;
-      if (system === 'french') {
-        const pmtUva = monthlyRate > 0 ? (balanceUva * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -(totalMonths - i + 1))) : constantAmortizationUva;
-        principalUva = pmtUva - interestUva;
-      } else { principalUva = constantAmortizationUva; }
-      
-      if (principalUva > balanceUva) { principalUva = balanceUva; balanceUva = 0; } else { balanceUva -= principalUva; }
-      
+    for (const fila of cuadro) {
+      const i = fila.mes;
+      const interestUva = fila.interes;
+      const principalUva = fila.principal;
+      const balanceUva = fila.saldo;
+
       const inflMatch = inflacionMap.get((currentDate.getMonth() + 1) + '-' + currentDate.getFullYear()) ?? null;
       let sourceName = 'MANUAL';
       if (inflationMode === 'rem') {
