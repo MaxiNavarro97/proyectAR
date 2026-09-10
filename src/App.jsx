@@ -1222,10 +1222,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               </label>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl border dark:border-slate-800 divide-y dark:divide-slate-700">
+            <div className="divide-y dark:divide-slate-800">
 
               {/* Tramo 1: los meses que tienen dato oficial */}
-              <div className="p-4">
+              <div className="pb-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">
                     {mesesOficiales > 0 ? `Primeros ${mesesOficiales} meses` : 'Primeros meses'}
@@ -1239,12 +1239,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   <div>
                     <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2.5">IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</p>
                     {inflacionAnual.length > 0 && (
-                      <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${inflacionAnual.length}, minmax(0, 1fr))` }}>
+                      <div className="flex gap-5">
                         {inflacionAnual.map(a => (
-                          <div key={a.año} className="bg-white dark:bg-slate-900 rounded-xl py-2 px-1 text-center border dark:border-slate-700">
-                            <p className="text-[12px] font-black uppercase text-slate-400 leading-none mb-1">{a.año}</p>
-                            <p className="text-[15px] font-black font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
-                            {a.parcial && <p className="text-[10px] font-bold uppercase text-slate-400 leading-none mt-1">parcial</p>}
+                          <div key={a.año} className="text-left">
+                            <p className="text-[12px] font-black uppercase text-slate-400 leading-none mb-1.5">{a.año}{a.parcial && <span className="normal-case opacity-70"> (parcial)</span>}</p>
+                            <p className="text-[16px] font-black font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
                           </div>
                         ))}
                       </div>
@@ -1270,7 +1269,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               </div>
 
               {/* Tramo 2: los meses para los que ya no hay REM */}
-              <div className="p-4">
+              <div className="pt-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
