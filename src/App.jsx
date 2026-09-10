@@ -7,6 +7,7 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import { cuadroFrances } from './lib/amortizacion.js';
 import { faqsOperativas } from './content/faqs.jsx';
+import { Panel, Card, SectionTitle, Label, Hint, Body, Field, Stat, Segmented, Badge, Notice, NumberField } from './ui/index.jsx';
 
 import { 
   Calculator, DollarSign,
@@ -410,40 +411,31 @@ function NavigationMenu() {
   );
 }
 
-function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent, color = 'indigo' }) {
-  const [isFocused, setIsFocused] = useState(false);
-  const handleChange = (e) => {
-    const rawValue = e.target.value.replace(/\D/g, '');
-    const numericValue = rawValue === '' ? 0 : Number(rawValue);
-    onChange(numericValue);
-  };
-  const formatted = (isFocused && value === 0) ? '' : money(value);
-  
-  // Colores dinámicos según el prop
-  const focusLabelColor = color === 'emerald' ? 'text-emerald-500' : 'text-indigo-500';
-  const focusBorderColor = color === 'emerald' 
-    ? 'focus:border-emerald-500/50 dark:focus:border-emerald-400/30' 
-    : 'focus:border-indigo-500/50 dark:focus:border-indigo-400/30';
-  
+// Monto en pesos. Usa las mismas piezas que el resto: la unica particularidad
+// es que formatea mientras se escribe.
+function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent }) {
+  const [enFoco, setEnFoco] = useState(false);
+  const mostrado = (enFoco && value === 0) ? '' : money(value);
+
   return (
-    <div className="group text-left">
-      <label className={`text-[12px] font-semibold block mb-2 flex items-center gap-2 transition-colors ${isFocused ? focusLabelColor : 'text-slate-400'}`}>{label}</label>
-      <div className={`relative transition-all duration-300 ${isFocused ? 'scale-[1.01]' : ''}`}>
-        <input 
-          type="text" 
+    <Field label={label} hint={sublabel}>
+      <div className="relative">
+        <input
+          type="text"
           inputMode="numeric"
-          value={formatted} 
-          onChange={handleChange} 
-          onFocus={(e) => { setIsFocused(true); e.target.select(); }} 
-          onBlur={() => setIsFocused(false)} 
-          placeholder="$ 0" 
-          className={`w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent ${focusBorderColor}  transition-all dark:text-white`}
+          value={mostrado}
+          onChange={(e) => { const crudo = e.target.value.replace(/\D/g, ''); onChange(crudo === '' ? 0 : Number(crudo)); }}
+          onFocus={(e) => { setEnFoco(true); e.target.select(); }}
+          onBlur={() => setEnFoco(false)}
+          placeholder="$ 0"
+          className="w-full bg-field dark:bg-field-dark border border-hair dark:border-transparent rounded-control px-3 py-2.5 pr-9 font-mono text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 transition-colors"
         />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
+        <DollarSign className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-faint dark:text-faint-dark pointer-events-none" />
       </div>
-      {usdEquivalent > 0 && <p className="text-[12px] text-emerald-600 dark:text-emerald-400 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(usdEquivalent))} <span className="text-[10px] opacity-70">(Oficial)</span></p>}
-      {sublabel && <p className="text-[12px] text-slate-400 mt-1 px-1 leading-relaxed">{sublabel}</p>}
-    </div>
+      {usdEquivalent > 0 && (
+        <Hint className="mt-1.5">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(usdEquivalent))} al oficial</Hint>
+      )}
+    </Field>
   );
 }
 
@@ -736,9 +728,9 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
   ];
 
   return (
-    <div title={`Datos actualizados el ${formatDateTime(lastUpdate)}`} className="w-full md:w-auto flex items-center gap-x-4 overflow-x-auto no-scrollbar md:overflow-visible">
+    <div title={`Datos actualizados el ${formatDateTime(lastUpdate)}`} className="w-full lg:w-auto flex items-center gap-x-4 overflow-x-auto no-scrollbar lg:overflow-visible">
       {items.map((it, i) => (
-        <div key={it.label} title={it.title} className={`flex items-baseline gap-1.5 shrink-0 md:flex-col md:items-start md:gap-1 ${i > 0 ? 'md:border-l md:border-slate-200 md:dark:border-slate-800 md:pl-4 lg:pl-6 md:ml-4 lg:ml-6' : ''}`}>
+        <div key={it.label} title={it.title} className={`flex items-baseline gap-1.5 shrink-0 lg:flex-col lg:items-start lg:gap-1 ${i > 0 ? 'lg:border-l lg:border-hair lg:dark:border-hair-dark lg:pl-5 lg:ml-5' : ''}`}>
           <span className="text-[11px] font-semibold text-slate-400 leading-none">{it.label}</span>
           <span className={`text-[13px] md:text-[15px] font-semibold font-mono leading-none ${it.color}`}>{it.valor}</span>
         </div>
@@ -1058,368 +1050,357 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         <AmortizationTable data={schedule} dark />
       </TableModal>
 
-      {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
+      {/* --- COLUMNA IZQUIERDA: LO QUE PONES --- */}
       <div className="lg:col-span-4 space-y-4">
-        
-        {/* BLOQUE Tipo de crédito */}
-        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent text-left">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <CalendarDays className="w-4 h-4 text-slate-400 shrink-0" />
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-white leading-none flex items-center gap-2">
-                Tipo de crédito
-                <Tooltip iconClass="w-3.5 h-3.5 text-slate-400">
-                  <p className="mb-3"><b className="text-indigo-400 font-bold">Nuevo:</b> Todavía no lo sacaste. Simulás desde cero con el monto, el plazo y la tasa que te ofrece el banco.</p>
-                  <p><b className="text-emerald-400 font-bold">En curso:</b> Ya lo tenés. Proyectás desde tu saldo deudor actual y las cuotas que te quedan por pagar.</p>
-                </Tooltip>
-              </h3>
-            </div>
-            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-xl transition-colors text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
-          </div>
 
-          <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>Nuevo</button>
-            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>En curso</button>
-          </div>
+        <Panel className="p-4 md:p-5">
+          <SectionTitle
+            icon={CalendarDays}
+            aside={
+              <button onClick={handleReset} title="Limpiar todo" aria-label="Limpiar formulario" className="p-1.5 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors">
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            }
+          >
+            Tipo de crédito
+            <Tooltip iconClass="w-3.5 h-3.5 text-faint">
+              <p className="mb-3"><b className="text-indigo-400">Nuevo:</b> todavía no lo sacaste. Simulás desde cero con el monto, el plazo y la tasa que te ofrece el banco.</p>
+              <p><b className="text-indigo-400">En curso:</b> ya lo tenés. Proyectás desde tu saldo deudor actual y las cuotas que te quedan.</p>
+            </Tooltip>
+          </SectionTitle>
 
-          <p className="text-[13px] font-bold text-slate-400 text-center leading-none flex items-center justify-center gap-1.5">
+          <Segmented
+            block
+            value={loanType}
+            onChange={setLoanType}
+            options={[{ value: 'new', label: 'Nuevo' }, { value: 'ongoing', label: 'En curso' }]}
+          />
+
+          <Hint className="mt-3 flex items-center justify-center gap-1.5">
             <CalendarDays className="w-3 h-3 shrink-0" /> Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}
-          </p>
-        </div>
+          </Hint>
+        </Panel>
 
-         {/* BLOQUE DATOS DEL CRÉDITO */}
-        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent space-y-4 text-left">
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <div className="flex items-center gap-3">
-              <Settings2 className="w-4 h-4 text-slate-400 shrink-0" />
-              <h3 className="text-sm font-semibold dark:text-white leading-none">Datos del crédito</h3>
-            </div>
-          </div>
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={Settings2}>Datos del crédito</SectionTitle>
 
           {loanType === 'new' ? (
-            <div className="animate-in fade-in space-y-4">
+            <div className="space-y-4 animate-in fade-in">
               <CurrencyInput label="Monto del préstamo" value={amount} onChange={setAmount} usdEquivalent={amount / dolarOficial} />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  <label className="text-[13px] font-semibold text-indigo-500 block mb-2 leading-none">Plazo (años)</label>
-                  <input type="text" inputMode="numeric" value={(yearsFocused && (years === 0 || years === '')) ? '' : years} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setYears(num !== '' && num > 50 ? 50 : num); }} onFocus={(e) => { setYearsFocused(true); e.target.select(); }} onBlur={() => setYearsFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  <label className="text-[13px] font-semibold text-indigo-500 mb-2 leading-none flex items-center justify-center gap-1.5">
-                    TNA (%)
-                    <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
-                        Tasa Nominal Anual. Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
-                      </Tooltip>
-                  </label>
-                  <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
-                </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Plazo (años)">
+                  <NumberField
+                    value={years || ''}
+                    onChange={(v) => { const n = v.replace(/\D/g, ''); setYears(n === '' ? '' : Math.min(50, Number(n))); }}
+                  />
+                </Field>
+                <Field
+                  label="TNA (%)"
+                  aside={<Tooltip iconClass="w-3 h-3 text-faint">Tasa Nominal Anual. La define cada banco: podés averiguarla en su web o simulando el crédito ahí mismo. Al final de esta columna están los links.</Tooltip>}
+                >
+                  <NumberField
+                    value={rate}
+                    onChange={(v) => { const t = v.replace(',', '.'); if (t === '' || /^\d*\.?\d*$/.test(t)) setRate(v); }}
+                  />
+                </Field>
               </div>
             </div>
           ) : (
-            <div className="animate-in fade-in space-y-4">
-              <div className="group text-left">
-                <div className="flex justify-between items-end mb-2">
-                  <label className="text-[12px] font-semibold flex items-center gap-1.5 text-slate-400 transition-colors">
-                    Saldo deudor
-                    <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
-                        Buscá tu Saldo Deudor actual en tu Home Banking. Podés elegir ingresarlo en Pesos o en cantidad de UVAs.
-                      </Tooltip>
-                  </label>
-                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl border dark:border-slate-600">
-                    <button onClick={() => setBalanceCurrency('ars')} className={`px-3 py-1 text-[11px] font-semibold rounded ${balanceCurrency === 'ars' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>$ ARS</button>
-                    <button onClick={() => setBalanceCurrency('uva')} className={`px-3 py-1 text-[11px] font-semibold rounded ${balanceCurrency === 'uva' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>UVA</button>
-                  </div>
-                </div>
-                <div className="relative">
-                  <input 
-                    type="text" inputMode="numeric"
-                    value={amountFocused && amount === 0 ? '' : (balanceCurrency === 'ars' ? money(amount) : new Intl.NumberFormat('es-AR').format(amount))}
-                    onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setAmount(v === '' ? 0 : Number(v)); }}
-                    onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)}
-                    placeholder={balanceCurrency === 'ars' ?"$ 0" :"0"}
-                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent focus:border-indigo-500/50 dark:focus:border-indigo-400/30  transition-all dark:text-white"
+            <div className="space-y-4 animate-in fade-in">
+              <Field
+                label="Saldo deudor"
+                hint={
+                  amount > 0
+                    ? (balanceCurrency === 'ars'
+                        ? `Equivale a ${new Intl.NumberFormat('es-AR').format(Math.round(amount / uvaValue))} UVA aprox.`
+                        : `Equivale a ${money(amount * uvaValue)} al valor UVA de hoy`)
+                    : 'Está en tu home banking. Podés cargarlo en pesos o en UVA.'
+                }
+                aside={
+                  <Segmented
+                    size="sm"
+                    value={balanceCurrency}
+                    onChange={setBalanceCurrency}
+                    options={[{ value: 'ars', label: '$' }, { value: 'uva', label: 'UVA' }]}
                   />
-                  {balanceCurrency === 'uva' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-semibold text-xs dark:text-slate-400">UVAs</div>}
-                  {balanceCurrency === 'ars' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>}
-                </div>
-                {balanceCurrency === 'ars' && amount > 0 && <p className="text-[12px] text-indigo-600 dark:text-indigo-400 mt-2 px-1 font-bold">Equivale a {new Intl.NumberFormat('es-AR').format(Math.round(amount / uvaValue))} UVAs aprox.</p>}
-                {balanceCurrency === 'uva' && amount > 0 && <p className="text-[12px] text-indigo-600 dark:text-indigo-400 mt-2 px-1 font-bold">Equivale a {money(amount * uvaValue)} <span className="text-[10px] opacity-70">(A valor UVA de hoy)</span></p>}
-              </div>
-              
-             <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  {/* Cambiado de <label> a <div> */}
-                  <div className="text-[11px] sm:text-[13px] font-semibold text-indigo-500 mb-2 flex items-center justify-center gap-1.5 leading-none">
-                    Cuotas restantes
-                  </div>
-                  <input type="text" inputMode="numeric" value={(remFocused && (remInstallments === 0 || remInstallments === '')) ? '' : remInstallments} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setRemInstallments(num !== '' && num > 600 ? 600 : num); }} onFocus={(e) => { setRemFocused(true); e.target.select(); }} onBlur={() => setRemFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  {/* Cambiado de <label> a <div> */}
-                  <div className="text-[13px] font-semibold text-indigo-500 mb-2 leading-none flex items-center justify-center gap-1.5">
-                    TNA (%)
-                    <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
-                        Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
-                      </Tooltip>
-                  </div>
-                  <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
-                </div>
+                }
+              >
+                <NumberField
+                  value={amountFocused && amount === 0 ? '' : (balanceCurrency === 'ars' ? money(amount) : new Intl.NumberFormat('es-AR').format(amount))}
+                  onChange={(v) => { const n = v.replace(/\D/g, ''); setAmount(n === '' ? 0 : Number(n)); }}
+                  suffix={balanceCurrency === 'uva' ? 'UVA' : '$'}
+                  placeholder={balanceCurrency === 'ars' ? '$ 0' : '0'}
+                />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Cuotas restantes">
+                  <NumberField
+                    value={remInstallments || ''}
+                    onChange={(v) => { const n = v.replace(/\D/g, ''); setRemInstallments(n === '' ? '' : Math.min(600, Number(n))); }}
+                  />
+                </Field>
+                <Field
+                  label="TNA (%)"
+                  aside={<Tooltip iconClass="w-3 h-3 text-faint">La define cada banco. Podés averiguarla en su web o en tu resumen.</Tooltip>}
+                >
+                  <NumberField
+                    value={rate}
+                    onChange={(v) => { const t = v.replace(',', '.'); if (t === '' || /^\d*\.?\d*$/.test(t)) setRate(v); }}
+                  />
+                </Field>
               </div>
 
-              <div className="pt-4 border-t dark:border-slate-800">
+              <div className="pt-4 border-t border-hair dark:border-hair-dark">
                 <CurrencyInput
                   label="Cuota que te cobra el banco (opcional)"
                   value={bankInstallment}
                   onChange={setBankInstallment}
-                  sublabel="El total de tu último resumen. Sirve para ver cuánto se aparta la simulación de lo que pagás de verdad."
+                  sublabel="El total de tu último resumen, para ver cuánto se aparta la simulación de lo que pagás."
                 />
                 {bankInstallment > 0 && totals.cuotaInicial > 0 && (
-                  <div className={`mt-4 p-4 rounded-2xl border-2 space-y-2 animate-in fade-in ${
-                    Math.abs(gapPct) <= 5
-                      ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
-                      : 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800'
-                  }`}>
-                    <div className="flex items-center justify-between text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                      <span>Cuota simulada</span><span className="font-mono">{money(totals.cuotaInicial)}</span>
+                  <Notice tone={Math.abs(gapPct) <= 5 ? 'info' : 'warning'} icon={ArrowRightLeft} className="mt-3">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span>Simulada {money(totals.cuotaInicial)}</span>
+                      <span className="font-mono text-stat">{gapPct > 0 ? '+' : ''}{gapPct.toFixed(1)}%</span>
                     </div>
-                    <div className={`flex items-center justify-between text-[12px] font-semibold ${Math.abs(gapPct) <= 5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                      <span className="flex items-center gap-2"><ArrowRightLeft className="w-3.5 h-3.5"/> Diferencia</span>
-                      <span className="text-base leading-none font-mono">{gapPct > 0 ? '+' : ''}{gapPct.toFixed(1)}%</span>
-                    </div>
-                    <p className="text-[12px] leading-tight font-medium text-slate-500 dark:text-slate-400 pt-1">
+                    <span className="text-micro opacity-80">
                       {Math.abs(gapPct) <= 5
-                        ? 'La simulación coincide con tu resumen. Lo que queda de diferencia suelen ser los seguros y gastos administrativos.'
-                        : `Tu banco cobra ${money(Math.abs(gapAbs))} ${gapAbs > 0 ? 'más' : 'menos'} por mes. Puede ser por seguros y gastos, o porque aplica otro criterio de recálculo que el sistema francés puro que usa esta simulación.`}
-                    </p>
-                  </div>
+                        ? 'Coincide con tu resumen. Lo que queda suelen ser seguros y gastos.'
+                        : `Tu banco cobra ${money(Math.abs(gapAbs))} ${gapAbs > 0 ? 'más' : 'menos'} por mes: seguros y gastos, u otro criterio de recálculo.`}
+                    </span>
+                  </Notice>
                 )}
               </div>
             </div>
           )}
-          
-          <div className="pt-4 border-t dark:border-slate-800">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[12px] font-semibold text-slate-400 flex items-center gap-2 min-w-0 overflow-visible">
-                <TrendingUp className="w-3 h-3 shrink-0"/> Inflación proyectada
-                <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
-                    <p className="mb-3 text-indigo-300 font-bold">💡 La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400">Primeros meses</b></div>
-                      <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. Es la opción por defecto y la más fundada.</p>
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400">Meses restantes</b></div>
-                      <p className="mb-3">El REM llega hasta unos dos años. Para los que siguen no hay dato oficial de nadie, así que se repite el último valor del REM.</p>
-                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-white font-bold">Propia:</span> en cualquiera de los dos tramos podés poner tu propio número anual y ver qué pasa. Ojo que ahí dejás de mirar una proyección oficial y pasás a mirar un supuesto tuyo.</p></div>
+        </Panel>
+
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={TrendingUp}>
+            Inflación proyectada
+            <Tooltip iconClass="w-3.5 h-3.5 text-faint">
+              <p className="mb-3">La inflación que usamos para proyectar cómo sube tu cuota mes a mes.</p>
+              <p className="mb-3">Los meses ya cerrados usan el <b className="text-white">IPC del INDEC</b> y los que vienen, el <b className="text-white">REM del BCRA</b>. El REM llega hasta unos dos años; para los que siguen se repite su último valor.</p>
+              <p><b className="text-white">Propia:</b> en cualquiera de los dos tramos podés poner tu número. Ojo que ahí dejás de mirar una proyección oficial y pasás a mirar un supuesto tuyo.</p>
+            </Tooltip>
+          </SectionTitle>
+
+          <div className="divide-y divide-hair dark:divide-hair-dark">
+            <div className="pb-4">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <Label>{mesesOficiales === 0 ? 'Primeros meses' : mesesSinDato === 0 ? `Los ${mesesOficiales} meses` : `Primeros ${mesesOficiales} meses`}</Label>
+                <Segmented size="sm" value={inflFirstMode} onChange={setInflFirstMode}
+                  options={[{ value: 'rem', label: 'REM' }, { value: 'custom', label: 'Propia' }]} />
+              </div>
+              {inflFirstMode === 'rem' ? (
+                <div>
+                  <Body>IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</Body>
+                  {inflacionAnual.length > 0 && (
+                    <div className="flex gap-5 mt-3">
+                      {inflacionAnual.map(a => (
+                        <div key={a.año}>
+                          <Label className="block mb-1">{a.año}{a.parcial && <span className="text-faint"> parcial</span>}</Label>
+                          <p className="text-stat font-mono text-emerald-600 dark:text-emerald-400">{a.valor.toFixed(0)}%</p>
+                        </div>
+                      ))}
                     </div>
-                </Tooltip>
-              </label>
+                  )}
+                </div>
+              ) : (
+                <div className="animate-in fade-in">
+                  <NumberField value={inflFirstAnnual} suffix="% anual"
+                    onChange={(v) => { const t = v.replace(',', '.'); if (t === '' || /^\d*\.?\d*$/.test(t)) setInflFirstAnnual(v); }} />
+                  <Hint className="mt-1.5">Reemplaza el dato oficial. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</Hint>
+                </div>
+              )}
             </div>
 
-            <div className="divide-y dark:divide-slate-800">
-
-              {/* Tramo 1: los meses que tienen dato oficial */}
-              <div className="pb-4">
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <p className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 leading-none">
-                    {mesesOficiales === 0 ? 'Primeros meses' : mesesSinDato === 0 ? `Los ${mesesOficiales} meses` : `Primeros ${mesesOficiales} meses`}
-                  </p>
-                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
-                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflFirstMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflFirstMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>Propia</button>
-                  </div>
-                </div>
-                {inflFirstMode === 'rem' ? (
-                  <div>
-                    <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2.5">IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</p>
-                    {inflacionAnual.length > 0 && (
-                      <div className="flex gap-5">
-                        {inflacionAnual.map(a => (
-                          <div key={a.año} className="text-left">
-                            <p className="text-[12px] font-semibold text-slate-400 leading-none mb-1.5">{a.año}{a.parcial && <span className="normal-case opacity-70"> (parcial)</span>}</p>
-                            <p className="text-[16px] font-semibold font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="animate-in fade-in">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[12px] font-semibold text-slate-500 leading-none shrink-0">Anual</span>
-                      <div className="relative flex-1">
-                        <input
-                          type="text" inputMode="decimal" value={inflFirstAnnual}
-                          onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflFirstAnnual(e.target.value); }}
-                          onFocus={(e) => e.target.select()}
-                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-semibold outline-none focus:border-indigo-500 dark:text-white"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-slate-400 pointer-events-none">%</span>
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">Reemplaza el dato oficial por tu número. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Tramo 2: los meses para los que ya no hay REM. Si el credito termina
-                  antes de que se acabe el REM, este tramo no gobierna nada. */}
-              {mesesSinDato > 0 && (
+            {mesesSinDato > 0 && (
               <div className="pt-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <p className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
-                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
-                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>Propia</button>
-                  </div>
+                  <Label>Meses restantes</Label>
+                  <Segmented size="sm" value={inflLongMode} onChange={setInflLongMode}
+                    options={[{ value: 'rem', label: 'REM' }, { value: 'custom', label: 'Propia' }]} />
                 </div>
                 {inflLongMode === 'rem' ? (
-                  <p className="text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-tight">
+                  <Body>
                     {ultimoRemMensual > 0
                       ? `Sigue con el último dato del REM: ${String(ultimoRemMensual).replace('.', ',')}% mensual, ${ultimoRemAnual.toFixed(1).replace('.', ',')}% anual.`
                       : 'Sigue con el último dato disponible del REM.'}
-                  </p>
+                  </Body>
                 ) : (
                   <div className="animate-in fade-in">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[12px] font-semibold text-slate-500 leading-none shrink-0">Anual</span>
-                      <div className="relative flex-1">
-                        <input
-                          type="text" inputMode="decimal" value={inflLongAnnual}
-                          onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflLongAnnual(e.target.value); }}
-                          onFocus={(e) => e.target.select()}
-                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-semibold outline-none focus:border-indigo-500 dark:text-white"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-slate-400 pointer-events-none">%</span>
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
+                    <NumberField value={inflLongAnnual} suffix="% anual"
+                      onChange={(v) => { const t = v.replace(',', '.'); if (t === '' || /^\d*\.?\d*$/.test(t)) setInflLongAnnual(v); }} />
+                    <Hint className="mt-1.5">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</Hint>
                   </div>
                 )}
               </div>
-              )}
-            </div>
-          </div>
-          
-          {/* BLOQUE RCI AL FONDO */}
-          <div className="pt-4 border-t dark:border-slate-800 animate-in fade-in slide-in-from-bottom-2">
-            <CurrencyInput 
-              label="Sueldo neto mensual (opcional)" 
-              value={salary} 
-              onChange={setSalary} 
-              sublabel="Para ver qué porcentaje de tu sueldo se lleva la primera cuota." 
-            />
-
-            {salary > 0 && totals.cuotaInicial > 0 && (
-              <div className="space-y-3 mt-4">
-                <div className={`p-4 rounded-2xl text-[12px] font-semibold flex items-center justify-between border-2 transition-colors ${
-                  (totals.cuotaInicial / salary) > 0.3 
-                    ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
-                    : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
-                }`}>
-                  <span className="flex items-center gap-2"><Activity className="w-4 h-4"/> Afectación (RCI)</span>
-                  <span className="text-lg leading-none">{((totals.cuotaInicial / salary) * 100).toFixed(1)}%</span>
-                </div>
-                <p className="text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-tight px-1">
-                  Los bancos suelen pedir que la primera cuota no supere el <b>25-30% de tus ingresos netos</b>. Si estás por encima, es probable que te pidan sumar un codeudor o bajar el monto.
-                </p>
-                <p className="text-[11px] text-slate-400 italic font-medium leading-tight px-1">
-                  Es solo la primera cuota. Si tu sueldo sube menos que la inflación, con el tiempo te va a pesar más.
-                </p>
-              </div>
             )}
           </div>
-        </div>
+        </Panel>
 
-          {/* BANCOS */}
-        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent space-y-4 text-left text-[13px]">
-          <h4 className="font-semibold text-slate-800 dark:text-white flex items-center gap-2 leading-none"><Globe className="w-3 h-3 text-indigo-500" /> Webs de los principales bancos argentinos</h4>
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={Activity}>Tu sueldo</SectionTitle>
+          <CurrencyInput
+            label="Sueldo neto mensual (opcional)"
+            value={salary}
+            onChange={setSalary}
+            sublabel="Para ver qué porcentaje se lleva la primera cuota."
+          />
+          {salary > 0 && totals.cuotaInicial > 0 && (
+            <div className="mt-4 space-y-2 animate-in fade-in">
+              <Stat
+                label="Afectación de la primera cuota"
+                value={`${((totals.cuotaInicial / salary) * 100).toFixed(1)}%`}
+                tone={(totals.cuotaInicial / salary) > 0.3 ? 'negative' : 'neutral'}
+              />
+              <Body>Los bancos suelen pedir que no supere el <b>25-30%</b> de tus ingresos netos. Por encima de eso normalmente piden codeudor o bajar el monto.</Body>
+              <Hint>Es solo la primera cuota. Si tu sueldo sube menos que la inflación, con el tiempo va a pesar más.</Hint>
+            </div>
+          )}
+        </Panel>
+
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={Globe}>Bancos</SectionTitle>
           <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2">
             {[
-              { n:"Bco. Nación", u:"https://www.bna.com.ar/Personas/CreditosHipotecarios", l:"/logos/bconacion.png" },
-              { n:"Bco. Provincia", u:"https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l:"/logos/provincia.png" },
-              { n:"Galicia", u:"https://www.galicia.ar/personas/prestamos/hipotecarios", l:"/logos/galicia.png" },
-              { n:"Santander", u:"https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l:"/logos/santander.png" },
-              { n:"Macro", u:"https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l:"/logos/macro.png" },
-              { n:"BBVA", u:"https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l:"/logos/bbva.png" },
-              { n:"Credicoop", u:"https://www.bancocredicoop.coop/personas/asalariados/creditos-para-la-vivienda/compra-uvas", l:"/logos/credicoop.png" },
-              { n:"Bco. Ciudad", u:"https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l:"/logos/ciudad.png" },
-              { n:"ICBC", u:"https://www.icbc.com.ar/personas/productos-servicios/prestamos/hipotecarios", l:"/logos/icbc.png" },
-              { n:"Supervielle", u:"https://www.supervielle.com.ar/personas/prestamos/hipotecarios", l:"/logos/supervielle.png" },
-              { n:"Patagonia", u:"https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios", l:"/logos/patagonia.png" },
-              { n:"Hipotecario", u:"https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l:"/logos/hipotecario.png" }
+              { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/bconacion.png" },
+              { n: "Bco. Provincia", u: "https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l: "/logos/provincia.png" },
+              { n: "Galicia", u: "https://www.galicia.ar/personas/prestamos/hipotecarios", l: "/logos/galicia.png" },
+              { n: "Santander", u: "https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
+              { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" },
+              { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l: "/logos/bbva.png" },
+              { n: "Credicoop", u: "https://www.bancocredicoop.coop/personas/asalariados/creditos-para-la-vivienda/compra-uvas", l: "/logos/credicoop.png" },
+              { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
+              { n: "ICBC", u: "https://www.icbc.com.ar/personas/productos-servicios/prestamos/hipotecarios", l: "/logos/icbc.png" },
+              { n: "Supervielle", u: "https://www.supervielle.com.ar/personas/prestamos/hipotecarios", l: "/logos/supervielle.png" },
+              { n: "Patagonia", u: "https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios", l: "/logos/patagonia.png" },
+              { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" }
             ].map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
           </div>
-        </div>
+        </Panel>
       </div>
-      
-      {/* --- COLUMNA DERECHA: RESULTADOS --- */}
-      <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
-        <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={loanType === 'new' ?"Inicio" :"Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
-          <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado; el que está en UVA es el que mide de verdad cuánto te cuesta el crédito." />
-          <SummaryCard title={loanType === 'new' ?"Total" :"Restante"} value={moneyCompact(totals.totalPagadoFinal)} sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null} icon={CheckCircle2} colorClass="slate" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar también el total en UVA." />
-          <SummaryCard
-            title="Costo real"
-            value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` :"---"}
-            sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x en pesos nominales` : null}
-            icon={Activity}
-            colorClass="slate"
-            tooltip={<><p className="mb-3">Cuántas veces el capital terminás devolviendo, <b className="text-white">medido en UVA</b>. Un 1,50x significa que por cada 100 UVA que te prestaron devolvés 150: esos 50 son el costo real del crédito.</p><p>Abajo está el mismo cociente en pesos nominales, que siempre da mucho más alto porque suma pesos de años distintos sin descontar la inflación. Ese número asusta pero no mide el crédito: mide la inflación.</p></>}
-          />
+
+      {/* --- COLUMNA DERECHA: LO QUE SALE --- */}
+      <div ref={resultsRef} className="lg:col-span-8 space-y-4 min-w-0">
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <Card className="p-4">
+            <Stat
+              size="display"
+              label={loanType === 'new' ? 'Primera cuota' : 'Próxima cuota'}
+              value={moneyCompact(totals.cuotaInicial)}
+              aside={<Tooltip iconClass="w-3 h-3 text-faint">Capital más intereses de la primera cuota, o de la próxima si el crédito ya está en curso.</Tooltip>}
+            />
+          </Card>
+          <Card className="p-4">
+            <Stat
+              tone="interest"
+              label="Intereses"
+              value={moneyCompact(totals.totalIntereses)}
+              sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null}
+              aside={<Tooltip iconClass="w-3 h-3 text-faint">Lo que cobra el banco, sin contar la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado: el que mide de verdad es el que está en UVA.</Tooltip>}
+            />
+          </Card>
+          <Card className="p-4">
+            <Stat
+              label={loanType === 'new' ? 'Total a pagar' : 'Falta pagar'}
+              value={moneyCompact(totals.totalPagadoFinal)}
+              sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null}
+              aside={<Tooltip iconClass="w-3 h-3 text-faint">Todo lo que vas a desembolsar hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar el total en UVA.</Tooltip>}
+            />
+          </Card>
+          <Card className="p-4">
+            <Stat
+              label="Costo real"
+              value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` : '---'}
+              sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x en pesos nominales` : null}
+              aside={<Tooltip iconClass="w-3 h-3 text-faint"><p className="mb-3">Cuántas veces el capital terminás devolviendo, <b className="text-white">medido en UVA</b>. Un 1,50x significa que por cada 100 UVA prestadas devolvés 150: esos 50 son el costo del crédito.</p><p>Abajo está el mismo cociente en pesos nominales, que siempre da mucho más alto porque suma pesos de años distintos. Ese número asusta pero mide la inflación, no el crédito.</p></Tooltip>}
+            />
+          </Card>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
-            <div className="flex items-center gap-3">
-               <h3 className="font-semibold text-lg md:text-xl tracking-tight dark:text-white leading-none">Proyección de pagos del crédito</h3>
-               <button onClick={() => setIsFullscreen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver en Pantalla Completa" aria-label="Ver en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
-            </div>
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto max-w-full no-scrollbar">
-              {['1y', '2y', '3y', '10y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-semibold transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>
-                  {t === 'all' ? 'Todo' : t === '1y' ? '1 año' : t.replace('y', ' años')}
+        <Card className="p-4 md:p-5 relative z-40">
+          <SectionTitle
+            aside={
+              <div className="flex items-center gap-2">
+                <Segmented
+                  size="sm"
+                  value={timeframe}
+                  onChange={setTimeframe}
+                  options={[
+                    { value: '1y', label: '1 año' },
+                    { value: '2y', label: '2 años' },
+                    { value: '3y', label: '3 años' },
+                    { value: '10y', label: '10 años' },
+                    { value: 'all', label: 'Todo' },
+                  ]}
+                />
+                <button onClick={() => setIsFullscreen(true)} title="Ver en pantalla completa" aria-label="Ver en pantalla completa"
+                  className="p-2 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors shrink-0">
+                  <Maximize2 className="w-4 h-4" />
                 </button>
-              ))}
-            </div>
-          </div>
-          <div className="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-2.5 mb-4">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            <p className="text-[13px] text-amber-600 dark:text-amber-400/80 font-medium leading-tight flex-1">No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.</p>
-          </div>
-          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker /></div>
+              </div>
+            }
+          >
+            Proyección de pagos
+          </SectionTitle>
 
-        </div>
+          <Notice tone="warning" icon={AlertTriangle} className="mb-4">
+            No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.
+          </Notice>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
-          <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-[14px] font-semibold text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> Tabla de amortización</span>
-              <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
-            </div>
-            
-            <div className="flex w-full lg:w-auto gap-2 items-stretch">
-              <div className="flex flex-col justify-center px-3 bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 rounded-xl shrink-0">
-                <label className="text-[10px] font-semibold text-slate-400 leading-none mb-1">Exportar</label>
-                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} className="bg-transparent text-[12px] font-semibold outline-none text-slate-800 dark:text-white cursor-pointer leading-none">
+          <div className="h-[200px] md:h-[420px] w-full">
+            <CompositionChart data={filteredData} dateMode="calendar" showRemMarker />
+          </div>
+        </Card>
+
+        <Card className="overflow-hidden">
+          <div className="p-4 md:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-hair dark:border-hair-dark">
+            <SectionTitle
+              icon={FileText}
+              aside={
+                <button onClick={() => { if (schedule.length > 0) setIsTableFullscreen(true); }} title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"
+                  className="p-2 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors shrink-0">
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+              }
+            >
+              Tabla de amortización
+            </SectionTitle>
+
+            <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap lg:-mt-4">
+              <Field label="Exportar" className="shrink-0">
+                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)}
+                  className="bg-field dark:bg-field-dark border border-hair dark:border-transparent rounded-control px-2.5 py-2 text-label text-ink dark:text-ink-dark outline-none cursor-pointer">
                   {[['all', 'Todo'], ['1', '1 año'], ['2', '2 años'], ['3', '3 años'], ['5', '5 años'], ['10', '10 años']].map(([v, l]) => (
                     <option key={v} value={v} className={OPTION_CLASS}>{l}</option>
                   ))}
                 </select>
-              </div>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
-                 <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
+              </Field>
+
+              {[
+                { id: 'pdf', icon: FileText, label: 'PDF', primary: true },
+                { id: 'excel', icon: FileSpreadsheet, label: 'Excel' },
+                { id: 'csv', icon: Download, label: 'CSV' },
+              ].map(b => (
+                <button key={b.id} onClick={() => { if (schedule.length > 0) handleExportClick(b.id); }}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-control text-label transition-colors ${b.primary
+                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    : 'bg-field dark:bg-field-dark border border-hair dark:border-transparent text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'}`}>
+                  <b.icon className="w-4 h-4" /> {b.label}
+                </button>
+              ))}
+
+              <button onClick={copyToWhatsApp} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp"
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-transparent text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
+                {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4" />}
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-semibold rounded-xl hover:scale-105 transition-all leading-none">
-                 <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
-              </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:scale-105 transition-all leading-none whitespace-nowrap">
-                 <FileText className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">PDF</span> 
-              </button>
-              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
-                 {copiedWP ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
-              </button>
-              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
-                 {copiedShare ? <Check className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
+              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-transparent text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
+                {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -1428,7 +1409,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <AmortizationTable data={schedule} />
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
@@ -2229,7 +2210,7 @@ export default function App() {
             
             {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
-            <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 leading-none">
+            <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto lg:h-24 flex flex-col lg:flex-row items-center justify-between px-4 md:px-10 py-4 lg:py-0 gap-4 lg:gap-0 leading-none">
               <div className="flex items-center gap-3 md:gap-5">
                 <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-sm" />
                 <div className="flex flex-col text-left leading-none"><span className="font-semibold text-lg md:text-3xl tracking-tighter leading-none">Proyect<span className="text-indigo-500">AR</span></span><span className="text-[11px] md:text-[13px] font-semibold tracking-[0.2em] text-slate-500 mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
@@ -2237,7 +2218,7 @@ export default function App() {
 
               <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
 
-              <div className="flex items-center gap-2 md:gap-10 w-full md:w-auto justify-between md:justify-end">
+              <div className="flex items-center gap-2 lg:gap-8 w-full lg:w-auto justify-between lg:justify-end">
                 <NavigationMenu />
                 <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" className="p-2.5 md:p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 active:scale-90">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
               </div>
