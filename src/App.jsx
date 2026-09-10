@@ -1253,12 +1253,19 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   </div>
                 ) : (
                   <div className="animate-in fade-in">
-                    <div className="flex justify-between items-center mb-1.5 text-[12px] font-black uppercase leading-none">
-                      <span className="text-slate-500">Anual</span>
-                      <span className="font-mono dark:text-white">{inflFirstAnnual}%</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[12px] font-black uppercase text-slate-500 leading-none shrink-0">Anual</span>
+                      <div className="relative flex-1">
+                        <input
+                          type="text" inputMode="decimal" value={inflFirstAnnual}
+                          onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflFirstAnnual(e.target.value); }}
+                          onFocus={(e) => e.target.select()}
+                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-emerald-500 dark:text-white"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-slate-400 pointer-events-none">%</span>
+                      </div>
                     </div>
-                    <input type="range" min="0" max="200" step="1" value={Number(String(inflFirstAnnual).replace(',', '.')) || 0} onChange={(e)=>setInflFirstAnnual(e.target.value)} className="w-full accent-emerald-500" />
-                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-1.5">Reemplaza el dato oficial por tu número. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
+                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">Reemplaza el dato oficial por tu número. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
                   </div>
                 )}
               </div>
@@ -1280,12 +1287,19 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   </p>
                 ) : (
                   <div className="animate-in fade-in">
-                    <div className="flex justify-between items-center mb-1.5 text-[12px] font-black uppercase leading-none">
-                      <span className="text-slate-500">Anual</span>
-                      <span className="font-mono dark:text-white">{inflLongAnnual}%</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[12px] font-black uppercase text-slate-500 leading-none shrink-0">Anual</span>
+                      <div className="relative flex-1">
+                        <input
+                          type="text" inputMode="decimal" value={inflLongAnnual}
+                          onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflLongAnnual(e.target.value); }}
+                          onFocus={(e) => e.target.select()}
+                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-slate-400 pointer-events-none">%</span>
+                      </div>
                     </div>
-                    <input type="range" min="0" max="200" step="1" value={Number(String(inflLongAnnual).replace(',', '.')) || 0} onChange={(e)=>setInflLongAnnual(e.target.value)} className="w-full accent-indigo-500" />
-                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-1.5">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
+                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
                   </div>
                 )}
               </div>
