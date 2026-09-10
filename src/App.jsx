@@ -51,6 +51,8 @@ const mensualAAnual = (mensual) => (Math.pow(1 + mensual / 100, 12) - 1) * 100;
 
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
 
+const OPTION_CLASS = "bg-white text-slate-900 dark:bg-slate-800 dark:text-white";
+
 const uvas = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 }).format(v);
 
 const moneyCompact = (v) => {
@@ -1422,13 +1424,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <div className="flex w-full lg:w-auto gap-2 items-stretch">
               <div className="flex flex-col justify-center px-3 bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 rounded-xl shrink-0">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Exportar</label>
-                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} className="bg-transparent text-[12px] font-black uppercase outline-none dark:text-white cursor-pointer leading-none">
-                  <option value="all">Todo</option>
-                  <option value="1">1 año</option>
-                  <option value="2">2 años</option>
-                  <option value="3">3 años</option>
-                  <option value="5">5 años</option>
-                  <option value="10">10 años</option>
+                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} className="bg-transparent text-[12px] font-black uppercase outline-none text-slate-800 dark:text-white cursor-pointer leading-none">
+                  {[['all', 'Todo'], ['1', '1 año'], ['2', '2 años'], ['3', '3 años'], ['5', '5 años'], ['10', '10 años']].map(([v, l]) => (
+                    <option key={v} value={v} className={OPTION_CLASS}>{l}</option>
+                  ))}
                 </select>
               </div>
               <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
@@ -1828,10 +1827,10 @@ function RentCalculator({ remData, dolarOficial }) {
              rentType === 'new' ? (
                 <div className="grid grid-cols-2 gap-3 animate-in fade-in">
                   <select value={startYear} onChange={(e) => setStartYear(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">
-                    {[CURRENT_YEAR, CURRENT_YEAR + 1, CURRENT_YEAR + 2].map(y => <option key={y} value={y}>{y}</option>)}
+                    {[CURRENT_YEAR, CURRENT_YEAR + 1, CURRENT_YEAR + 2].map(y => <option key={y} value={y} className={OPTION_CLASS}>{y}</option>)}
                   </select>
                   <select value={startMonth} onChange={(e) => setStartMonth(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">
-                    {MESES.map((m, i) => <option key={m} value={i} disabled={startYear === hoy.getFullYear() && i < hoy.getMonth()}>{m.toUpperCase()}</option>)}
+                    {MESES.map((m, i) => <option key={m} value={i} className={OPTION_CLASS} disabled={startYear === hoy.getFullYear() && i < hoy.getMonth()}>{m.toUpperCase()}</option>)}
                   </select>
                 </div>
              ) : (
