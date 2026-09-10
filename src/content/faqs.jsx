@@ -62,7 +62,7 @@ export const faqsOperativas = [
     {
       q: "¿Qué significa 'Inercia' en el origen de la inflación?",
       resumen: "Cuando se agotan los datos del REM, la proyeccion aplica el ultimo valor mensual disponible para los meses restantes. Se puede dejar en automatico o fijar una tasa propia.",
-      a: <><p>Cuando se agotan los datos del REM (que típicamente cubre 12-18 meses hacia adelante), la proyección necesita seguir. La <b>inercia</b> toma el último valor mensual disponible del REM y lo repite para los meses restantes.</p><p>Es la opción por defecto (modo "Auto"). Si preferís, podés cambiar a modo "Fija" e ingresar manualmente una tasa mensual que consideres más realista para el largo plazo.</p></>
+      a: <><p>Cuando se agotan los datos del REM (que típicamente cubre 12-18 meses hacia adelante), la proyección necesita seguir. La <b>inercia</b> toma el último valor mensual disponible del REM y lo repite para los meses restantes.</p><p>Es la opción por defecto en el tramo "Meses restantes". Si te parece poco realista para el largo plazo, podés cambiarlo a "Propia" y poner tu propia inflación anual. Lo mismo vale para los primeros meses, aunque ahí el dato oficial es bastante más sólido que cualquier número propio.</p></>
     },
     {
       q: "¿Cómo funciona el ajuste de alquileres?",

@@ -29,16 +29,8 @@ Font.register({
   src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf'
 });
 
-// Escenarios de inflacion anual para los meses que quedan despues del REM.
-// El REM del BCRA cubre alrededor de dos anios; de ahi en adelante hay que
-// elegir un supuesto, y estos tres son los que se ofrecen como atajo.
-const CONVERGENCIA = {
-  optimista: { label: 'Optimista', anual: 5 },
-  base:      { label: 'Base',      anual: 10 },
-  pesimista: { label: 'Pesimista', anual: 20 },
-};
-
 const anualAMensual = (anual) => Math.pow(1 + anual / 100, 1 / 12) - 1;
+const mensualAAnual = (mensual) => (Math.pow(1 + mensual / 100, 12) - 1) * 100;
 
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
 
@@ -722,8 +714,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [salary, setSalary] = useState(0); 
   const [years, setYears] = useState(0);
   const [rate, setRate] = useState("0");
-  const [convergenceMode, setConvergenceMode] = useState('base');
-  const [convergenceAnnual, setConvergenceAnnual] = useState("10");
+  // Cada tramo de la proyeccion decide por separado si sigue el dato oficial
+  // o una inflacion propia. Los valores propios arrancan en el ultimo REM.
+  const [inflFirstMode, setInflFirstMode] = useState('rem');
+  const [inflFirstAnnual, setInflFirstAnnual] = useState("25");
+  const [inflLongMode, setInflLongMode] = useState('rem');
+  const [inflLongAnnual, setInflLongAnnual] = useState("25");
   // Cada cuantos meses te ajustan el sueldo. Entre ajuste y ajuste el sueldo
   // queda quieto mientras la UVA sigue subiendo: de ahi sale el diente de sierra.
   const [salaryAdjustPeriod, setSalaryAdjustPeriod] = useState(6);
@@ -772,6 +768,18 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   useEffect(() => { try { localStorage.setItem('proyectar_tf_mortgage', timeframe); } catch { /* ignorar */ } }, [timeframe]);
 
+  const ultimoRemMensual = (remData && remData.length > 0) ? remData[remData.length - 1].valor : 0;
+  const ultimoRemAnual = mensualAAnual(ultimoRemMensual);
+
+  // Al elegir "propia" se arranca desde el ultimo dato oficial, no desde un numero suelto.
+  useEffect(() => {
+    if (ultimoRemMensual > 0) {
+      const anual = String(Math.round(mensualAAnual(ultimoRemMensual)));
+      setInflFirstAnnual(anual);
+      setInflLongAnnual(anual);
+    }
+  }, [ultimoRemMensual]);
+
   const schedule = useMemo(() => {
     if (!amount || amount === 0) return [];
     
@@ -780,11 +788,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     
     const currentUva = uvaValue || 1;
     const rateNum = (Number(String(rate).replace(',', '.')) || 0) / 100;
-    // Inflacion mensual para los meses posteriores al REM.
-    const convAnual = convergenceMode === 'custom'
-      ? (Number(String(convergenceAnnual).replace(',', '.')) || 0)
-      : CONVERGENCIA[convergenceMode].anual;
-    const convMensual = anualAMensual(convAnual);
+    // Inflacion mensual de cada tramo.
+    const primerosMensual = anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0);
+    const restantesMensual = inflLongMode === 'rem'
+      ? ultimoRemMensual / 100
+      : anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0);
     const periodoAjuste = Number(salaryAdjustPeriod) || 1;
     
     let capitalUvaInicial;
@@ -821,7 +829,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       const balanceUva = fila.saldo;
 
       const inflMatch = inflacionMap.get((currentDate.getMonth() + 1) + '-' + currentDate.getFullYear()) ?? null;
-      const sourceName = inflMatch ? (inflMatch.origen === 'IPC' ? 'IPC' : 'REM') : 'INERCIA';
+      const sourceName = inflMatch
+        ? (inflFirstMode === 'custom' ? 'PROPIA' : (inflMatch.origen === 'IPC' ? 'IPC' : 'REM'))
+        : (inflLongMode === 'custom' ? 'PROPIA' : 'INERCIA');
 
       // El sueldo recupera de una sola vez toda la inflacion acumulada desde el ajuste anterior.
       const esMesDeAjuste = i > 1 && (i - 1) % periodoAjuste === 0;
@@ -856,6 +866,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         principal: principalUva * projUva, 
         cuotaTotal: cuotaTotal, 
         saldo: balanceUva * projUva, 
+        oficial: !!inflMatch,
         ingreso: projIngreso,
         rci: projIngreso > 0 ? (cuotaTotal / projIngreso) * 100 : 0,
         source: sourceName,
@@ -868,13 +879,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       lastMonthVal = cuotaTotal;
       if (currentDate.getMonth() === 11) { lastDecVal = cuotaTotal; }
 
-      const currentMonthInf = inflMatch ? inflMatch.valor / 100 : convMensual;
+      const currentMonthInf = inflMatch
+        ? (inflFirstMode === 'custom' ? primerosMensual : inflMatch.valor / 100)
+        : restantesMensual;
       projUva *= (1 + currentMonthInf);
       factorSueldo *= (1 + currentMonthInf);
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [amount, years, rate, convergenceMode, convergenceAnnual, salaryAdjustPeriod, salary, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
+  }, [amount, years, rate, inflFirstMode, inflFirstAnnual, inflLongMode, inflLongAnnual, ultimoRemMensual, salaryAdjustPeriod, salary, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
   const totals = useMemo(() => ({
       totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
@@ -886,7 +899,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
 
   // Cuantos meses de la proyeccion tienen dato oficial (IPC o REM) detras.
-  const mesesOficiales = schedule.filter(d => d.source !== 'INERCIA').length;
+  const mesesOficiales = schedule.filter(d => d.oficial).length;
 
   // Cuanto se aparta la simulacion de lo que el banco cobra de verdad.
   const gapAbs = (bankInstallment > 0 && totals.cuotaInicial > 0) ? bankInstallment - totals.cuotaInicial : 0;
@@ -1143,44 +1156,69 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                     <p className="mb-3 text-indigo-300 font-bold">💡 La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
                     <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Primeros meses (Oficial)</b></div>
-                      <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. Eso no se toca: viene de la fuente oficial.</p>
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Resto del crédito</b></div>
-                      <p>El REM llega hasta unos dos años. Para los años que siguen no hay dato oficial de nadie, así que hay que elegir un supuesto: a qué valor creés que se estabiliza la inflación.</p>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Primeros meses</b></div>
+                      <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. Es la opción por defecto y la más fundada.</p>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Meses restantes</b></div>
+                      <p className="mb-3">El REM llega hasta unos dos años. Para los que siguen no hay dato oficial de nadie, así que se repite el último valor del REM.</p>
+                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[11px] leading-snug"><span className="text-white font-bold">Propia:</span> en cualquiera de los dos tramos podés poner tu propio número anual y ver qué pasa. Ojo que ahí dejás de mirar una proyección oficial y pasás a mirar un supuesto tuyo.</p></div>
                     </div>
                 </Tooltip>
               </label>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800 space-y-4">
-              <div className="flex items-center justify-between gap-2 pb-3 border-b dark:border-slate-700">
-                <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase flex items-center gap-1.5 leading-none"><Zap className="w-3 h-3" /> Primeros meses</p>
-                <span className="text-[9px] font-black uppercase tracking-tighter text-slate-400 text-right leading-tight">
-                  {mesesOficiales > 0 ? `${mesesOficiales} meses de IPC + REM` : 'IPC + REM oficial'}
-                </span>
-              </div>
+            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl border dark:border-slate-800 divide-y dark:divide-slate-700">
 
-              <div>
-                <p className="text-[10px] font-black text-indigo-500 uppercase mb-2.5 leading-none">Inflación a largo plazo</p>
-                <div className="grid grid-cols-3 gap-1.5 mb-2">
-                  {Object.entries(CONVERGENCIA).map(([key, esc]) => (
-                    <button key={key} onClick={() => setConvergenceMode(key)} className={`py-2 px-1 text-[9px] font-black rounded-lg transition-all leading-tight ${convergenceMode === key ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
-                      {esc.label}<br/><span className="opacity-70 font-mono">{esc.anual}%</span>
-                    </button>
-                  ))}
+              {/* Tramo 1: los meses que tienen dato oficial */}
+              <div className="p-4">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">
+                    {mesesOficiales > 0 ? `Primeros ${mesesOficiales} meses` : 'Primeros meses'}
+                  </p>
+                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
+                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflFirstMode === 'custom' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
+                  </div>
                 </div>
-                <button onClick={() => setConvergenceMode('custom')} className={`w-full py-2 text-[9px] font-black rounded-lg transition-all ${convergenceMode === 'custom' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>OTRO VALOR</button>
-                {convergenceMode === 'custom' && (
-                  <div className="mt-3 animate-in fade-in">
-                    <div className="flex justify-between items-center mb-1 text-[10px] font-black uppercase dark:text-white leading-none">
-                      <span className="text-slate-500">Anual</span><span className="font-mono">{convergenceAnnual}%</span>
+                {inflFirstMode === 'rem' ? (
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</p>
+                ) : (
+                  <div className="animate-in fade-in">
+                    <div className="flex justify-between items-center mb-1.5 text-[10px] font-black uppercase leading-none">
+                      <span className="text-slate-500">Anual</span>
+                      <span className="font-mono dark:text-white">{inflFirstAnnual}%</span>
                     </div>
-                    <input type="range" min="0" max="100" step="0.5" value={Number(String(convergenceAnnual).replace(',', '.')) || 0} onChange={(e)=>setConvergenceAnnual(String(e.target.value).replace('.', ','))} className="w-full accent-indigo-500" />
+                    <input type="range" min="0" max="200" step="1" value={Number(String(inflFirstAnnual).replace(',', '.')) || 0} onChange={(e)=>setInflFirstAnnual(e.target.value)} className="w-full accent-emerald-500" />
+                    <p className="text-[9px] text-slate-400 font-medium leading-tight mt-1.5">Reemplaza el dato oficial por tu número. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
                   </div>
                 )}
-                <p className="text-[9px] text-slate-400 font-medium leading-tight mt-2.5">Se aplica a los meses que quedan después del REM.</p>
               </div>
 
+              {/* Tramo 2: los meses para los que ya no hay REM */}
+              <div className="p-4">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
+                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
+                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
+                  </div>
+                </div>
+                {inflLongMode === 'rem' ? (
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">
+                    {ultimoRemMensual > 0
+                      ? `Sigue con el último dato del REM: ${String(ultimoRemMensual).replace('.', ',')}% mensual, ${ultimoRemAnual.toFixed(1).replace('.', ',')}% anual.`
+                      : 'Sigue con el último dato disponible del REM.'}
+                  </p>
+                ) : (
+                  <div className="animate-in fade-in">
+                    <div className="flex justify-between items-center mb-1.5 text-[10px] font-black uppercase leading-none">
+                      <span className="text-slate-500">Anual</span>
+                      <span className="font-mono dark:text-white">{inflLongAnnual}%</span>
+                    </div>
+                    <input type="range" min="0" max="200" step="1" value={Number(String(inflLongAnnual).replace(',', '.')) || 0} onChange={(e)=>setInflLongAnnual(e.target.value)} className="w-full accent-indigo-500" />
+                    <p className="text-[9px] text-slate-400 font-medium leading-tight mt-1.5">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           
