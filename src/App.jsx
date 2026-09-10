@@ -106,7 +106,7 @@ function Tooltip({ children, iconClass = "w-3.5 h-3.5 text-slate-400", color = "
           onMouseLeave={() => { if (!touchedRef.current) setOpen(false); }}
         />
       </div>
-      <div ref={tipRef} className={`absolute left-0 bottom-full mb-2 w-[min(22rem,calc(100vw-2rem))] p-4 bg-slate-900/95 backdrop-blur-md text-[12px] text-slate-300 font-medium rounded-2xl shadow-2xl z-[200] leading-relaxed border border-white/10 normal-case tracking-normal text-left whitespace-normal break-words transition-opacity duration-100 pointer-events-none opacity-0 ${open ? '!opacity-100 !pointer-events-auto' : ''}`} style={{left: 0}}>
+      <div ref={tipRef} className={`absolute left-0 bottom-full mb-2 w-[min(22rem,calc(100vw-2rem))] p-4 bg-slate-900/95 backdrop-blur-md text-[14px] text-slate-300 font-medium rounded-2xl shadow-2xl z-[200] leading-relaxed border border-white/10 normal-case tracking-normal text-left whitespace-normal break-words transition-opacity duration-100 pointer-events-none opacity-0 ${open ? '!opacity-100 !pointer-events-auto' : ''}`} style={{left: 0}}>
         <button onClick={() => { setOpen(false); touchedRef.current = false; }} className="absolute top-2 right-2 text-slate-500 hover:text-white transition-colors p-1 md:hidden" aria-label="Cerrar"><X className="w-3.5 h-3.5" /></button>
         {children}
       </div>
@@ -328,7 +328,7 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
 
            <div className="relative py-3">
              <div className="absolute inset-0 flex items-center" aria-hidden="true"><div className="w-full border-t border-slate-200 dark:border-slate-700"></div></div>
-             <div className="relative flex justify-center"><span className="bg-white dark:bg-slate-900 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">O continuar a la descarga</span></div>
+             <div className="relative flex justify-center"><span className="bg-white dark:bg-slate-900 px-2 text-[12px] font-bold text-slate-400 uppercase tracking-widest">O continuar a la descarga</span></div>
            </div>
            
            <div className="mt-2">{getButtonContent()}</div>
@@ -351,16 +351,16 @@ function WelcomeModal({ onClose }) {
         </div>
         <div className="p-8 text-left">
            <div className="flex items-center gap-2 mb-2">
-             <span className="bg-emerald-100 text-emerald-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">Novedades</span>
+             <span className="bg-emerald-100 text-emerald-700 text-[11px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">Novedades</span>
              <h2 className="text-xl font-black uppercase text-slate-800 dark:text-white">Version {APP_VERSION}</h2>
            </div>
            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-6 leading-relaxed">
              Seguimos mejorando ProyectAR para que tengas la mejor experiencia de análisis financiero:
            </p>
            <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[10px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Más Bancos</h4><p className="text-[10px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-lg text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Modo Cine Mejorado</h4><p className="text-[10px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[12px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Más Bancos</h4><p className="text-[12px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-lg text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Modo Cine Mejorado</h4><p className="text-[12px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
            </div>
            <button onClick={onClose} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 group">
              <span>¡A simular!</span> <Sparkles className="w-3 h-3 text-indigo-300 group-hover:text-white transition-colors"/>
@@ -382,7 +382,7 @@ const NAV_THEMES = {
 const NavBtn = React.memo(function NavBtn({ to, currentPath, icon, label, color }) {
   const active = currentPath === to || (to === '/' && currentPath === '');
   return (
-    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? NAV_THEMES[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[11px] sm:text-[12px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? NAV_THEMES[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
       {React.cloneElement(icon, { className: "w-3.5 h-3.5 md:w-5 md:h-5" })} {label}
     </Link>
   );
@@ -417,7 +417,7 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent, color 
   
   return (
     <div className="group text-left">
-      <label className={`text-[10px] font-black block mb-2 uppercase tracking-widest flex items-center gap-2 transition-colors ${isFocused ? focusLabelColor : 'text-slate-400'}`}>{label}</label>
+      <label className={`text-[12px] font-black block mb-2 uppercase tracking-widest flex items-center gap-2 transition-colors ${isFocused ? focusLabelColor : 'text-slate-400'}`}>{label}</label>
       <div className={`relative transition-all duration-300 ${isFocused ? 'scale-[1.01]' : ''}`}>
         <input 
           type="text" 
@@ -431,8 +431,8 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent, color 
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
       </div>
-      {usdEquivalent > 0 && <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(usdEquivalent))} <span className="text-[8px] opacity-70">(Oficial)</span></p>}
-      {sublabel && <p className="text-[10px] text-slate-400 mt-1 px-1 leading-relaxed">{sublabel}</p>}
+      {usdEquivalent > 0 && <p className="text-[12px] text-emerald-600 dark:text-emerald-400 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(usdEquivalent))} <span className="text-[10px] opacity-70">(Oficial)</span></p>}
+      {sublabel && <p className="text-[12px] text-slate-400 mt-1 px-1 leading-relaxed">{sublabel}</p>}
     </div>
   );
 }
@@ -465,7 +465,7 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
       <div className={`p-2 rounded-xl shrink-0 ${SUMMARY_COLOR_MAP[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
       <div className="min-w-0 text-left flex-1 relative"> 
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{title}</p>
+          <p className="text-[11px] md:text-[12px] font-black text-slate-400 uppercase tracking-widest truncate">{title}</p>
           {tooltip && (
             <Tooltip iconClass="w-3 h-3 text-slate-300">
               {tooltip}
@@ -496,15 +496,15 @@ function TooltipContent({ data, isRent }) {
   return (
     <>
       <div className="flex items-center justify-between mb-2.5 border-b border-white/10 pb-2.5">
-        <p className="text-[12px] font-black text-indigo-400 uppercase tracking-widest">{data.label}</p>
-        <span className={`text-[9px] px-2 py-0.5 rounded font-black ${data.source === 'IPC' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : data.source === 'REM' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/10 text-slate-300 border border-white/10'}`}>{data.source}</span>
+        <p className="text-[14px] font-black text-indigo-400 uppercase tracking-widest">{data.label}</p>
+        <span className={`text-[11px] px-2 py-0.5 rounded font-black ${data.source === 'IPC' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : data.source === 'REM' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/10 text-slate-300 border border-white/10'}`}>{data.source}</span>
       </div>
-      <div className="space-y-2 text-[13px] mb-3 border-b border-white/10 pb-3">
+      <div className="space-y-2 text-[15px] mb-3 border-b border-white/10 pb-3">
         <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 uppercase tracking-wide">Total:</span><span className="font-black text-white">{money(data.cuotaTotal)}</span></div>
         <div className={`flex justify-between items-center gap-4 font-bold uppercase tracking-wide ${isRent ? 'text-emerald-400' : 'text-indigo-400'}`}><div className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${isRent ? 'bg-emerald-500' : 'bg-indigo-500'}`} /><span className="uppercase">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
         <div className="flex justify-between items-center gap-4 text-orange-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="uppercase">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
       </div>
-      <div className="space-y-1.5 text-[12px]">
+      <div className="space-y-1.5 text-[14px]">
         {data.rci > 0 && (
           <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">% del sueldo:</span><span className={`font-black ${data.rci > 30 ? 'text-rose-400' : 'text-emerald-400'}`}>{data.rci.toFixed(1)}%</span></div>
         )}
@@ -540,17 +540,17 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
     return (
       <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50 gap-3 p-4">
         <Calculator className="w-8 h-8 md:w-10 md:h-10 text-slate-300 dark:text-slate-700" />
-        <p className="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-slate-400 text-center">Completá el monto y el plazo para ver tu proyección</p>
+        <p className="text-[12px] md:text-[13px] font-black uppercase tracking-widest text-slate-400 text-center">Completá el monto y el plazo para ver tu proyección</p>
       </div>
     );
   }
 
   const maxVal = Math.max(...data.map(d => d.cuotaTotal)) * 1.15;
-  const w = 1000, h = 320, padL = 100, padB = 55;
+  const w = 1000, h = 320, padL = 138, padB = 55;
   // El eje derecho solo existe cuando se superpone la linea de sueldo.
   const conRci = showRci && data.some(d => d.rci > 0);
   const padT = conRci ? 30 : 15; // deja aire arriba para el rotulo del eje derecho
-  const padR = conRci ? 62 : 0;
+  const padR = conRci ? 78 : 0;
   const anchoUtil = w - padL - padR;
   const step = Math.max(1, Math.ceil(data.length / (isRent ? 40 : 60)));
   const sampled = data.filter((_, i) => i % step === 0);
@@ -580,8 +580,8 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
         {[0, 0.25, 0.5, 0.75, 1].map(p => (
           <g key={p}>
             <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w - padR} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
-            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[12px] fill-slate-400 font-mono font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
-            {conRci && <text x={w - padR + 12} y={h - padB - (h - padB - padT) * p + 5} textAnchor="start" className="text-[12px] fill-indigo-400 font-mono font-bold">{(maxRci * p).toFixed(0)}%</text>}
+            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[14px] fill-slate-400 font-mono font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
+            {conRci && <text x={w - padR + 12} y={h - padB - (h - padB - padT) * p + 5} textAnchor="start" className="text-[14px] fill-indigo-400 font-mono font-bold">{(maxRci * p).toFixed(0)}%</text>}
           </g>
         ))}
         {sampled.map((d, i) => {
@@ -603,12 +603,12 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
               <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill={isRent ? "#10b981" : "#6366f1"} rx="1.5" className="transition-all group-hover:brightness-110"/>
               <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill={isRent ? "#f59e0b" : "#fb923c"} rx="1.5" className="transition-all group-hover:brightness-110"/>
               {(i % Math.ceil(sampled.length/10) === 0) && (
-                <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[11px] fill-slate-500 font-black uppercase tracking-tighter md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
+                <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[13px] fill-slate-500 font-black uppercase tracking-tighter md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
                   {dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}
                 </text>
               )}
               {(i % Math.ceil(sampled.length/10) === 0) && (
-                <text x={x + barW/2} y={h - padB + 22} textAnchor="middle" className="text-[12px] fill-slate-500 font-black uppercase tracking-tighter hidden md:block">{dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}</text>
+                <text x={x + barW/2} y={h - padB + 22} textAnchor="middle" className="text-[14px] fill-slate-500 font-black uppercase tracking-tighter hidden md:block">{dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}</text>
               )}
             </g>
           );
@@ -624,7 +624,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
               {maxRci > 30 && <line x1={padL} y1={yr(30)} x2={w - padR} y2={yr(30)} stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.65"/>}
               <path d={linea} fill="none" stroke="#a5b4fc" strokeWidth="4" strokeLinejoin="round" opacity="0.35"/>
               <path d={linea} fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinejoin="round"/>
-              <text x={w - padR + 12} y={14} textAnchor="start" className="text-[12px] fill-indigo-500 font-black uppercase">% sueldo</text>
+              <text x={w} y={14} textAnchor="end" className="text-[14px] fill-indigo-500 font-black uppercase">% sueldo</text>
             </g>
           );
         })()}
@@ -638,7 +638,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
             return (
               <g>
                 <line x1={tx} y1={padT} x2={tx} y2={h - padB} stroke="#818cf8" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6"/>
-                <text x={tx + 6} y={padT + 12} className="text-[9px] fill-indigo-400 font-bold" opacity="0.7">Proyectado →</text>
+                <text x={tx + 6} y={padT + 12} className="text-[11px] fill-indigo-400 font-bold" opacity="0.7">Proyectado →</text>
               </g>
             );
           }
@@ -959,17 +959,17 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
-        <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 700 }}>
-          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
+        <table className="w-full text-left border-collapse text-[13px]" style={{ minWidth: 700 }}>
+          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[12px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
             <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-center">
             {schedule.map((d) => (
               <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? 'bg-sky-900/20 border-l-4 border-sky-500' : 'hover:bg-white/5'}`}>
                 <td className="p-4 font-bold text-slate-200 flex items-center justify-center gap-2">
-                  {d.label} {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
+                  {d.label} {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
                 </td>
-                <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
+                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
                 <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                 <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
                 <td className="p-4 text-indigo-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
@@ -1000,11 +1000,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
 
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
-            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>EN CURSO</button>
+            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
+            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>EN CURSO</button>
           </div>
 
-          <p className="text-[11px] font-bold text-slate-400 text-center leading-none flex items-center justify-center gap-1.5">
+          <p className="text-[13px] font-bold text-slate-400 text-center leading-none flex items-center justify-center gap-1.5">
             <CalendarDays className="w-3 h-3 shrink-0" /> Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}
           </p>
         </div>
@@ -1024,11 +1024,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  <label className="text-[11px] font-black text-indigo-500 block mb-2 uppercase tracking-widest leading-none">PLAZO (AÑOS)</label>
+                  <label className="text-[13px] font-black text-indigo-500 block mb-2 uppercase tracking-widest leading-none">PLAZO (AÑOS)</label>
                   <input type="text" inputMode="numeric" value={(yearsFocused && (years === 0 || years === '')) ? '' : years} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setYears(num !== '' && num > 50 ? 50 : num); }} onFocus={(e) => { setYearsFocused(true); e.target.select(); }} onBlur={() => setYearsFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  <label className="text-[11px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
+                  <label className="text-[13px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
                     TNA (%)
                     <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
                         Tasa Nominal Anual. Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
@@ -1042,15 +1042,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <div className="animate-in fade-in space-y-4">
               <div className="group text-left">
                 <div className="flex justify-between items-end mb-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 text-slate-400 transition-colors">
+                  <label className="text-[12px] font-black uppercase tracking-widest flex items-center gap-1.5 text-slate-400 transition-colors">
                     SALDO DEUDOR
                     <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                         Buscá tu Saldo Deudor actual en tu Home Banking. Podés elegir ingresarlo en Pesos o en cantidad de UVAs.
                       </Tooltip>
                   </label>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg border dark:border-slate-600">
-                    <button onClick={() => setBalanceCurrency('ars')} className={`px-3 py-1 text-[9px] font-black rounded ${balanceCurrency === 'ars' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500'}`}>$ ARS</button>
-                    <button onClick={() => setBalanceCurrency('uva')} className={`px-3 py-1 text-[9px] font-black rounded ${balanceCurrency === 'uva' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500'}`}>UVA</button>
+                    <button onClick={() => setBalanceCurrency('ars')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'ars' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500'}`}>$ ARS</button>
+                    <button onClick={() => setBalanceCurrency('uva')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'uva' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500'}`}>UVA</button>
                   </div>
                 </div>
                 <div className="relative">
@@ -1065,21 +1065,21 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   {balanceCurrency === 'uva' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-black text-xs dark:text-slate-400">UVAs</div>}
                   {balanceCurrency === 'ars' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>}
                 </div>
-                {balanceCurrency === 'ars' && amount > 0 && <p className="text-[10px] text-indigo-600 dark:text-indigo-400 mt-2 px-1 font-bold">Equivale a {new Intl.NumberFormat('es-AR').format(Math.round(amount / uvaValue))} UVAs aprox.</p>}
-                {balanceCurrency === 'uva' && amount > 0 && <p className="text-[10px] text-indigo-600 dark:text-indigo-400 mt-2 px-1 font-bold">Equivale a {money(amount * uvaValue)} <span className="text-[8px] opacity-70">(A valor UVA de hoy)</span></p>}
+                {balanceCurrency === 'ars' && amount > 0 && <p className="text-[12px] text-indigo-600 dark:text-indigo-400 mt-2 px-1 font-bold">Equivale a {new Intl.NumberFormat('es-AR').format(Math.round(amount / uvaValue))} UVAs aprox.</p>}
+                {balanceCurrency === 'uva' && amount > 0 && <p className="text-[12px] text-indigo-600 dark:text-indigo-400 mt-2 px-1 font-bold">Equivale a {money(amount * uvaValue)} <span className="text-[10px] opacity-70">(A valor UVA de hoy)</span></p>}
               </div>
               
              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
                   {/* Cambiado de <label> a <div> */}
-                  <div className="text-[9px] sm:text-[11px] font-black text-indigo-500 mb-2 uppercase tracking-widest flex items-center justify-center gap-1.5 leading-none">
+                  <div className="text-[11px] sm:text-[13px] font-black text-indigo-500 mb-2 uppercase tracking-widest flex items-center justify-center gap-1.5 leading-none">
                     CUOTAS RESTANTES
                   </div>
                   <input type="text" inputMode="numeric" value={(remFocused && (remInstallments === 0 || remInstallments === '')) ? '' : remInstallments} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setRemInstallments(num !== '' && num > 600 ? 600 : num); }} onFocus={(e) => { setRemFocused(true); e.target.select(); }} onBlur={() => setRemFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
                   {/* Cambiado de <label> a <div> */}
-                  <div className="text-[11px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
+                  <div className="text-[13px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
                     TNA (%)
                     <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
                         Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
@@ -1102,14 +1102,14 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                       ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
                       : 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800'
                   }`}>
-                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between text-[12px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
                       <span>Cuota simulada</span><span className="font-mono">{money(totals.cuotaInicial)}</span>
                     </div>
-                    <div className={`flex items-center justify-between text-[10px] font-black uppercase tracking-widest ${Math.abs(gapPct) <= 5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                    <div className={`flex items-center justify-between text-[12px] font-black uppercase tracking-widest ${Math.abs(gapPct) <= 5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                       <span className="flex items-center gap-2"><ArrowRightLeft className="w-3.5 h-3.5"/> Diferencia</span>
                       <span className="text-base leading-none font-mono">{gapPct > 0 ? '+' : ''}{gapPct.toFixed(1)}%</span>
                     </div>
-                    <p className="text-[10px] leading-tight font-medium text-slate-500 dark:text-slate-400 pt-1">
+                    <p className="text-[12px] leading-tight font-medium text-slate-500 dark:text-slate-400 pt-1">
                       {Math.abs(gapPct) <= 5
                         ? 'La simulación coincide con tu resumen. Lo que queda de diferencia suelen ser los seguros y gastos administrativos.'
                         : `Tu banco cobra ${money(Math.abs(gapAbs))} ${gapAbs > 0 ? 'más' : 'menos'} por mes. Puede ser por seguros y gastos, o porque aplica otro criterio de recálculo que el sistema francés puro que usa esta simulación.`}
@@ -1122,7 +1122,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           
           <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
+              <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
                 <TrendingUp className="w-3 h-3 shrink-0"/> INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                     <p className="mb-3 text-indigo-300 font-bold">💡 La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
@@ -1131,7 +1131,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                       <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. Es la opción por defecto y la más fundada.</p>
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Meses restantes</b></div>
                       <p className="mb-3">El REM llega hasta unos dos años. Para los que siguen no hay dato oficial de nadie, así que se repite el último valor del REM.</p>
-                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[11px] leading-snug"><span className="text-white font-bold">Propia:</span> en cualquiera de los dos tramos podés poner tu propio número anual y ver qué pasa. Ojo que ahí dejás de mirar una proyección oficial y pasás a mirar un supuesto tuyo.</p></div>
+                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-white font-bold">Propia:</span> en cualquiera de los dos tramos podés poner tu propio número anual y ver qué pasa. Ojo que ahí dejás de mirar una proyección oficial y pasás a mirar un supuesto tuyo.</p></div>
                     </div>
                 </Tooltip>
               </label>
@@ -1142,24 +1142,24 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               {/* Tramo 1: los meses que tienen dato oficial */}
               <div className="p-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <p className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">
+                  <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">
                     {mesesOficiales > 0 ? `Primeros ${mesesOficiales} meses` : 'Primeros meses'}
                   </p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
-                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflFirstMode === 'custom' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
+                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'custom' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
                   </div>
                 </div>
                 {inflFirstMode === 'rem' ? (
                   <div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2.5">IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</p>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2.5">IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</p>
                     {inflacionAnual.length > 0 && (
                       <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${inflacionAnual.length}, minmax(0, 1fr))` }}>
                         {inflacionAnual.map(a => (
                           <div key={a.año} className="bg-white dark:bg-slate-900 rounded-lg py-2 px-1 text-center border dark:border-slate-700">
-                            <p className="text-[10px] font-black uppercase text-slate-400 leading-none mb-1">{a.año}</p>
-                            <p className="text-[13px] font-black font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
-                            {a.parcial && <p className="text-[8px] font-bold uppercase text-slate-400 leading-none mt-1">parcial</p>}
+                            <p className="text-[12px] font-black uppercase text-slate-400 leading-none mb-1">{a.año}</p>
+                            <p className="text-[15px] font-black font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
+                            {a.parcial && <p className="text-[10px] font-bold uppercase text-slate-400 leading-none mt-1">parcial</p>}
                           </div>
                         ))}
                       </div>
@@ -1167,12 +1167,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   </div>
                 ) : (
                   <div className="animate-in fade-in">
-                    <div className="flex justify-between items-center mb-1.5 text-[10px] font-black uppercase leading-none">
+                    <div className="flex justify-between items-center mb-1.5 text-[12px] font-black uppercase leading-none">
                       <span className="text-slate-500">Anual</span>
                       <span className="font-mono dark:text-white">{inflFirstAnnual}%</span>
                     </div>
                     <input type="range" min="0" max="200" step="1" value={Number(String(inflFirstAnnual).replace(',', '.')) || 0} onChange={(e)=>setInflFirstAnnual(e.target.value)} className="w-full accent-emerald-500" />
-                    <p className="text-[9px] text-slate-400 font-medium leading-tight mt-1.5">Reemplaza el dato oficial por tu número. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
+                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-1.5">Reemplaza el dato oficial por tu número. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
                   </div>
                 )}
               </div>
@@ -1180,26 +1180,26 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               {/* Tramo 2: los meses para los que ya no hay REM */}
               <div className="p-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <p className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
+                  <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
-                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[9px] font-black rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
+                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
                   </div>
                 </div>
                 {inflLongMode === 'rem' ? (
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">
+                  <p className="text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-tight">
                     {ultimoRemMensual > 0
                       ? `Sigue con el último dato del REM: ${String(ultimoRemMensual).replace('.', ',')}% mensual, ${ultimoRemAnual.toFixed(1).replace('.', ',')}% anual.`
                       : 'Sigue con el último dato disponible del REM.'}
                   </p>
                 ) : (
                   <div className="animate-in fade-in">
-                    <div className="flex justify-between items-center mb-1.5 text-[10px] font-black uppercase leading-none">
+                    <div className="flex justify-between items-center mb-1.5 text-[12px] font-black uppercase leading-none">
                       <span className="text-slate-500">Anual</span>
                       <span className="font-mono dark:text-white">{inflLongAnnual}%</span>
                     </div>
                     <input type="range" min="0" max="200" step="1" value={Number(String(inflLongAnnual).replace(',', '.')) || 0} onChange={(e)=>setInflLongAnnual(e.target.value)} className="w-full accent-indigo-500" />
-                    <p className="text-[9px] text-slate-400 font-medium leading-tight mt-1.5">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
+                    <p className="text-[11px] text-slate-400 font-medium leading-tight mt-1.5">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
                   </div>
                 )}
               </div>
@@ -1217,7 +1217,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
             {salary > 0 && (
               <div className="mt-4 animate-in fade-in">
-                <div className="text-[10px] font-black text-indigo-500 uppercase mb-2.5 flex items-center gap-1.5 leading-none">
+                <div className="text-[12px] font-black text-indigo-500 uppercase mb-2.5 flex items-center gap-1.5 leading-none">
                   ¿Cada cuánto te ajustan?
                   <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
                     Entre un ajuste y el siguiente tu sueldo queda quieto, pero la UVA sigue subiendo todos los días. Por eso la cuota te pesa cada vez más hasta que llega el aumento, ahí baja de golpe, y vuelve a empezar. Cuanto más espaciado el ajuste, más profundo el pozo.
@@ -1225,12 +1225,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 </div>
                 <div className="grid grid-cols-5 gap-1.5">
                   {[1, 3, 4, 6, 12].map(m => (
-                    <button key={m} onClick={() => setSalaryAdjustPeriod(m)} className={`py-2 text-[9px] font-black rounded-lg transition-all leading-none ${salaryAdjustPeriod === m ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                    <button key={m} onClick={() => setSalaryAdjustPeriod(m)} className={`py-2 text-[11px] font-black rounded-lg transition-all leading-none ${salaryAdjustPeriod === m ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
                       {m === 1 ? 'MES' : m}
                     </button>
                   ))}
                 </div>
-                <p className="text-[9px] text-slate-400 font-medium leading-tight mt-2">
+                <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">
                   {salaryAdjustPeriod === 1
                     ? 'Tu sueldo sigue a la inflación mes a mes.'
                     : `Tu sueldo recupera la inflación acumulada cada ${salaryAdjustPeriod} meses.`}
@@ -1240,10 +1240,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
             {salary > 0 && totals.cuotaInicial > 0 && (
               <div className="space-y-3 mt-4">
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
+                <p className="text-[12px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
                   Este número es el de la primera cuota. Cómo evoluciona después lo ves en el gráfico "Cuota sobre tus ingresos".
                 </p>
-                <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
+                <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                   (totals.cuotaInicial / salary) > 0.3 
                     ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
                     : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
@@ -1257,7 +1257,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         </div>
 
           {/* BANCOS */}
-        <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl border dark:border-slate-800 shadow-xl space-y-4 text-left text-[11px]">
+        <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl border dark:border-slate-800 shadow-xl space-y-4 text-left text-[13px]">
           <h4 className="font-black uppercase text-slate-800 dark:text-white flex items-center gap-2 leading-none"><Globe className="w-3 h-3 text-indigo-500" /> Webs de los principales bancos argentinos</h4>
           <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2">
             {[
@@ -1295,7 +1295,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             </div>
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner overflow-x-auto max-w-full no-scrollbar">
               {['1y', '2y', '3y', '10y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400'}`}>
                   {t === 'all' ? 'TODO' : t === '1y' ? '1 AÑO' : t.replace('y', ' AÑOS')}
                 </button>
               ))}
@@ -1303,7 +1303,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
           <div className="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-2.5 mb-4">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            <p className="text-[11px] text-amber-600 dark:text-amber-400/80 font-medium leading-tight flex-1">No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.</p>
+            <p className="text-[13px] text-amber-600 dark:text-amber-400/80 font-medium leading-tight flex-1">No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.</p>
           </div>
           <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker showRci={salary > 0} /></div>
 
@@ -1318,7 +1318,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 ];
               })().map(k => (
                 <div key={k.t} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-3 border dark:border-slate-800 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-tight mb-1.5">{k.t}</p>
+                  <p className="text-[12px] font-black uppercase tracking-widest text-slate-400 leading-tight mb-1.5">{k.t}</p>
                   <p className={`text-xl font-black font-mono leading-none ${k.v > 30 ? 'text-rose-500' : 'text-emerald-500'}`}>{k.v.toFixed(1)}%</p>
                 </div>
               ))}
@@ -1326,10 +1326,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           )}
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> TABLA DE AMORTIZACIÓN</span>
+              <span className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> TABLA DE AMORTIZACIÓN</span>
               <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
             
@@ -1354,16 +1354,16 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           <div className="max-h-[400px] md:max-h-[850px] overflow-auto w-full no-scrollbar">
             <div className="inline-block min-w-full align-middle">
               <table className="w-full text-left border-collapse min-w-[700px] md:min-w-[900px]">
-                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[10px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
+                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[12px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
                   <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
                 </thead>
                 <tbody className="divide-y dark:divide-slate-800 text-center">
                   {schedule.map((d) => (
                     <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? 'bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500' : 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40'}`}>
                       <td className="p-4 font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-2">
-                        {d.label} {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
+                        {d.label} {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
                       </td>
-                      <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
+                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
                       <td className="p-4 font-black text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                       <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
                       <td className="p-4 text-indigo-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
@@ -1684,15 +1684,15 @@ function RentCalculator({ remData, dolarOficial }) {
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Pagos Mensuales">
-        <table className="w-full text-left border-collapse text-[11px]" style={{ minWidth: 600 }}>
-          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[10px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
+        <table className="w-full text-left border-collapse text-[13px]" style={{ minWidth: 600 }}>
+          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[12px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
             <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-center">
             {schedule.map((d) => (
               <tr key={d.mes} className="transition-colors hover:bg-white/5">
                 <td className="p-4 font-bold text-slate-200">{d.label}</td>
-                <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
+                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
                 <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                 <td className="p-4 text-emerald-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
                 <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
@@ -1722,14 +1722,14 @@ function RentCalculator({ remData, dolarOficial }) {
           </div>
           
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
-            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>FECHA EXACTA</button>
-            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>SIN FECHA FIJA</button>
+            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>FECHA EXACTA</button>
+            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>SIN FECHA FIJA</button>
           </div>
 
           {dateMode === 'calendar' && (
              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-               <button onClick={() => setRentType('new')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${rentType === 'new' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
-               <button onClick={() => setRentType('ongoing')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all flex items-center justify-center gap-1 ${rentType === 'ongoing' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>
+               <button onClick={() => setRentType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${rentType === 'new' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
+               <button onClick={() => setRentType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all flex items-center justify-center gap-1 ${rentType === 'ongoing' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>
                  EN CURSO 
                  <Tooltip iconClass="w-3 h-3 text-slate-400" color="indigo">
                      Simulá contratos vigentes ajustados a la inflación actual.
@@ -1741,7 +1741,7 @@ function RentCalculator({ remData, dolarOficial }) {
           {dateMode === 'generic' && (
             <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl flex items-start gap-3 animate-pulse mb-4">
               <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-              <p className="text-[10px] font-black uppercase tracking-tighter text-rose-600 leading-tight">Sin fecha fija, usás inflación manual y no se conecta al calendario REM.</p>
+              <p className="text-[12px] font-black uppercase tracking-tighter text-rose-600 leading-tight">Sin fecha fija, usás inflación manual y no se conecta al calendario REM.</p>
             </div>
           )}
 
@@ -1757,7 +1757,7 @@ function RentCalculator({ remData, dolarOficial }) {
                 </div>
              ) : (
                 <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800 text-center animate-in fade-in">
-                   <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
+                   <span className="text-[12px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
                 </div>
              )
           )}
@@ -1774,45 +1774,45 @@ function RentCalculator({ remData, dolarOficial }) {
 
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 z-10"></div>
-            <button onClick={() => setRentRole('tenant')} className={`flex-1 py-1.5 text-[9px] font-black rounded transition-all ${rentRole === 'tenant' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500'}`}>MODO INQUILINO</button>
-            <button onClick={() => setRentRole('owner')} className={`flex-1 py-1.5 text-[9px] font-black rounded transition-all ${rentRole === 'owner' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500'}`}>MODO PROPIETARIO</button>
+            <button onClick={() => setRentRole('tenant')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'tenant' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500'}`}>MODO INQUILINO</button>
+            <button onClick={() => setRentRole('owner')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'owner' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500'}`}>MODO PROPIETARIO</button>
           </div>
 
           <div className="space-y-4 animate-in fade-in">
             <div className="group text-left">
-              <label className="text-[10px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentType === 'new' ? (rentRole === 'owner' ? 'INGRESO DEL ALQUILER' : 'MONTO DEL ALQUILER') : 'ALQUILER ACTUAL (MES EN CURSO)'}</label>
+              <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentType === 'new' ? (rentRole === 'owner' ? 'INGRESO DEL ALQUILER' : 'MONTO DEL ALQUILER') : 'ALQUILER ACTUAL (MES EN CURSO)'}</label>
               <div className="relative">
                 <input type="text" inputMode="numeric" value={amountFocused && rentAmount === 0 ? '' : money(rentAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setRentAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50 shadow-inner dark:text-white" />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
               </div>
-              {rentAmount > 0 && <p className="text-[10px] text-emerald-600 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(rentAmount / dolarOficial))} <span className="text-[8px] opacity-70">(Oficial)</span></p>}
+              {rentAmount > 0 && <p className="text-[12px] text-emerald-600 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(rentAmount / dolarOficial))} <span className="text-[10px] opacity-70">(Oficial)</span></p>}
             </div>
 
             <div className="group text-left">
-              <label className="text-[10px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentRole === 'owner' ? 'EXPENSAS A CARGO INQUILINO' : 'EXPENSAS INICIALES'}</label>
+              <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentRole === 'owner' ? 'EXPENSAS A CARGO INQUILINO' : 'EXPENSAS INICIALES'}</label>
               <div className="relative mb-2">
                 <input type="text" inputMode="numeric" value={expFocused && expensesAmount === 0 ? '' : money(expensesAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setExpensesAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setExpFocused(true); e.target.select(); }} onBlur={() => setExpFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50 shadow-inner dark:text-white" />
               </div>
               <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border dark:border-slate-700">
-                <span className="text-[10px] font-black uppercase text-slate-500 leading-tight">¿Ajustar por inflación? (Mensual)</span>
+                <span className="text-[12px] font-black uppercase text-slate-500 leading-tight">¿Ajustar por inflación? (Mensual)</span>
                 <button onClick={() => setAdjustExpenses(!adjustExpenses)} className={`w-10 h-5 rounded-full transition-all relative ${adjustExpenses ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}><div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${adjustExpenses ? 'left-5' : 'left-0.5'}`} /></button>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
-                <label className="text-[11px] font-black text-emerald-600 block mb-2 uppercase leading-none">{rentType === 'new' ? 'DURACIÓN (MESES)' : 'MESES RESTANTES'}</label>
+                <label className="text-[13px] font-black text-emerald-600 block mb-2 uppercase leading-none">{rentType === 'new' ? 'DURACIÓN (MESES)' : 'MESES RESTANTES'}</label>
                 <input type="text" inputMode="numeric" value={(durFocused && (durationMonths === 0 || durationMonths === '')) ? '' : durationMonths} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setDurationMonths(num !== '' && num > 240 ? 240 : num); }} onFocus={(e) => { setDurFocused(true); e.target.select(); }} onBlur={() => setDurFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
-                <label className="text-[11px] font-black text-emerald-600 block mb-2 uppercase leading-none">AJUSTA CADA (MESES)</label>
+                <label className="text-[13px] font-black text-emerald-600 block mb-2 uppercase leading-none">AJUSTA CADA (MESES)</label>
                 <input type="text" inputMode="numeric" value={(adjFocused && (adjustPeriod === 0 || adjustPeriod === '')) ? '' : adjustPeriod} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setAdjustPeriod(num !== '' && num > 120 ? 120 : num); }} onFocus={(e) => { setAdjFocused(true); e.target.select(); }} onBlur={() => setAdjFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
               </div>
             </div>
 
             {rentType === 'ongoing' && (
               <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-emerald-500/20 text-center animate-in fade-in slide-in-from-top-2">
-                <label className="text-[11px] font-black text-emerald-600 mb-2 uppercase flex justify-center items-center gap-1.5">
+                <label className="text-[13px] font-black text-emerald-600 mb-2 uppercase flex justify-center items-center gap-1.5">
                   MESES DESDE EL ÚLTIMO AJUSTE
                   <Tooltip iconClass="w-3 h-3 text-emerald-400" color="emerald">
                       Ej: Si firmaste o tuviste el último aumento hace 2 meses exactos, ingresá "2". Esto permite calcular con precisión el próximo mes de ajuste.
@@ -1825,14 +1825,14 @@ function RentCalculator({ remData, dolarOficial }) {
           
           <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
+              <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
                 INFLACIÓN PROYECTADA
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="emerald">
                     <p className="mb-3 text-emerald-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu alquiler mes a mes.</p>
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
                       <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-emerald-300">mes a mes</span> automáticamente.</p>
-                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[11px] leading-snug"><span className="text-emerald-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
+                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-emerald-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
                     <div className="h-px w-full bg-white/5 mb-3"></div>
                     <div>
                       <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div><b className="text-sky-400 uppercase tracking-wider">Modo Manual</b></div>
@@ -1842,21 +1842,21 @@ function RentCalculator({ remData, dolarOficial }) {
                 </Tooltip>
               </label>
               <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0">
-                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'rem' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
-                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[9px] font-black rounded-lg ${inflationMode === 'manual' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
+                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[11px] font-black rounded-lg ${inflationMode === 'rem' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
+                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[11px] font-black rounded-lg ${inflationMode === 'manual' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
               </div>
             </div>
             
             <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
               {inflationMode === 'manual' ? (
                 <div className="animate-in fade-in space-y-2">
-                    <div className="flex justify-between items-center"><span className="text-[10px] font-black text-emerald-600 uppercase leading-none">Tasa fija anual estimada</span><span className="text-[11px] font-mono font-black dark:text-white leading-none">{manualInf}%</span></div>
+                    <div className="flex justify-between items-center"><span className="text-[12px] font-black text-emerald-600 uppercase leading-none">Tasa fija anual estimada</span><span className="text-[13px] font-mono font-black dark:text-white leading-none">{manualInf}%</span></div>
                     <input type="range" min="0" max="100" step="1" value={Number(String(manualInf).replace(',', '.')) || 0} onChange={(e)=>setManualInf(String(e.target.value).replace('.', ','))} className="w-full accent-emerald-500" />
                 </div>
               ) : (
                 <div className="flex flex-col gap-4 animate-in fade-in">
-                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'auto' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[8px] font-black rounded-lg ${remStabilizedMode === 'custom' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>FIJA</button></div></div>
-                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[10px] font-black dark:text-white uppercase leading-tight ">
+                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[12px] font-black text-emerald-600 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[10px] font-black rounded-lg ${remStabilizedMode === 'auto' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[10px] font-black rounded-lg ${remStabilizedMode === 'custom' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>FIJA</button></div></div>
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[12px] font-black dark:text-white uppercase leading-tight ">
                     {remStabilizedMode === 'auto' ? `Aplicando el último dato oficial (${(remData && remData.length > 0 ? remData[remData.length-1].valor : '---')}%) para los meses restantes.` : 
                       <div>
                         <div className="flex justify-between mb-1"><span>Tasa Fija mensual estimada para los meses restantes:</span><span>{remStabilizedValue}%</span></div>
@@ -1873,7 +1873,7 @@ function RentCalculator({ remData, dolarOficial }) {
           <div className="pt-4 border-t dark:border-slate-800 animate-in fade-in slide-in-from-bottom-2">
             {rentRole === 'owner' ? (
               <div className="group text-left">
-                <label className="text-[10px] font-black text-slate-400 block mb-2 uppercase tracking-widest">
+                <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">
                   VALOR DE LA PROPIEDAD (USD)
                 </label>
                 <div className="relative">
@@ -1887,7 +1887,7 @@ function RentCalculator({ remData, dolarOficial }) {
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-black text-xs dark:text-slate-400">USD</div>
                 </div>
-                <p className="text-[9px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
                   Para calcular la Rentabilidad Bruta Anual (Gross Yield) de manera aproximada.
                 </p>
               </div>
@@ -1902,10 +1902,10 @@ function RentCalculator({ remData, dolarOficial }) {
                 />
                 {salary > 0 && totals.cuotaTotalInicial > 0 && (
                   <div className="space-y-3 mt-4">
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
                       ⚠️ Importante: Este cálculo es del primer mes. Si tu sueldo sube menos que el alquiler, el impacto sobre tu bolsillo será mayor con el tiempo.
                     </p>
-                    <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
+                    <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                       (totals.cuotaTotalInicial / salary) > 0.3 
                         ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
                         : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
@@ -1921,7 +1921,7 @@ function RentCalculator({ remData, dolarOficial }) {
             {/* Yield abajo de los inputs en modo propietario */}
             {rentRole === 'owner' && propertyValueUsd > 0 && rentAmount > 0 && (
               <div className="mt-4">
-                <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
+                <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                   yieldColor === 'rose' 
                     ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800'
                     : yieldColor === 'orange'
@@ -1936,7 +1936,7 @@ function RentCalculator({ remData, dolarOficial }) {
                   </span>
                   <span className="text-lg leading-none">{grossYield.toFixed(1)}%</span>
                 </div>
-                <p className="text-[9px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
                   Rentabilidad bruta anual. Solo cuenta el alquiler en dólares (oficial de hoy), sin gastos extras como impuestos o mantenimiento. 
                 </p>
               </div>
@@ -1973,7 +1973,7 @@ function RentCalculator({ remData, dolarOficial }) {
              </div>
              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner overflow-x-auto max-w-full no-scrollbar">
               {['1y', '2y', '3y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400'}`}>
                   {t === 'all' ? 'TODO' : t.replace('y', ' AÑO' + (parseInt(t) > 1 ? 'S' : ''))}
                 </button>
               ))}
@@ -1983,10 +1983,10 @@ function RentCalculator({ remData, dolarOficial }) {
         </div>
 
         {/* TABLA DE ALQUILERES */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> TABLA DE PAGOS MENSUALES</span>
+              <span className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> TABLA DE PAGOS MENSUALES</span>
               <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
             
@@ -2011,14 +2011,14 @@ function RentCalculator({ remData, dolarOficial }) {
           <div className="max-h-[400px] md:max-h-[850px] overflow-auto w-full no-scrollbar">
             <div className="inline-block min-w-full align-middle">
               <table className="w-full text-left border-collapse min-w-[700px] md:min-w-[900px]">
-                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[10px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
+                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[12px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
                   <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
                 </thead>
                 <tbody className="divide-y dark:divide-slate-800 text-center">
                   {schedule.map((d) => (
                     <tr key={d.mes} className="transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/40">
                       <td className="p-4 font-bold text-slate-800 dark:text-slate-200">{d.label}</td>
-                      <td className="p-4"><span className={`text-[8px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
+                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
                       <td className="p-4 font-black text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                       <td className="p-4 text-emerald-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
                       <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
@@ -2181,9 +2181,9 @@ export default function App() {
             {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
             <div className="bg-slate-900 text-white py-2.5 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
-              <div className="max-w-[1800px] mx-auto flex justify-between items-center text-[10px] font-black tracking-widest uppercase text-slate-500 leading-none">
-                <div className="flex items-center gap-1.5 text-slate-400"><Clock className="w-3 h-3 text-indigo-500 shrink-0" /><span className="text-[8px] sm:text-[10px]">{formatDateTime(lastUpdate)}</span></div>
-                <div className="flex gap-3 sm:gap-8 items-center font-mono leading-none text-[8px] sm:text-[10px]">
+              <div className="max-w-[1800px] mx-auto flex justify-between items-center text-[12px] font-black tracking-widest uppercase text-slate-500 leading-none">
+                <div className="flex items-center gap-1.5 text-slate-400"><Clock className="w-3 h-3 text-indigo-500 shrink-0" /><span className="text-[10px] sm:text-[12px]">{formatDateTime(lastUpdate)}</span></div>
+                <div className="flex gap-3 sm:gap-8 items-center font-mono leading-none text-[10px] sm:text-[12px]">
                   <div>DÓLAR <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
                   <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
                 </div>
@@ -2193,7 +2193,7 @@ export default function App() {
             <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 shadow-sm leading-none">
               <div className="flex items-center gap-3 md:gap-5">
                 <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-md" />
-                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-violet-500">AR</span></span><span className="text-[9px] md:text-[11px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
+                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-violet-500">AR</span></span><span className="text-[11px] md:text-[13px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
               </div>
               <div className="flex items-center gap-2 md:gap-10 w-full md:w-auto justify-between md:justify-end">
                 <NavigationMenu />
@@ -2203,7 +2203,7 @@ export default function App() {
 
             <main className="max-w-[1800px] mx-auto p-6 md:p-10 flex-grow w-full">
               {loading ? (
-                <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse text-center">Sincronizando Mercados...</p></div>
+                <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[14px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse text-center">Sincronizando Mercados...</p></div>
               ) : (
                 <div className="animate-in fade-in zoom-in-95 duration-1000">
                   <Routes>
@@ -2296,13 +2296,13 @@ export default function App() {
 
             <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col gap-8">
               <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
-                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
-                <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[10px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
-                <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[11px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
+                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
+                <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[12px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
+                <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[13px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
               </div>
               <div className="border-t dark:border-slate-800 pt-6 text-center">
-                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 opacity-40 mb-3">Fuentes de datos · Últ. act. {formatDateTime(lastUpdate)}</p>
-                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] font-bold text-slate-400 opacity-50">
+                <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 opacity-40 mb-3">Fuentes de datos · Últ. act. {formatDateTime(lastUpdate)}</p>
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12px] font-bold text-slate-400 opacity-50">
                   <a href="https://www.bcra.gob.ar/relevamiento-expectativas-mercado-rem/" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">BCRA (REM {remDateLabel || '---'})</a>
                   <span className="text-slate-700">·</span>
                   <a href="https://argentinadatos.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">ArgentinaDatos API</a>
