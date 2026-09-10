@@ -1062,7 +1062,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       </TableModal>
 
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
-      <div className="lg:col-span-3 space-y-4">
+      <div className="lg:col-span-4 space-y-4">
         
         {/* BLOQUE TIPO DE CRÉDITO */}
         <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl shadow-xl border dark:border-slate-800 text-left">
@@ -1360,7 +1360,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       </div>
       
       {/* --- COLUMNA DERECHA: RESULTADOS --- */}
-      <div ref={resultsRef} className="lg:col-span-9 space-y-5 min-w-0">
+      <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
           <SummaryCard title={loanType === 'new' ? "Inicio" : "Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
           <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado; el que está en UVA es el que mide de verdad cuánto te cuesta el crédito." />
@@ -1781,7 +1781,7 @@ function RentCalculator({ remData, dolarOficial }) {
       </TableModal>
 
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
-      <div className="lg:col-span-3 space-y-4">
+      <div className="lg:col-span-4 space-y-4">
         
         {/* BLOQUE INICIO ALQUILERES (INTEGRADO) */}
         <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl shadow-xl border dark:border-slate-800 text-left">
@@ -2024,7 +2024,7 @@ function RentCalculator({ remData, dolarOficial }) {
       </div>
       
       {/* --- COLUMNA DERECHA: RESULTADOS ALQUILERES --- */}
-      <div ref={resultsRef} className="lg:col-span-9 space-y-5 min-w-0">
+      <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
           <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ? "Primer Ingreso" : "Primer Pago") : "Alquiler Actual"} value={moneyCompact(totals.alquilerInicial)} icon={Wallet} colorClass={rentRole === 'owner' ? 'emerald' : 'indigo'} sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
           <SummaryCard title="Expensas" value={moneyCompact(totals.totalExpensas)} icon={TrendingUp} colorClass="orange" tooltip="Proyección de todas las expensas sumadas a lo largo de la simulación." />
