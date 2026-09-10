@@ -51,6 +51,8 @@ const mensualAAnual = (mensual) => (Math.pow(1 + mensual / 100, 12) - 1) * 100;
 
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
 
+const uvas = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 }).format(v);
+
 const moneyCompact = (v) => {
   const abs = Math.abs(v);
   if (abs >= 1_000_000_000) return `$ ${(v / 1_000_000_000).toFixed(1).replace('.', ',')} MM`;
@@ -448,7 +450,7 @@ const SUMMARY_COLOR_MAP = {
   slate: 'bg-slate-500/10 text-slate-500',
 };
 
-const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, colorClass, sticky, tooltip }) {
+const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, colorClass, sticky, tooltip, sub }) {
   const [displayValue, setDisplayValue] = useState(value);
   const [animating, setAnimating] = useState(false);
 
@@ -473,6 +475,7 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
           )}
         </div>
         <p className={`text-sm md:text-base font-black font-mono tracking-tight leading-none truncate transition-opacity duration-200 ${animating ? 'opacity-30' : 'opacity-100'} ${colorClass === 'rose' && title.includes('Rentabilidad') ? 'text-rose-500' : 'dark:text-white'}`}>{displayValue}</p>
+        {sub && <p className="text-[11px] font-bold text-slate-400 leading-none truncate mt-1">{sub}</p>}
       </div>
     </div>
   );
@@ -649,6 +652,77 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
   );
 }
 
+// Tabla de amortizacion del credito UVA. La usan la vista normal y el modal a
+// pantalla completa; `dark` es el modal, que siempre va sobre fondo oscuro.
+function AmortizationTable({ data, conSueldo = false, dark = false }) {
+  const th = `p-4 text-center ${dark ? '' : ''}`;
+  const totalCuotas = data.reduce((a, d) => a + d.cuotaTotal, 0);
+  const totalInteres = data.reduce((a, d) => a + d.interes, 0);
+  const totalCapital = data.reduce((a, d) => a + d.principal, 0);
+  const totalUva = data.reduce((a, d) => a + d.cuotaUva, 0);
+
+  return (
+    <table className={`w-full text-left border-collapse text-[13px] ${dark ? '' : 'min-w-[900px] md:min-w-[1100px]'}`} style={dark ? { minWidth: 1000 } : undefined}>
+      <thead className={`sticky top-0 z-10 font-black uppercase text-[12px] leading-none ${dark ? 'bg-slate-950 text-slate-400 border-b border-white/10 shadow-[0_-8px_0_0_#020617]' : 'bg-white dark:bg-slate-900 text-slate-400 border-b dark:border-slate-800 shadow-sm'}`}>
+        <tr>
+          <th className={th}>Periodo</th>
+          <th className={th}>Inflación</th>
+          <th className={th}>Cuota UVA</th>
+          <th className={th}>Valor UVA</th>
+          <th className={th}>Cuota Total</th>
+          <th className={th}>Interés</th>
+          <th className={th}>Capital</th>
+          <th className={th}>Saldo</th>
+          {conSueldo && <th className={th}>% Sueldo</th>}
+        </tr>
+      </thead>
+      <tbody className={`text-center ${dark ? 'divide-y divide-white/5' : 'divide-y dark:divide-slate-800'}`}>
+        {data.map((d, i) => {
+          // El origen de la inflacion solo se muestra cuando cambia: repetirlo en
+          // las 240 filas es ruido.
+          const cambiaOrigen = i === 0 || data[i - 1].source !== d.source;
+          return (
+            <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? (dark ? 'bg-sky-900/20 border-l-4 border-sky-500' : 'bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500') : (dark ? 'hover:bg-white/5' : 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40')}`}>
+              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-slate-200' : 'text-slate-800 dark:text-slate-200'}`}>
+                <span className="flex items-center justify-center gap-1.5">
+                  {d.label}
+                  {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
+                  {conSueldo && d.ajusteSueldo && <span title="Mes en que se ajusta tu sueldo"><Wallet className="w-3 h-3 text-emerald-500" /></span>}
+                </span>
+              </td>
+              <td className="p-4">
+                {cambiaOrigen
+                  ? <span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : d.source === 'PROPIA' ? 'bg-amber-600 text-white' : (dark ? 'bg-slate-600 text-white' : 'bg-slate-500 text-white')}`}>{d.source}</span>
+                  : <span className="text-slate-300 dark:text-slate-700">·</span>}
+              </td>
+              <td className={`p-4 font-mono font-bold whitespace-nowrap ${dark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}`}>{uvas(d.cuotaUva)}</td>
+              <td className="p-4 font-mono text-slate-400 whitespace-nowrap">{money(d.valorUva)}</td>
+              <td className={`p-4 font-black whitespace-nowrap ${dark ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{money(d.cuotaTotal)}</td>
+              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(d.interes)}</td>
+              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(d.principal)}</td>
+              <td className={`p-4 font-black font-mono whitespace-nowrap ${dark ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{money(d.saldo)}</td>
+              {conSueldo && <td className={`p-4 font-black font-mono whitespace-nowrap ${d.rci > 30 ? 'text-rose-500' : 'text-emerald-500'}`}>{d.rci.toFixed(1)}%</td>}
+            </tr>
+          );
+        })}
+      </tbody>
+      <tfoot className={`sticky bottom-0 font-black uppercase text-[12px] ${dark ? 'bg-slate-950 text-slate-300 border-t border-white/10' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-200 border-t dark:border-slate-700'}`}>
+        <tr>
+          <td className="p-4 text-center whitespace-nowrap">Totales</td>
+          <td className="p-4"></td>
+          <td className="p-4 text-center font-mono whitespace-nowrap">{uvas(totalUva)}</td>
+          <td className="p-4"></td>
+          <td className="p-4 text-center whitespace-nowrap">{money(totalCuotas)}</td>
+          <td className={`p-4 text-center whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(totalInteres)}</td>
+          <td className={`p-4 text-center whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(totalCapital)}</td>
+          <td className="p-4"></td>
+          {conSueldo && <td className="p-4"></td>}
+        </tr>
+      </tfoot>
+    </table>
+  );
+}
+
 // --- UTILIDADES DE COMPARTIR POR URL ---
 const encodeParams = (params) => {
   const encoded = btoa(JSON.stringify(params));
@@ -703,6 +777,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [exportType, setExportType] = useState('pdf');
+  const [exportRange, setExportRange] = useState('all');
   const [copiedWP, setCopiedWP] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTableFullscreen, setIsTableFullscreen] = useState(false);
@@ -837,7 +912,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         principal: principalUva * projUva, 
         cuotaTotal: cuotaTotal, 
         saldo: balanceUva * projUva, 
+        // En sistema frances la cuota en UVA es constante: lo que sube es el valor de la UVA.
+        cuotaUva: principalUva + interestUva,
+        interesUva: interestUva,
+        valorUva: projUva,
         oficial: !!inflMatch,
+        ajusteSueldo: esMesDeAjuste,
         ingreso: projIngreso,
         rci: projIngreso > 0 ? (cuotaTotal / projIngreso) * 100 : 0,
         source: sourceName,
@@ -860,12 +940,20 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     return data;
   }, [amount, years, rate, inflFirstMode, inflFirstAnnual, inflLongMode, inflLongAnnual, ultimoRemMensual, salaryAdjustPeriod, salary, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
-  const totals = useMemo(() => ({
-      totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
-      totalIntereses: schedule.reduce((acc, curr) => acc + curr.interes, 0),
-      cuotaInicial: schedule[0]?.cuotaTotal || 0,
-      montoOriginalPesos: loanType === 'new' ? amount : (balanceCurrency === 'ars' ? amount : amount * uvaValue)
-  }), [schedule, amount, loanType, balanceCurrency, uvaValue]);
+  const totals = useMemo(() => {
+      const montoOriginalPesos = loanType === 'new' ? amount : (balanceCurrency === 'ars' ? amount : amount * uvaValue);
+      return {
+        totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
+        totalIntereses: schedule.reduce((acc, curr) => acc + curr.interes, 0),
+        totalCapital: schedule.reduce((acc, curr) => acc + curr.principal, 0),
+        cuotaInicial: schedule[0]?.cuotaTotal || 0,
+        montoOriginalPesos,
+        // En UVA la inflacion no infla los totales, asi que estos si miden el credito.
+        totalPagadoUva: schedule.reduce((acc, curr) => acc + curr.cuotaUva, 0),
+        totalInteresesUva: schedule.reduce((acc, curr) => acc + curr.interesUva, 0),
+        capitalUva: uvaValue > 0 ? montoOriginalPesos / uvaValue : 0,
+      };
+  }, [schedule, amount, loanType, balanceCurrency, uvaValue]);
 
   const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
 
@@ -886,11 +974,17 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     prevScheduleLen.current = schedule.length;
   }, [schedule.length, rateNum]);
 
+  // La tabla en pantalla siempre muestra el credito completo; lo que se recorta
+  // es el archivo que te llevas.
+  const datosExport = exportRange === 'all'
+    ? schedule
+    : schedule.slice(0, Math.min(schedule.length, parseInt(exportRange) * 12));
+
   const exportToCSV = () => {
-    if (schedule.length === 0) return;
-    const headers = ["Mes", "Cuota Total", "Interes", "Capital", "Saldo Pendiente", "Inflación"];
-    const rows = schedule.map(d => [
-      d.label, Math.round(d.cuotaTotal), Math.round(d.interes),
+    if (datosExport.length === 0) return;
+    const headers = ["Mes", "Cuota UVA", "Valor UVA", "Cuota Total", "Interes", "Capital", "Saldo Pendiente", "Inflación"];
+    const rows = datosExport.map(d => [
+      d.label, d.cuotaUva.toFixed(2), d.valorUva.toFixed(2), Math.round(d.cuotaTotal), Math.round(d.interes),
       Math.round(d.principal), Math.round(d.saldo), d.source
     ]);
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
@@ -903,14 +997,17 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   };
 
   const exportToExcel = () => {
-    if (schedule.length === 0) return;
-    const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({
+    if (datosExport.length === 0) return;
+    const ws = XLSX.utils.json_to_sheet(datosExport.map(d => ({
       "Periodo": d.label,
+      "Cuota UVA": Number(d.cuotaUva.toFixed(2)),
+      "Valor UVA": Number(d.valorUva.toFixed(2)),
       "Cuota Total": Math.round(d.cuotaTotal),
       "Interés": Math.round(d.interes),
       "Capital": Math.round(d.principal),
       "Saldo Pendiente": Math.round(d.saldo),
-      "Inflación": d.source
+      "Inflación": d.source,
+      ...(salary > 0 ? { "% Sueldo": Number(d.rci.toFixed(1)) } : {})
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Proyeccion");
@@ -918,7 +1015,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   };
 
   const handleExportClick = (type) => {
-      if (schedule.length === 0) return;
+      if (datosExport.length === 0) return;
       setExportType(type);
       setShowDonationModal(true);
   };
@@ -943,7 +1040,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               if(exportType === 'csv') exportToCSV();
           }}
           downloadLink={
-            <PDFDownloadLink document={<MortgagePDFDocument data={schedule} summary={totals} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
+            <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
               {({ loading }) => (
                 <button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg flex items-center justify-center gap-2">
                    <FileText className="w-4 h-4"/> {loading ? 'Generando Archivo...' : 'Descargar PDF Ahora'}
@@ -959,25 +1056,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
-        <table className="w-full text-left border-collapse text-[13px]" style={{ minWidth: 700 }}>
-          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[12px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
-            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
-          </thead>
-          <tbody className="divide-y divide-white/5 text-center">
-            {schedule.map((d) => (
-              <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? 'bg-sky-900/20 border-l-4 border-sky-500' : 'hover:bg-white/5'}`}>
-                <td className="p-4 font-bold text-slate-200 flex items-center justify-center gap-2">
-                  {d.label} {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
-                </td>
-                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
-                <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
-                <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
-                <td className="p-4 text-indigo-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
-                <td className="p-4 text-slate-100 font-black font-mono whitespace-nowrap">{money(d.saldo)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <AmortizationTable data={schedule} conSueldo={salary > 0} dark />
       </TableModal>
 
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
@@ -1282,9 +1361,16 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       <div ref={resultsRef} className="lg:col-span-9 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
           <SummaryCard title={loanType === 'new' ? "Inicio" : "Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
-          <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital." />
-          <SummaryCard title={loanType === 'new' ? "Total" : "Restante"} value={moneyCompact(totals.totalPagadoFinal)} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda." />
-          <SummaryCard title="Cociente" value={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Relación entre el Pago Final y el Monto/Saldo original. Ej: '2.0x' significa que terminás pagando el doble de pesos nominales de los que debías hoy." />
+          <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado; el que está en UVA es el que mide de verdad cuánto te cuesta el crédito." />
+          <SummaryCard title={loanType === 'new' ? "Total" : "Restante"} value={moneyCompact(totals.totalPagadoFinal)} sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar también el total en UVA." />
+          <SummaryCard
+            title="Costo del crédito"
+            value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` : "---"}
+            sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x en pesos nominales` : null}
+            icon={Activity}
+            colorClass="amber"
+            tooltip={<><p className="mb-3">Cuántas veces el capital terminás devolviendo, <b className="text-white">medido en UVA</b>. Un 1,50x significa que por cada 100 UVA que te prestaron devolvés 150: esos 50 son el costo real del crédito.</p><p>Abajo está el mismo cociente en pesos nominales, que siempre da mucho más alto porque suma pesos de años distintos sin descontar la inflación. Ese número asusta pero no mide el crédito: mide la inflación.</p></>}
+          />
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
@@ -1333,7 +1419,18 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
             
-            <div className="flex w-full lg:w-auto gap-2">
+            <div className="flex w-full lg:w-auto gap-2 items-stretch">
+              <div className="flex flex-col justify-center px-3 bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 rounded-xl shrink-0">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Exportar</label>
+                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} className="bg-transparent text-[12px] font-black uppercase outline-none dark:text-white cursor-pointer leading-none">
+                  <option value="all">Todo</option>
+                  <option value="1">1 año</option>
+                  <option value="2">2 años</option>
+                  <option value="3">3 años</option>
+                  <option value="5">5 años</option>
+                  <option value="10">10 años</option>
+                </select>
+              </div>
               <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
                  <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
               </button>
@@ -1353,25 +1450,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
           <div className="max-h-[400px] md:max-h-[850px] overflow-auto w-full no-scrollbar">
             <div className="inline-block min-w-full align-middle">
-              <table className="w-full text-left border-collapse min-w-[700px] md:min-w-[900px]">
-                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[12px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
-                  <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Cuota Total</th><th className="p-4 text-center">Interés</th><th className="p-4 text-center">Capital</th><th className="p-4 text-center">Saldo</th></tr>
-                </thead>
-                <tbody className="divide-y dark:divide-slate-800 text-center">
-                  {schedule.map((d) => (
-                    <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? 'bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500' : 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40'}`}>
-                      <td className="p-4 font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-2">
-                        {d.label} {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
-                      </td>
-                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
-                      <td className="p-4 font-black text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
-                      <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
-                      <td className="p-4 text-indigo-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
-                      <td className="p-4 text-slate-800 dark:text-slate-100 font-black font-mono whitespace-nowrap">{money(d.saldo)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <AmortizationTable data={schedule} conSueldo={salary > 0} />
             </div>
           </div>
         </div>
