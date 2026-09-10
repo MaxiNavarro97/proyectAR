@@ -29,6 +29,23 @@ Font.register({
   src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf'
 });
 
+// Acumula la inflacion mensual de cada anio calendario. Un anio queda "parcial"
+// si remData no trae sus doce meses (tipicamente el ultimo anio del REM).
+const inflacionPorAnio = (remData) => {
+  if (!remData || remData.length === 0) return [];
+  const porAnio = new Map();
+  remData.forEach(d => {
+    if (!porAnio.has(d.año)) porAnio.set(d.año, { año: d.año, factor: 1, meses: 0, oficialCerrado: 0 });
+    const a = porAnio.get(d.año);
+    a.factor *= (1 + d.valor / 100);
+    a.meses += 1;
+    if (d.origen === 'IPC') a.oficialCerrado += 1;
+  });
+  return [...porAnio.values()]
+    .sort((a, b) => a.año - b.año)
+    .map(a => ({ año: a.año, valor: (a.factor - 1) * 100, parcial: a.meses < 12, ipc: a.oficialCerrado }));
+};
+
 const anualAMensual = (anual) => Math.pow(1 + anual / 100, 1 / 12) - 1;
 const mensualAAnual = (mensual) => (Math.pow(1 + mensual / 100, 12) - 1) * 100;
 
@@ -488,6 +505,9 @@ function TooltipContent({ data, isRent }) {
         <div className="flex justify-between items-center gap-4 text-orange-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="uppercase">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
       </div>
       <div className="space-y-1.5 text-[12px]">
+        {data.rci > 0 && (
+          <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">% del sueldo:</span><span className={`font-black ${data.rci > 30 ? 'text-rose-400' : 'text-emerald-400'}`}>{data.rci.toFixed(1)}%</span></div>
+        )}
         <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Mensual:</span><span className={`font-black ${data.varMensual > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varMensual > 0 ? '+' : ''}{data.varMensual.toFixed(1)}%</span></div>
         <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Acumulado YTD:</span><span className={`font-black ${data.varYTD > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varYTD > 0 ? '+' : ''}{data.varYTD.toFixed(1)}%</span></div>
         <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Total:</span><span className={`font-black ${data.varTotal > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varTotal > 0 ? '+' : ''}{data.varTotal.toFixed(1)}%</span></div>
@@ -496,7 +516,7 @@ function TooltipContent({ data, isRent }) {
   );
 }
 
-function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fullscreen = false }) {
+function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fullscreen = false, showRci = false }) {
   const [hovered, setHovered] = useState(null);
   const touchTimer = useRef(null);
 
@@ -526,9 +546,15 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
   }
 
   const maxVal = Math.max(...data.map(d => d.cuotaTotal)) * 1.15;
-  const w = 1000, h = 320, padL = 100, padB = 55, padT = 15;
+  const w = 1000, h = 320, padL = 100, padB = 55;
+  // El eje derecho solo existe cuando se superpone la linea de sueldo.
+  const conRci = showRci && data.some(d => d.rci > 0);
+  const padT = conRci ? 30 : 15; // deja aire arriba para el rotulo del eje derecho
+  const padR = conRci ? 62 : 0;
+  const anchoUtil = w - padL - padR;
   const step = Math.max(1, Math.ceil(data.length / (isRent ? 40 : 60)));
   const sampled = data.filter((_, i) => i % step === 0);
+  const maxRci = conRci ? Math.max(Math.max(...data.map(d => d.rci)), 40) * 1.1 : 0;
 
   return (
     <div className="relative w-full h-full">
@@ -553,12 +579,13 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
 
         {[0, 0.25, 0.5, 0.75, 1].map(p => (
           <g key={p}>
-            <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
+            <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w - padR} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
             <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[12px] fill-slate-400 font-mono font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
+            {conRci && <text x={w - padR + 12} y={h - padB - (h - padB - padT) * p + 5} textAnchor="start" className="text-[12px] fill-indigo-400 font-mono font-bold">{(maxRci * p).toFixed(0)}%</text>}
           </g>
         ))}
         {sampled.map((d, i) => {
-          const barAreaW = (w - padL) / sampled.length;
+          const barAreaW = anchoUtil / sampled.length;
           const barW = barAreaW * 0.8;
           const x = padL + i * barAreaW;
           const hInt = (d.interes / maxVal) * (h - padB - padT);
@@ -586,11 +613,27 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
             </g>
           );
         })}
+        {/* Cuota como % del sueldo, eje derecho. Usa todos los meses: muestrear borra la sierra. */}
+        {conRci && (() => {
+          const barAreaW = anchoUtil / sampled.length;
+          const xr = (k) => padL + (k / Math.max(1, data.length - 1)) * (anchoUtil - barAreaW) + barAreaW / 2;
+          const yr = (rci) => h - padB - (rci / maxRci) * (h - padB - padT);
+          const linea = data.map((d, k) => `${k === 0 ? 'M' : 'L'} ${xr(k).toFixed(1)} ${yr(d.rci).toFixed(1)}`).join(' ');
+          return (
+            <g style={{ pointerEvents: 'none' }}>
+              {maxRci > 30 && <line x1={padL} y1={yr(30)} x2={w - padR} y2={yr(30)} stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.65"/>}
+              <path d={linea} fill="none" stroke="#a5b4fc" strokeWidth="4" strokeLinejoin="round" opacity="0.35"/>
+              <path d={linea} fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinejoin="round"/>
+              <text x={w - padR + 12} y={14} textAnchor="start" className="text-[12px] fill-indigo-500 font-black uppercase">% sueldo</text>
+            </g>
+          );
+        })()}
+
         {/* Línea divisoria IPC → REM */}
         {showRemMarker && (() => {
           const transIdx = sampled.findIndex(d => d.source === 'REM' || d.source === 'INERCIA');
           if (transIdx > 0) {
-            const barAreaW = (w - padL) / sampled.length;
+            const barAreaW = anchoUtil / sampled.length;
             const tx = padL + transIdx * barAreaW - barAreaW * 0.1;
             return (
               <g>
@@ -601,79 +644,6 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
           }
           return null;
         })()}
-      </svg>
-    </div>
-  );
-}
-
-// Cuanto de tus ingresos se lleva la cuota, mes a mes. La sierra sale de que el
-// sueldo se ajusta cada tantos meses y la UVA, todos los dias.
-function IncomeRatioChart({ data }) {
-  if (!data || data.length === 0) return null;
-
-  const w = 1000, h = 260, padL = 55, padB = 40, padT = 20;
-  // Sin muestreo: con ajustes cada pocos meses, saltearse puntos borra la sierra.
-  const puntos = data;
-
-  const maxRci = Math.max(...puntos.map(d => d.rci), 40) * 1.1;
-  const x = (i) => padL + (i / Math.max(1, puntos.length - 1)) * (w - padL - 10);
-  const y = (rci) => h - padB - (rci / maxRci) * (h - padB - padT);
-
-  const linea = puntos.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)} ${y(d.rci).toFixed(1)}`).join(' ');
-  const area = `${linea} L ${x(puntos.length - 1).toFixed(1)} ${h - padB} L ${padL} ${h - padB} Z`;
-
-  const inicial = data[0].rci;
-  const final = data[data.length - 1].rci;
-  const pico = Math.max(...data.map(d => d.rci));
-
-  return (
-    <div className="w-full">
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        {[
-          { t: 'Primera cuota', v: inicial },
-          { t: 'Máximo', v: pico },
-          { t: 'Última cuota', v: final },
-        ].map(k => (
-          <div key={k.t} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-3 border dark:border-slate-800 text-center">
-            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1.5">{k.t}</p>
-            <p className={`text-lg font-black font-mono leading-none ${k.v > 30 ? 'text-rose-500' : 'text-emerald-500'}`}>{k.v.toFixed(1)}%</p>
-          </div>
-        ))}
-      </div>
-
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[180px] md:h-[240px]" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="rciFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {[0, 0.25, 0.5, 0.75, 1].map(f => {
-          const val = maxRci * f;
-          return (
-            <g key={f}>
-              <line x1={padL} y1={y(val)} x2={w - 10} y2={y(val)} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeWidth="1" />
-              <text x={padL - 8} y={y(val) + 4} textAnchor="end" className="text-[13px] fill-slate-400 font-bold">{val.toFixed(0)}%</text>
-            </g>
-          );
-        })}
-
-        {/* Umbral del 30%: el limite que suelen mirar los bancos para aprobar */}
-        {maxRci > 30 && (
-          <g>
-            <line x1={padL} y1={y(30)} x2={w - 10} y2={y(30)} stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.7" />
-            <text x={w - 14} y={y(30) - 6} textAnchor="end" className="text-[13px] fill-rose-500 font-black">Límite 30%</text>
-          </g>
-        )}
-
-        <path d={area} fill="url(#rciFill)" />
-        <path d={linea} fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinejoin="round" />
-
-        {puntos.filter((_, i) => i % Math.max(1, Math.ceil(puntos.length / 8)) === 0).map((d, i, arr) => {
-          const idx = puntos.indexOf(d);
-          return <text key={d.mes} x={x(idx)} y={h - padB + 24} textAnchor={i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle'} className="text-[13px] fill-slate-500 font-black uppercase">{d.shortDate}</text>;
-        })}
       </svg>
     </div>
   );
@@ -768,6 +738,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   useEffect(() => { try { localStorage.setItem('proyectar_tf_mortgage', timeframe); } catch { /* ignorar */ } }, [timeframe]);
 
+  const inflacionAnual = useMemo(() => inflacionPorAnio(remData).filter(a => a.año >= hoy.getFullYear()), [remData, hoy]);
   const ultimoRemMensual = (remData && remData.length > 0) ? remData[remData.length - 1].valor : 0;
   const ultimoRemAnual = mensualAAnual(ultimoRemMensual);
 
@@ -1033,9 +1004,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>EN CURSO</button>
           </div>
 
-          <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-200 dark:border-indigo-800 text-center">
-            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
-          </div>
+          <p className="text-[11px] font-bold text-slate-400 text-center leading-none flex items-center justify-center gap-1.5">
+            <CalendarDays className="w-3 h-3 shrink-0" /> Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}
+          </p>
         </div>
 
          {/* BLOQUE DATOS DEL CRÉDITO */}
@@ -1180,7 +1151,20 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   </div>
                 </div>
                 {inflFirstMode === 'rem' ? (
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</p>
+                  <div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight mb-2.5">IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</p>
+                    {inflacionAnual.length > 0 && (
+                      <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${inflacionAnual.length}, minmax(0, 1fr))` }}>
+                        {inflacionAnual.map(a => (
+                          <div key={a.año} className="bg-white dark:bg-slate-900 rounded-lg py-2 px-1 text-center border dark:border-slate-700">
+                            <p className="text-[10px] font-black uppercase text-slate-400 leading-none mb-1">{a.año}</p>
+                            <p className="text-[13px] font-black font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
+                            {a.parcial && <p className="text-[8px] font-bold uppercase text-slate-400 leading-none mt-1">parcial</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="animate-in fade-in">
                     <div className="flex justify-between items-center mb-1.5 text-[10px] font-black uppercase leading-none">
@@ -1321,20 +1305,26 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <p className="text-[11px] text-amber-600 dark:text-amber-400/80 font-medium leading-tight flex-1">No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.</p>
           </div>
-          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker /></div>
-        </div>
+          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker showRci={salary > 0} /></div>
 
-        {salary > 0 && schedule.length > 0 && (
-          <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-sm text-left animate-in fade-in">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-5">
-              <h3 className="font-black text-lg md:text-xl tracking-tight uppercase dark:text-white leading-none">Cuota sobre tus ingresos</h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight md:text-right">
-                Qué porcentaje de tu sueldo se lleva la cuota, mes a mes.
-              </p>
+          {salary > 0 && filteredData.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t dark:border-slate-800 animate-in fade-in">
+              {(() => {
+                const rcis = filteredData.map(d => d.rci);
+                return [
+                  { t: 'Cuota sobre sueldo hoy', v: rcis[0] },
+                  { t: 'Peor momento', v: Math.max(...rcis) },
+                  { t: 'Última cuota', v: rcis[rcis.length - 1] },
+                ];
+              })().map(k => (
+                <div key={k.t} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-3 border dark:border-slate-800 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-tight mb-1.5">{k.t}</p>
+                  <p className={`text-xl font-black font-mono leading-none ${k.v > 30 ? 'text-rose-500' : 'text-emerald-500'}`}>{k.v.toFixed(1)}%</p>
+                </div>
+              ))}
             </div>
-            <IncomeRatioChart data={filteredData} />
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[11px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
