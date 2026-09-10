@@ -29,11 +29,14 @@ export default {
         muted:  { DEFAULT: '#475569', dark: '#94a3b8' },
         faint:  { DEFAULT: '#94a3b8', dark: '#64748b' },
         // Superficies: tres niveles que nunca se anidan entre sí.
-        page:   { DEFAULT: '#f8fafc', dark: '#020617' },
-        panel:  { DEFAULT: '#f1f5f9', dark: '#0f172a' },
-        card:   { DEFAULT: '#ffffff', dark: '#0f172a' },
-        field:  { DEFAULT: '#ffffff', dark: '#1e293b' },
-        hair:   { DEFAULT: '#e2e8f0', dark: '#1e293b' },
+        // Cuatro escalones de luminosidad que tienen que distinguirse SIEMPRE,
+        // en los dos temas: la pagina es el fondo, el panel se hunde, la
+        // tarjeta se eleva y el campo es el hueco donde se escribe.
+        page:   { DEFAULT: '#f1f5f9', dark: '#020617' },
+        panel:  { DEFAULT: '#e9eef5', dark: '#0d1526' },
+        card:   { DEFAULT: '#ffffff', dark: '#161f33' },
+        field:  { DEFAULT: '#ffffff', dark: '#0a111f' },
+        hair:   { DEFAULT: '#dde5ee', dark: '#243044' },
       },
       borderRadius: {
         control: '0.625rem',  // botones, inputs, chips

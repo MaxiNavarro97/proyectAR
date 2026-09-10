@@ -17,7 +17,7 @@ const unir = (...clases) => clases.filter(Boolean).join(' ');
 // Zona de entrada: se hunde respecto de la página.
 export function Panel({ children, className }) {
   return (
-    <div className={unir('bg-panel dark:bg-panel-dark rounded-surface border border-hair dark:border-transparent', className)}>
+    <div className={unir('bg-panel dark:bg-panel-dark rounded-surface border border-hair dark:border-hair-dark', className)}>
       {children}
     </div>
   );
@@ -26,7 +26,7 @@ export function Panel({ children, className }) {
 // Zona de salida: se apoya sobre la página.
 export function Card({ children, className }) {
   return (
-    <div className={unir('bg-card dark:bg-card-dark rounded-surface border border-hair dark:border-transparent', className)}>
+    <div className={unir('bg-card dark:bg-card-dark rounded-surface border border-hair dark:border-hair-dark', className)}>
       {children}
     </div>
   );
@@ -166,7 +166,7 @@ export function Notice({ tone = 'info', icon: Icon, children, className }) {
 
 /* ---------- Controles de entrada ---------- */
 
-const CAMPO = 'w-full bg-field dark:bg-field-dark border border-hair dark:border-transparent rounded-control px-3 py-2.5 font-mono text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-colors';
+const CAMPO = 'w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 font-mono text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-colors';
 
 // Un número con su unidad pegada al borde (%, UVA, lo que sea).
 export function NumberField({ value, onChange, suffix, prefix, placeholder, align = 'left' }) {

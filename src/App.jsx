@@ -428,7 +428,7 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent }) {
           onFocus={(e) => { setEnFoco(true); e.target.select(); }}
           onBlur={() => setEnFoco(false)}
           placeholder="$ 0"
-          className="w-full bg-field dark:bg-field-dark border border-hair dark:border-transparent rounded-control px-3 py-2.5 pr-9 font-mono text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 transition-colors"
+          className="w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 pr-9 font-mono text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 transition-colors"
         />
         <DollarSign className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-faint dark:text-faint-dark pointer-events-none" />
       </div>
@@ -1370,7 +1370,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap lg:-mt-4">
               <Field label="Exportar" className="shrink-0">
                 <select value={exportRange} onChange={(e) => setExportRange(e.target.value)}
-                  className="bg-field dark:bg-field-dark border border-hair dark:border-transparent rounded-control px-2.5 py-2 text-label text-ink dark:text-ink-dark outline-none cursor-pointer">
+                  className="bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-2.5 py-2 text-label text-ink dark:text-ink-dark outline-none cursor-pointer">
                   {[['all', 'Todo'], ['1', '1 año'], ['2', '2 años'], ['3', '3 años'], ['5', '5 años'], ['10', '10 años']].map(([v, l]) => (
                     <option key={v} value={v} className={OPTION_CLASS}>{l}</option>
                   ))}
@@ -1385,17 +1385,17 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 <button key={b.id} onClick={() => { if (schedule.length > 0) handleExportClick(b.id); }}
                   className={`flex items-center gap-2 px-3 py-2 rounded-control text-label transition-colors ${b.primary
                     ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    : 'bg-field dark:bg-field-dark border border-hair dark:border-transparent text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'}`}>
+                    : 'bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'}`}>
                   <b.icon className="w-4 h-4" /> {b.label}
                 </button>
               ))}
 
               <button onClick={copyToWhatsApp} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-transparent text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
                 {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4" />}
               </button>
               <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-transparent text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
                 {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -1732,7 +1732,7 @@ function RentCalculator({ remData, dolarOficial }) {
       <div className="lg:col-span-4 space-y-4">
         
         {/* BLOQUE INICIO ALQUILERES (INTEGRADO) */}
-        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-hair-dark text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <CalendarDays className="w-4 h-4 text-slate-400 shrink-0" />
@@ -1790,7 +1790,7 @@ function RentCalculator({ remData, dolarOficial }) {
         </div>
 
         {/* BLOQUE DATOS DEL CONTRATO */}
-        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent space-y-4 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-hair-dark space-y-4 text-left">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
               <Settings2 className="w-4 h-4 text-slate-400 shrink-0" />
@@ -2202,7 +2202,7 @@ export default function App() {
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         </Helmet>
         <div className={darkMode ? 'dark' : ''}>
-          <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative" style={{ fontFamily:"'Inter', system-ui, -apple-system, sans-serif" }}>
+          <div className="min-h-screen bg-page dark:bg-page-dark text-ink dark:text-ink-dark transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative" style={{ fontFamily:"'Inter', system-ui, -apple-system, sans-serif" }}>
             
             {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
