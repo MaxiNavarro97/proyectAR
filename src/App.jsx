@@ -1065,10 +1065,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       <div className="lg:col-span-4 space-y-4">
         
         {/* BLOQUE TIPO DE CRÉDITO */}
-        <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl shadow-xl border dark:border-slate-800 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg"><CalendarDays className="w-4 h-4" /></div>
+              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-lg"><CalendarDays className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none flex items-center gap-2">
                 TIPO DE CRÉDITO
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-400">
@@ -1091,10 +1091,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         </div>
 
          {/* BLOQUE DATOS DEL CRÉDITO */}
-        <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl shadow-xl border dark:border-slate-800 space-y-4 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg"><Settings2 className="w-4 h-4" /></div>
+              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-lg"><Settings2 className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest dark:text-white leading-none">DATOS DEL CRÉDITO</h3>
             </div>
           </div>
@@ -1338,7 +1338,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         </div>
 
           {/* BANCOS */}
-        <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl border dark:border-slate-800 shadow-xl space-y-4 text-left text-[13px]">
+        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left text-[13px]">
           <h4 className="font-black uppercase text-slate-800 dark:text-white flex items-center gap-2 leading-none"><Globe className="w-3 h-3 text-indigo-500" /> Webs de los principales bancos argentinos</h4>
           <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2">
             {[
@@ -1366,7 +1366,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado; el que está en UVA es el que mide de verdad cuánto te cuesta el crédito." />
           <SummaryCard title={loanType === 'new' ? "Total" : "Restante"} value={moneyCompact(totals.totalPagadoFinal)} sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar también el total en UVA." />
           <SummaryCard
-            title="Costo del crédito"
+            title="Costo real"
             value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` : "---"}
             sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x en pesos nominales` : null}
             icon={Activity}
@@ -1784,10 +1784,10 @@ function RentCalculator({ remData, dolarOficial }) {
       <div className="lg:col-span-4 space-y-4">
         
         {/* BLOQUE INICIO ALQUILERES (INTEGRADO) */}
-        <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl shadow-xl border dark:border-slate-800 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-500 rounded-lg text-white shadow-lg"><CalendarDays className="w-4 h-4" /></div>
+              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg"><CalendarDays className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none flex items-center gap-2">
                 INICIO Y TIPO
                 <Tooltip iconClass="w-3.5 h-3.5 text-emerald-400" color="emerald">
@@ -1842,10 +1842,10 @@ function RentCalculator({ remData, dolarOficial }) {
         </div>
 
         {/* BLOQUE DATOS DEL CONTRATO */}
-        <div className="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl shadow-xl border dark:border-slate-800 space-y-4 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-500 rounded-lg text-white shadow-lg"><Settings2 className="w-4 h-4" /></div>
+              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg"><Settings2 className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest dark:text-white leading-none">DATOS DEL CONTRATO</h3>
             </div>
           </div>
