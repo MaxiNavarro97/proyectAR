@@ -966,6 +966,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   // Cuantos meses de la proyeccion tienen dato oficial (IPC o REM) detras.
   const mesesOficiales = schedule.filter(d => d.oficial).length;
+  const mesesSinDato = schedule.length - mesesOficiales;
 
   // Cuanto se aparta la simulacion de lo que el banco cobra de verdad.
   const gapAbs = (bankInstallment > 0 && totals.cuotaInicial > 0) ? bankInstallment - totals.cuotaInicial : 0;
@@ -1228,7 +1229,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <div className="pb-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">
-                    {mesesOficiales > 0 ? `Primeros ${mesesOficiales} meses` : 'Primeros meses'}
+                    {mesesOficiales === 0 ? 'Primeros meses' : mesesSinDato === 0 ? `Los ${mesesOficiales} meses` : `Primeros ${mesesOficiales} meses`}
                   </p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
                     <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
@@ -1268,7 +1269,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 )}
               </div>
 
-              {/* Tramo 2: los meses para los que ya no hay REM */}
+              {/* Tramo 2: los meses para los que ya no hay REM. Si el credito termina
+                  antes de que se acabe el REM, este tramo no gobierna nada. */}
+              {mesesSinDato > 0 && (
               <div className="pt-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
@@ -1301,6 +1304,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   </div>
                 )}
               </div>
+              )}
             </div>
           </div>
           
