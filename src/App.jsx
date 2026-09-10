@@ -955,7 +955,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del crédito">
-          <CompositionChart data={filteredData} dateMode="calendar" showRemMarker fullscreen />
+          <CompositionChart data={filteredData} dateMode="calendar" showRemMarker showRci={salary > 0} fullscreen />
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
