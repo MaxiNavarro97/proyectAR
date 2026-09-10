@@ -51,6 +51,10 @@ const mensualAAnual = (mensual) => (Math.pow(1 + mensual / 100, 12) - 1) * 100;
 
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
 
+// Credito de ejemplo, para que la pagina no reciba a nadie con ceros y un
+// cartel de "completa los campos".
+const EJEMPLO = { amount: 100000000, years: 20, rate: "4.5" };
+
 const OPTION_CLASS = "bg-white text-slate-900 dark:bg-slate-800 dark:text-white";
 
 const moneyDec = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
@@ -803,10 +807,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [remFocused, setRemFocused] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
 
-  const [amount, setAmount] = useState(0); 
+  const [amount, setAmount] = useState(EJEMPLO.amount); 
   const [salary, setSalary] = useState(0); 
-  const [years, setYears] = useState(0);
-  const [rate, setRate] = useState("0");
+  const [years, setYears] = useState(EJEMPLO.years);
+  const [rate, setRate] = useState(EJEMPLO.rate);
   // Cada tramo de la proyeccion decide por separado si sigue el dato oficial
   // o una inflacion propia. Los valores propios arrancan en el ultimo REM.
   const [inflFirstMode, setInflFirstMode] = useState('rem');
@@ -1003,6 +1007,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         capitalUva: uvaValue > 0 ? montoOriginalPesos / uvaValue : 0,
       };
   }, [schedule, amount, loanType, balanceCurrency, uvaValue]);
+
+  const esEjemplo = loanType === 'new' && amount === EJEMPLO.amount && Number(years) === EJEMPLO.years && String(rate) === EJEMPLO.rate;
 
   const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
 
@@ -1408,6 +1414,14 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       
       {/* --- COLUMNA DERECHA: RESULTADOS --- */}
       <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
+        {esEjemplo && (
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl flex items-center gap-2.5">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            <p className="text-[12px] text-indigo-700 dark:text-indigo-300 font-medium leading-tight">
+              Estás viendo un <b>crédito de ejemplo</b> de {money(EJEMPLO.amount)} a {EJEMPLO.years} años. Cambiá los valores de la izquierda por los tuyos.
+            </p>
+          </div>
+        )}
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
           <SummaryCard title={loanType === 'new' ? "Inicio" : "Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
           <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado; el que está en UVA es el que mide de verdad cuánto te cuesta el crédito." />
