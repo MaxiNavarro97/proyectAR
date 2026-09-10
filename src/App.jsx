@@ -767,8 +767,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [balanceCurrency, setBalanceCurrency] = useState('ars'); 
   const [remInstallments, setRemInstallments] = useState(0);
   const [bankInstallment, setBankInstallment] = useState(0);
-  const [remFocused, setRemFocused] = useState(false);
-  const [amountFocused, setAmountFocused] = useState(false);
 
   const [amount, setAmount] = useState(EJEMPLO.amount); 
   const [salary, setSalary] = useState(0); 
@@ -795,8 +793,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTableFullscreen, setIsTableFullscreen] = useState(false);
 
-  const [yearsFocused, setYearsFocused] = useState(false);
-  const [rateFocused, setRateFocused] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
 
   // Cargar parámetros desde URL compartida
@@ -1126,7 +1122,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 }
               >
                 <NumberField
-                  value={amountFocused && amount === 0 ? '' : (balanceCurrency === 'ars' ? money(amount) : new Intl.NumberFormat('es-AR').format(amount))}
+                  value={amount === 0 ? '' : (balanceCurrency === 'ars' ? money(amount) : new Intl.NumberFormat('es-AR').format(amount))}
                   onChange={(v) => { const n = v.replace(/\D/g, ''); setAmount(n === '' ? 0 : Number(n)); }}
                   suffix={balanceCurrency === 'uva' ? 'UVA' : '$'}
                   placeholder={balanceCurrency === 'ars' ? '$ 0' : '0'}
