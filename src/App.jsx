@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import ReactGA from "react-ga4"; 
+import ReactGA from"react-ga4"; 
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
 import * as XLSX from 'xlsx';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 
 // --- CONSTANTES GLOBALES ---
-const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-const APP_VERSION = "1.1.0";
+const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const APP_VERSION ="1.1.0";
 const CURRENT_YEAR = new Date().getFullYear();
 
 Font.register({
@@ -29,7 +29,7 @@ Font.register({
   src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf'
 });
 
-// Acumula la inflacion mensual de cada anio calendario. Un anio queda "parcial"
+// Acumula la inflacion mensual de cada anio calendario. Un anio queda"parcial"
 // si remData no trae sus doce meses (tipicamente el ultimo anio del REM).
 const inflacionPorAnio = (remData) => {
   if (!remData || remData.length === 0) return [];
@@ -52,10 +52,10 @@ const mensualAAnual = (mensual) => (Math.pow(1 + mensual / 100, 12) - 1) * 100;
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
 
 // Credito de ejemplo, para que la pagina no reciba a nadie con ceros y un
-// cartel de "completa los campos".
-const EJEMPLO = { amount: 100000000, years: 20, rate: "4.5" };
+// cartel de"completa los campos".
+const EJEMPLO = { amount: 100000000, years: 20, rate:"4.5" };
 
-const OPTION_CLASS = "bg-white text-slate-900 dark:bg-slate-800 dark:text-white";
+const OPTION_CLASS ="bg-white text-slate-900 dark:bg-slate-800 dark:text-white";
 
 const moneyDec = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
 
@@ -75,7 +75,7 @@ const formatDateTime = (dateStr) => {
 };
 
 // --- TOOLTIP COMPONENT (mobile-friendly, click to toggle, viewport-safe) ---
-function Tooltip({ children, iconClass = "w-3.5 h-3.5 text-slate-400", color = "indigo" }) {
+function Tooltip({ children, iconClass ="w-3.5 h-3.5 text-slate-400", color ="indigo" }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
   const tipRef = useRef(null);
@@ -126,21 +126,21 @@ function Tooltip({ children, iconClass = "w-3.5 h-3.5 text-slate-400", color = "
 
 // --- ESTILOS PDF ---
 // Borde compartido por columnas de tabla PDF
-const PDF_BORDER = { borderStyle: "solid", borderColor: '#e2e8f0', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0 };
+const PDF_BORDER = { borderStyle:"solid", borderColor: '#e2e8f0', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0 };
 
 const pdfStyles = StyleSheet.create({
   page: { padding: 30, fontFamily: 'Roboto', backgroundColor: '#f8fafc' },
   header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', paddingBottom: 10 },
-  brandTitle: { fontSize: 18, fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase' },
+  brandTitle: { fontSize: 18, fontWeight: 'bold', color: '#4f46e5', textTransform: '' },
   brandSub: { fontSize: 8, color: '#64748b', letterSpacing: 1 },
-  reportTitle: { fontSize: 14, fontWeight: 'bold', color: '#1e293b', marginTop: 10, marginBottom: 5, textTransform: 'uppercase' },
+  reportTitle: { fontSize: 14, fontWeight: 'bold', color: '#1e293b', marginTop: 10, marginBottom: 5, textTransform: '' },
   disclaimerBox: { backgroundColor: '#f1f5f9', padding: 8, borderRadius: 4, marginBottom: 15 },
   disclaimerText: { fontSize: 7, color: '#475569', textAlign: 'center' },
-  table: { display: "flex", flexDirection: "column", width: "100%", borderStyle: "solid", borderColor: '#e2e8f0', borderWidth: 1, borderRightWidth: 0, borderBottomWidth: 0 },
-  tableRow: { flexDirection: "row" },
-  tableColHeader: { ...PDF_BORDER, width: "14.28%", borderBottomColor: '#4f46e5', backgroundColor: '#eef2ff' },
-  tableCol: { ...PDF_BORDER, width: "14.28%" },
-  tableCellHeader: { margin: 5, fontSize: 8, fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', textAlign: 'center' },
+  table: { display:"flex", flexDirection:"column", width:"100%", borderStyle:"solid", borderColor: '#e2e8f0', borderWidth: 1, borderRightWidth: 0, borderBottomWidth: 0 },
+  tableRow: { flexDirection:"row" },
+  tableColHeader: { ...PDF_BORDER, width:"14.28%", borderBottomColor: '#4f46e5', backgroundColor: '#eef2ff' },
+  tableCol: { ...PDF_BORDER, width:"14.28%" },
+  tableCellHeader: { margin: 5, fontSize: 8, fontWeight: 'bold', color: '#4f46e5', textTransform: '', textAlign: 'center' },
   tableCell: { margin: 5, fontSize: 8, color: '#334155', textAlign: 'center' },
   footer: { position: 'absolute', bottom: 20, left: 30, right: 30, textAlign: 'center', fontSize: 7, color: '#94a3b8', borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 10 }
 });
@@ -158,14 +158,14 @@ const MortgagePDFDocument = ({ data, summary }) => (
          <Text style={pdfStyles.disclaimerText}>AVISO LEGAL: ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos.</Text>
       </View>
       <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
-          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>CUOTA INICIAL</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.cuotaInicial)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#fff7ed', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#ea580c', fontWeight: 'bold' }}>TOTAL INTERESES</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalIntereses)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>PAGO TOTAL EST.</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalPagadoFinal)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>Cuota inicial</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.cuotaInicial)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#fff7ed', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#ea580c', fontWeight: 'bold' }}>Total intereses</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalIntereses)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>Pago total est.</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalPagadoFinal)}</Text></View>
       </View>
       <View style={pdfStyles.table}>
         <View style={pdfStyles.tableRow}>
-          {["Periodo", "Origen Tasa", "Cuota Total", "Interés", "Capital", "Saldo"].map(h => (
-            <View style={{...pdfStyles.tableColHeader, width: "16.66%"}} key={h}><Text style={pdfStyles.tableCellHeader}>{h}</Text></View>
+          {["Periodo","Origen Tasa","Cuota Total","Interés","Capital","Saldo"].map(h => (
+            <View style={{...pdfStyles.tableColHeader, width:"16.66%"}} key={h}><Text style={pdfStyles.tableCellHeader}>{h}</Text></View>
           ))}
         </View>
         {data.map((row, i) => (
@@ -197,14 +197,14 @@ const RentPDFDocument = ({ data, summary, role }) => (
          <Text style={pdfStyles.disclaimerText}>AVISO LEGAL: ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos.</Text>
       </View>
       <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
-          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>{role === 'owner' ? 'INGRESO INICIAL' : 'ALQUILER INICIAL'}</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.alquilerInicial)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#fff7ed', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#ea580c', fontWeight: 'bold' }}>TOTAL EXPENSAS EST.</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalExpensas)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>{role === 'owner' ? 'INGRESO BRUTO EST.' : 'COSTO TOTAL CONTRATO'}</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalContrato)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>{role === 'owner' ? 'Ingreso inicial' : 'Alquiler inicial'}</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.alquilerInicial)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#fff7ed', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#ea580c', fontWeight: 'bold' }}>Total expensas est.</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalExpensas)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>{role === 'owner' ? 'INGRESO BRUTO EST.' : 'Costo total contrato'}</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalContrato)}</Text></View>
       </View>
       <View style={pdfStyles.table}>
         <View style={pdfStyles.tableRow}>
-          {["Periodo", "Inflación", "Total Mes", "Alquiler", "Expensas"].map(h => (
-            <View style={{...pdfStyles.tableColHeader, width: "20%"}} key={h}><Text style={pdfStyles.tableCellHeader}>{h}</Text></View>
+          {["Periodo","Inflación","Total Mes","Alquiler","Expensas"].map(h => (
+            <View style={{...pdfStyles.tableColHeader, width:"20%"}} key={h}><Text style={pdfStyles.tableCellHeader}>{h}</Text></View>
           ))}
         </View>
         {data.map((row, i) => (
@@ -254,7 +254,7 @@ function ChartModal({ isOpen, onClose, children, title }) {
     <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden animate-in fade-in duration-300">
       <div style={contentStyle} className="flex flex-col">
         <div className="flex justify-between items-center px-5 py-3 shrink-0">
-          <h3 className="text-white font-black text-base md:text-2xl uppercase tracking-tighter truncate mr-3">{title}</h3>
+          <h3 className="text-white font-semibold text-base md:text-2xl tracking-tighter truncate mr-3">{title}</h3>
           <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90 shrink-0"><X className="w-5 h-5" /></button>
         </div>
         <div className="flex-1 min-h-0 px-5 pb-3 flex items-center justify-center relative">
@@ -274,10 +274,10 @@ function TableModal({ isOpen, onClose, children, title }) {
     <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden animate-in fade-in duration-300">
       <div style={contentStyle} className="flex flex-col h-full">
         <div className="flex justify-between items-center px-5 py-4 shrink-0 border-b border-white/10">
-          <h3 className="text-white font-black text-base md:text-xl uppercase tracking-tighter truncate mr-3">{title}</h3>
+          <h3 className="text-white font-semibold text-base md:text-xl tracking-tighter truncate mr-3">{title}</h3>
           <div className="flex items-center gap-2 shrink-0">
             {isMobilePortrait && (
-              <button onClick={() => setLandscape(l => !l)} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90" title={landscape ? "Cambiar a vertical" : "Cambiar a horizontal"}>
+              <button onClick={() => setLandscape(l => !l)} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90" title={landscape ?"Cambiar a vertical" :"Cambiar a horizontal"}>
                 <Smartphone className="w-4 h-4" style={{ transition: `transform 0.4s ${EASE}`, transform: landscape ? 'rotate(-90deg)' : 'rotate(0deg)' }} />
               </button>
             )}
@@ -307,10 +307,10 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
       if (exportType === 'pdf') { return downloadLink; }
       let icon = <Download className="w-4 h-4"/>;
       let label = `Descargar ${exportType.toUpperCase()}`;
-      let bg = "bg-indigo-600 hover:bg-indigo-700";
-      if (exportType === 'excel') { icon = <FileSpreadsheet className="w-4 h-4"/>; bg = "bg-emerald-600 hover:bg-emerald-700"; }
+      let bg ="bg-indigo-600 hover:bg-indigo-700";
+      if (exportType === 'excel') { icon = <FileSpreadsheet className="w-4 h-4"/>; bg ="bg-emerald-600 hover:bg-emerald-700"; }
       return (
-        <button onClick={handleStandardDownload} disabled={downloading} className={`w-full py-3.5 ${bg} text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2`}>
+        <button onClick={handleStandardDownload} disabled={downloading} className={`w-full py-3.5 ${bg} text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2`}>
             {icon} {downloading ? 'Generando...' : label}
         </button>
       );
@@ -322,23 +322,23 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
         <div className="p-6 sm:p-8 text-center relative overflow-hidden">
            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 dark:from-indigo-950/30 to-transparent -z-10"></div>
            <HeartHandshake className="w-12 h-12 text-indigo-500 mx-auto mb-4 drop-shadow-sm animate-bounce-slow" />
-           <h2 className="text-xl sm:text-2xl font-black uppercase text-slate-800 dark:text-white mb-2 tracking-tight leading-none">¡Tu reporte está listo!</h2>
+           <h2 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-white mb-2 tracking-tight leading-none">¡Tu reporte está listo!</h2>
            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mb-6 leading-relaxed px-4">
              Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.
            </p>
            
            <div className="flex flex-col gap-3 mb-6">
-              <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all  hover:-translate-y-0.5">
+              <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#00cba9] hover:bg-[#00b899] text-white font-semibold rounded-xl text-xs transition-all  hover:-translate-y-0.5">
                   <Coffee className="w-4 h-4"/> Invitar un Cafecito
               </a>
-              <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all  hover:-translate-y-0.5">
+              <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#009ee3] hover:bg-[#008ed0] text-white font-semibold rounded-xl text-xs transition-all  hover:-translate-y-0.5">
                   <Handshake className="w-4 h-4"/> Aportar por Mercado Pago
               </a>
            </div>
 
            <div className="relative py-3">
              <div className="absolute inset-0 flex items-center" aria-hidden="true"><div className="w-full border-t border-slate-200 dark:border-slate-700"></div></div>
-             <div className="relative flex justify-center"><span className="bg-white dark:bg-slate-900 px-2 text-[12px] font-bold text-slate-400 uppercase tracking-widest">O continuar a la descarga</span></div>
+             <div className="relative flex justify-center"><span className="bg-white dark:bg-slate-900 px-2 text-[12px] font-bold text-slate-400">O continuar a la descarga</span></div>
            </div>
            
            <div className="mt-2">{getButtonContent()}</div>
@@ -361,18 +361,18 @@ function WelcomeModal({ onClose }) {
         </div>
         <div className="p-8 text-left">
            <div className="flex items-center gap-2 mb-2">
-             <span className="bg-emerald-100 text-emerald-700 text-[11px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">Novedades</span>
-             <h2 className="text-xl font-black uppercase text-slate-800 dark:text-white">Version {APP_VERSION}</h2>
+             <span className="bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Novedades</span>
+             <h2 className="text-xl font-semibold text-slate-800 dark:text-white">Version {APP_VERSION}</h2>
            </div>
            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-6 leading-relaxed">
              Seguimos mejorando ProyectAR para que tengas la mejor experiencia de análisis financiero:
            </p>
            <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[12px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Más Bancos</h4><p className="text-[12px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Modo Cine Mejorado</h4><p className="text-[12px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-semibold dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[12px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-semibold dark:text-white">Más Bancos</h4><p className="text-[12px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-semibold dark:text-white">Modo Cine Mejorado</h4><p className="text-[12px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
            </div>
-           <button onClick={onClose} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all active:scale-95 flex items-center justify-center gap-2 group">
+           <button onClick={onClose} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all active:scale-95 flex items-center justify-center gap-2 group">
              <span>¡A simular!</span> <Sparkles className="w-3 h-3 text-indigo-300 group-hover:text-white transition-colors"/>
            </button>
         </div>
@@ -392,8 +392,8 @@ const NAV_THEMES = {
 const NavBtn = React.memo(function NavBtn({ to, currentPath, icon, label, color }) {
   const active = currentPath === to || (to === '/' && currentPath === '');
   return (
-    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[11px] sm:text-[12px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? NAV_THEMES[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-      {React.cloneElement(icon, { className: "w-3.5 h-3.5 md:w-5 md:h-5" })} {label}
+    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[11px] sm:text-[12px] md:text-xs font-semibold flex items-center gap-1.5 md:gap-2 transition-all border border-transparent active:scale-95 ${active ? NAV_THEMES[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+      {React.cloneElement(icon, { className:"w-3.5 h-3.5 md:w-5 md:h-5" })} {label}
     </Link>
   );
 });
@@ -403,8 +403,8 @@ function NavigationMenu() {
   const location = useLocation();
   return (
     <div className="flex gap-1.5 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto no-scrollbar max-w-full">
-      <NavBtn currentPath={location.pathname} to="/calculadora-creditos-uva" icon={<Home />} label="CRÉDITOS" color="indigo"/>
-      <NavBtn currentPath={location.pathname} to="/calculadora-alquileres" icon={<ArrowRightLeft />} label="ALQUILERES" color="emerald"/>
+      <NavBtn currentPath={location.pathname} to="/calculadora-creditos-uva" icon={<Home />} label="Créditos" color="indigo"/>
+      <NavBtn currentPath={location.pathname} to="/calculadora-alquileres" icon={<ArrowRightLeft />} label="Alquileres" color="emerald"/>
       <NavBtn currentPath={location.pathname} to="/faq" icon={<HelpCircle />} label="FAQ" color="amber"/>
     </div>
   );
@@ -427,7 +427,7 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent, color 
   
   return (
     <div className="group text-left">
-      <label className={`text-[12px] font-black block mb-2 uppercase tracking-widest flex items-center gap-2 transition-colors ${isFocused ? focusLabelColor : 'text-slate-400'}`}>{label}</label>
+      <label className={`text-[12px] font-semibold block mb-2 flex items-center gap-2 transition-colors ${isFocused ? focusLabelColor : 'text-slate-400'}`}>{label}</label>
       <div className={`relative transition-all duration-300 ${isFocused ? 'scale-[1.01]' : ''}`}>
         <input 
           type="text" 
@@ -477,14 +477,14 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
       <div className={`p-2 rounded-xl shrink-0 ${SUMMARY_COLOR_MAP[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
       <div className="min-w-0 text-left flex-1 relative"> 
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <p className="text-[11px] md:text-[12px] font-black text-slate-400 uppercase tracking-widest truncate">{title}</p>
+          <p className="text-[11px] md:text-[12px] font-semibold text-slate-400 truncate">{title}</p>
           {tooltip && (
             <Tooltip iconClass="w-3 h-3 text-slate-300">
               {tooltip}
             </Tooltip>
           )}
         </div>
-        <p className={`text-sm md:text-base font-black font-mono tracking-tight leading-none truncate transition-opacity duration-200 ${animating ? 'opacity-30' : 'opacity-100'} ${colorClass === 'rose' && title.includes('Rentabilidad') ? 'text-rose-500' : 'dark:text-white'}`}>{displayValue}</p>
+        <p className={`text-xl md:text-2xl font-medium font-mono tracking-tight leading-none truncate transition-opacity duration-200 ${animating ? 'opacity-30' : 'opacity-100'} ${colorClass === 'rose' && title.includes('Rentabilidad') ? 'text-rose-500' : 'dark:text-white'}`}>{displayValue}</p>
         {sub && <p className="text-[11px] font-bold text-slate-400 leading-none truncate mt-1">{sub}</p>}
       </div>
     </div>
@@ -509,18 +509,18 @@ function TooltipContent({ data, isRent }) {
   return (
     <>
       <div className="flex items-center justify-between mb-2.5 border-b border-white/10 pb-2.5">
-        <p className="text-[14px] font-black text-indigo-400 uppercase tracking-widest">{data.label}</p>
-        <span className={`text-[11px] px-2 py-0.5 rounded font-black ${data.source === 'IPC' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : data.source === 'REM' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/10 text-slate-300 border border-white/10'}`}>{data.source}</span>
+        <p className="text-[14px] font-semibold text-indigo-400">{data.label}</p>
+        <span className={`text-[11px] px-2 py-0.5 rounded font-semibold ${data.source === 'IPC' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : data.source === 'REM' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/10 text-slate-300 border border-white/10'}`}>{data.source}</span>
       </div>
       <div className="space-y-2 text-[15px] mb-3 border-b border-white/10 pb-3">
-        <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 uppercase tracking-wide">Total:</span><span className="font-black text-white">{money(data.cuotaTotal)}</span></div>
-        <div className={`flex justify-between items-center gap-4 font-bold uppercase tracking-wide ${isRent ? 'text-emerald-400' : 'text-indigo-400'}`}><div className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${isRent ? 'bg-emerald-500' : 'bg-indigo-500'}`} /><span className="uppercase">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
-        <div className="flex justify-between items-center gap-4 text-orange-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="uppercase">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
+        <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 tracking-wide">Total:</span><span className="font-semibold text-white">{money(data.cuotaTotal)}</span></div>
+        <div className={`flex justify-between items-center gap-4 font-bold tracking-wide ${isRent ? 'text-emerald-400' : 'text-indigo-400'}`}><div className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${isRent ? 'bg-emerald-500' : 'bg-indigo-500'}`} /><span className="">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
+        <div className="flex justify-between items-center gap-4 text-orange-400 font-bold tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
       </div>
       <div className="space-y-1.5 text-[14px]">
-        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Mensual:</span><span className={`font-black ${data.varMensual > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varMensual > 0 ? '+' : ''}{data.varMensual.toFixed(1)}%</span></div>
-        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Acumulado YTD:</span><span className={`font-black ${data.varYTD > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varYTD > 0 ? '+' : ''}{data.varYTD.toFixed(1)}%</span></div>
-        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Total:</span><span className={`font-black ${data.varTotal > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varTotal > 0 ? '+' : ''}{data.varTotal.toFixed(1)}%</span></div>
+        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold tracking-wide">Var. Mensual:</span><span className={`font-semibold ${data.varMensual > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varMensual > 0 ? '+' : ''}{data.varMensual.toFixed(1)}%</span></div>
+        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold tracking-wide">Acumulado YTD:</span><span className={`font-semibold ${data.varYTD > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varYTD > 0 ? '+' : ''}{data.varYTD.toFixed(1)}%</span></div>
+        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold tracking-wide">Var. Total:</span><span className={`font-semibold ${data.varTotal > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varTotal > 0 ? '+' : ''}{data.varTotal.toFixed(1)}%</span></div>
       </div>
     </>
   );
@@ -550,7 +550,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
     return (
       <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 gap-3 p-4">
         <Calculator className="w-8 h-8 md:w-10 md:h-10 text-slate-300 dark:text-slate-700" />
-        <p className="text-[12px] md:text-[13px] font-black uppercase tracking-widest text-slate-400 text-center">Completá el monto y el plazo para ver tu proyección</p>
+        <p className="text-[12px] md:text-[13px] font-semibold text-slate-400 text-center">Completá el monto y el plazo para ver tu proyección</p>
       </div>
     );
   }
@@ -577,7 +577,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
       <svg
       viewBox={`0 0 ${w} ${h}`}
       className="w-full h-full select-none"
-      preserveAspectRatio={fullscreen ? "xMidYMid meet" : "xMinYMid meet"}
+      preserveAspectRatio={fullscreen ?"xMidYMid meet" :"xMinYMid meet"}
       onMouseLeave={() => setHovered(null)}
       onTouchStart={() => setHovered(null)}
       >
@@ -604,15 +604,15 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
               onTouchEnd={handleTouchEnd}
               className="group cursor-pointer"
             >
-              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill={isRent ? "#10b981" : "#6366f1"} rx="1.5" className="transition-all group-hover:brightness-110"/>
-              <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill={isRent ? "#f59e0b" : "#fb923c"} rx="1.5" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill={isRent ?"#10b981" :"#6366f1"} rx="1.5" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill={isRent ?"#f59e0b" :"#fb923c"} rx="1.5" className="transition-all group-hover:brightness-110"/>
               {(i % Math.ceil(sampled.length/10) === 0) && (
-                <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[13px] fill-slate-500 font-black uppercase tracking-tighter md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
+                <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[13px] fill-slate-500 font-semibold tracking-tighter md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
                   {dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}
                 </text>
               )}
               {(i % Math.ceil(sampled.length/10) === 0) && (
-                <text x={x + barW/2} y={h - padB + 22} textAnchor="middle" className="text-[14px] fill-slate-500 font-black uppercase tracking-tighter hidden md:block">{dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}</text>
+                <text x={x + barW/2} y={h - padB + 22} textAnchor="middle" className="text-[14px] fill-slate-500 font-semibold tracking-tighter hidden md:block">{dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}</text>
               )}
             </g>
           );
@@ -648,7 +648,7 @@ function AmortizationTable({ data, dark = false }) {
 
   return (
     <table className={`w-full text-left border-collapse text-[13px] ${dark ? '' : 'min-w-[900px] md:min-w-[1100px]'}`} style={dark ? { minWidth: 1000 } : undefined}>
-      <thead className={`sticky top-0 z-10 font-black uppercase text-[12px] leading-none ${dark ? 'bg-slate-950 text-slate-400 border-b border-white/10 shadow-[0_-8px_0_0_#020617]' : 'bg-white dark:bg-slate-900 text-slate-400 border-b dark:border-slate-800 shadow-sm'}`}>
+      <thead className={`sticky top-0 z-10 font-semibold text-[12px] leading-none ${dark ? 'bg-slate-950 text-slate-400 border-b border-white/10 shadow-[0_-8px_0_0_#020617]' : 'bg-white dark:bg-slate-900 text-slate-400 border-b dark:border-slate-800 shadow-sm'}`}>
         <tr>
           <th className={th}>Periodo</th>
           <th className={th}>Inflación</th>
@@ -670,13 +670,13 @@ function AmortizationTable({ data, dark = false }) {
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-slate-200' : 'text-slate-800 dark:text-slate-200'}`}>
                 <span className="flex items-center justify-center gap-1.5">
                   {d.label}
-                  {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
+                  {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded-full tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
                 </span>
               </td>
               <td className="p-4">
                 {cambiaOrigen
                   ? (
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-black uppercase ${dark ? 'bg-white/5 text-slate-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-semibold ${dark ? 'bg-white/5 text-slate-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${d.oficial ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                       {d.source}
                     </span>
@@ -685,15 +685,15 @@ function AmortizationTable({ data, dark = false }) {
               </td>
               <td className={`p-4 font-mono font-bold whitespace-nowrap ${dark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}`}>{uvas(d.cuotaUva)}</td>
               <td className="p-4 font-mono text-slate-400 whitespace-nowrap">{money(d.valorUva)}</td>
-              <td className={`p-4 font-black whitespace-nowrap ${dark ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{money(d.cuotaTotal)}</td>
+              <td className={`p-4 font-semibold whitespace-nowrap ${dark ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{money(d.cuotaTotal)}</td>
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(d.interes)}</td>
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(d.principal)}</td>
-              <td className={`p-4 font-black font-mono whitespace-nowrap ${dark ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{money(d.saldo)}</td>
+              <td className={`p-4 font-semibold font-mono whitespace-nowrap ${dark ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{money(d.saldo)}</td>
             </tr>
           );
         })}
       </tbody>
-      <tfoot className={`sticky bottom-0 font-black uppercase text-[12px] ${dark ? 'bg-slate-950 text-slate-300 border-t border-white/10' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-200 border-t dark:border-slate-700'}`}>
+      <tfoot className={`sticky bottom-0 font-semibold text-[12px] ${dark ? 'bg-slate-950 text-slate-300 border-t border-white/10' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-200 border-t dark:border-slate-700'}`}>
         <tr>
           <td className="p-4 text-center whitespace-nowrap">Totales</td>
           <td className="p-4"></td>
@@ -739,8 +739,8 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
     <div title={`Datos actualizados el ${formatDateTime(lastUpdate)}`} className="w-full md:w-auto flex items-center gap-x-4 overflow-x-auto no-scrollbar md:overflow-visible">
       {items.map((it, i) => (
         <div key={it.label} title={it.title} className={`flex items-baseline gap-1.5 shrink-0 md:flex-col md:items-start md:gap-1 ${i > 0 ? 'md:border-l md:border-slate-200 md:dark:border-slate-800 md:pl-4 lg:pl-6 md:ml-4 lg:ml-6' : ''}`}>
-          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 leading-none">{it.label}</span>
-          <span className={`text-[13px] md:text-[15px] font-black font-mono leading-none ${it.color}`}>{it.valor}</span>
+          <span className="text-[11px] font-semibold text-slate-400 leading-none">{it.label}</span>
+          <span className={`text-[13px] md:text-[15px] font-semibold font-mono leading-none ${it.color}`}>{it.valor}</span>
         </div>
       ))}
     </div>
@@ -838,7 +838,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const ultimoRemMensual = (remData && remData.length > 0) ? remData[remData.length - 1].valor : 0;
   const ultimoRemAnual = mensualAAnual(ultimoRemMensual);
 
-  // Al elegir "propia" se arranca desde el ultimo dato oficial, no desde un numero suelto.
+  // Al elegir"propia" se arranca desde el ultimo dato oficial, no desde un numero suelto.
   useEffect(() => {
     if (ultimoRemMensual > 0) {
       const anual = String(Math.round(mensualAAnual(ultimoRemMensual)));
@@ -990,12 +990,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const exportToCSV = () => {
     if (datosExport.length === 0) return;
-    const headers = ["Mes", "Cuota UVA", "Valor UVA", "Cuota Total", "Interes", "Capital", "Saldo Pendiente", "Inflación"];
+    const headers = ["Mes","Cuota UVA","Valor UVA","Cuota Total","Interes","Capital","Saldo Pendiente","Inflación"];
     const rows = datosExport.map(d => [
       d.label, d.cuotaUva.toFixed(2), d.valorUva.toFixed(2), Math.round(d.cuotaTotal), Math.round(d.interes),
       Math.round(d.principal), Math.round(d.saldo), d.source
     ]);
-    const csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
+    const csvContent ="data:text/csv;charset=utf-8," + headers.join(";") +"\n" + rows.map(e => e.join(";")).join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
     link.setAttribute("download", `ProyectAR_Hipotecas_${new Date().getTime()}.csv`);
@@ -1006,18 +1006,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const exportToExcel = () => {
     if (datosExport.length === 0) return;
-    const ws = XLSX.utils.json_to_sheet(datosExport.map(d => ({
- "Periodo": d.label,
- "Cuota UVA": Number(d.cuotaUva.toFixed(2)),
- "Valor UVA": Number(d.valorUva.toFixed(2)),
- "Cuota Total": Math.round(d.cuotaTotal),
- "Interés": Math.round(d.interes),
- "Capital": Math.round(d.principal),
- "Saldo Pendiente": Math.round(d.saldo),
- "Inflación": d.source
+    const ws = XLSX.utils.json_to_sheet(datosExport.map(d => ({"Periodo": d.label,"Cuota UVA": Number(d.cuotaUva.toFixed(2)),"Valor UVA": Number(d.valorUva.toFixed(2)),"Cuota Total": Math.round(d.cuotaTotal),"Interés": Math.round(d.interes),"Capital": Math.round(d.principal),"Saldo Pendiente": Math.round(d.saldo),"Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Proyeccion");
+    XLSX.utils.book_append_sheet(wb, ws,"Proyeccion");
     XLSX.writeFile(wb, `ProyectAR_Hipotecas_${new Date().getTime()}.xlsx`);
   };
 
@@ -1049,7 +1041,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           downloadLink={
             <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
               {({ loading }) => (
-                <button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
+                <button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2">
                    <FileText className="w-4 h-4"/> {loading ? 'Generando Archivo...' : 'Descargar PDF Ahora'}
                 </button>
               )}
@@ -1069,13 +1061,13 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
       <div className="lg:col-span-4 space-y-4">
         
-        {/* BLOQUE TIPO DE CRÉDITO */}
-        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-left">
+        {/* BLOQUE Tipo de crédito */}
+        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-xl"><CalendarDays className="w-4 h-4" /></div>
-              <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none flex items-center gap-2">
-                TIPO DE CRÉDITO
+              <CalendarDays className="w-4 h-4 text-slate-400 shrink-0" />
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white leading-none flex items-center gap-2">
+                Tipo de crédito
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-400">
                   <p className="mb-3"><b className="text-indigo-400 font-bold">Nuevo:</b> Todavía no lo sacaste. Simulás desde cero con el monto, el plazo y la tasa que te ofrece el banco.</p>
                   <p><b className="text-emerald-400 font-bold">En curso:</b> Ya lo tenés. Proyectás desde tu saldo deudor actual y las cuotas que te quedan por pagar.</p>
@@ -1086,8 +1078,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
 
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>NUEVO</button>
-            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>EN CURSO</button>
+            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>Nuevo</button>
+            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>En curso</button>
           </div>
 
           <p className="text-[13px] font-bold text-slate-400 text-center leading-none flex items-center justify-center gap-1.5">
@@ -1096,31 +1088,31 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         </div>
 
          {/* BLOQUE DATOS DEL CRÉDITO */}
-        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent space-y-4 text-left">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-xl"><Settings2 className="w-4 h-4" /></div>
-              <h3 className="text-sm font-black uppercase tracking-widest dark:text-white leading-none">DATOS DEL CRÉDITO</h3>
+              <Settings2 className="w-4 h-4 text-slate-400 shrink-0" />
+              <h3 className="text-sm font-semibold dark:text-white leading-none">Datos del crédito</h3>
             </div>
           </div>
 
           {loanType === 'new' ? (
             <div className="animate-in fade-in space-y-4">
-              <CurrencyInput label="MONTO DEL PRÉSTAMO" value={amount} onChange={setAmount} usdEquivalent={amount / dolarOficial} />
+              <CurrencyInput label="Monto del préstamo" value={amount} onChange={setAmount} usdEquivalent={amount / dolarOficial} />
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  <label className="text-[13px] font-black text-indigo-500 block mb-2 uppercase tracking-widest leading-none">PLAZO (AÑOS)</label>
-                  <input type="text" inputMode="numeric" value={(yearsFocused && (years === 0 || years === '')) ? '' : years} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setYears(num !== '' && num > 50 ? 50 : num); }} onFocus={(e) => { setYearsFocused(true); e.target.select(); }} onBlur={() => setYearsFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+                  <label className="text-[13px] font-semibold text-indigo-500 block mb-2 leading-none">Plazo (años)</label>
+                  <input type="text" inputMode="numeric" value={(yearsFocused && (years === 0 || years === '')) ? '' : years} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setYears(num !== '' && num > 50 ? 50 : num); }} onFocus={(e) => { setYearsFocused(true); e.target.select(); }} onBlur={() => setYearsFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
-                  <label className="text-[13px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
+                  <label className="text-[13px] font-semibold text-indigo-500 mb-2 leading-none flex items-center justify-center gap-1.5">
                     TNA (%)
                     <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
                         Tasa Nominal Anual. Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
                       </Tooltip>
                   </label>
-                  <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+                  <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
                 </div>
               </div>
             </div>
@@ -1128,15 +1120,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <div className="animate-in fade-in space-y-4">
               <div className="group text-left">
                 <div className="flex justify-between items-end mb-2">
-                  <label className="text-[12px] font-black uppercase tracking-widest flex items-center gap-1.5 text-slate-400 transition-colors">
-                    SALDO DEUDOR
+                  <label className="text-[12px] font-semibold flex items-center gap-1.5 text-slate-400 transition-colors">
+                    Saldo deudor
                     <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                         Buscá tu Saldo Deudor actual en tu Home Banking. Podés elegir ingresarlo en Pesos o en cantidad de UVAs.
                       </Tooltip>
                   </label>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl border dark:border-slate-600">
-                    <button onClick={() => setBalanceCurrency('ars')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'ars' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>$ ARS</button>
-                    <button onClick={() => setBalanceCurrency('uva')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'uva' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>UVA</button>
+                    <button onClick={() => setBalanceCurrency('ars')} className={`px-3 py-1 text-[11px] font-semibold rounded ${balanceCurrency === 'ars' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>$ ARS</button>
+                    <button onClick={() => setBalanceCurrency('uva')} className={`px-3 py-1 text-[11px] font-semibold rounded ${balanceCurrency === 'uva' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>UVA</button>
                   </div>
                 </div>
                 <div className="relative">
@@ -1145,10 +1137,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                     value={amountFocused && amount === 0 ? '' : (balanceCurrency === 'ars' ? money(amount) : new Intl.NumberFormat('es-AR').format(amount))}
                     onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setAmount(v === '' ? 0 : Number(v)); }}
                     onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)}
-                    placeholder={balanceCurrency === 'ars' ? "$ 0" : "0"}
+                    placeholder={balanceCurrency === 'ars' ?"$ 0" :"0"}
                     className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent focus:border-indigo-500/50 dark:focus:border-indigo-400/30  transition-all dark:text-white"
                   />
-                  {balanceCurrency === 'uva' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-black text-xs dark:text-slate-400">UVAs</div>}
+                  {balanceCurrency === 'uva' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-semibold text-xs dark:text-slate-400">UVAs</div>}
                   {balanceCurrency === 'ars' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>}
                 </div>
                 {balanceCurrency === 'ars' && amount > 0 && <p className="text-[12px] text-indigo-600 dark:text-indigo-400 mt-2 px-1 font-bold">Equivale a {new Intl.NumberFormat('es-AR').format(Math.round(amount / uvaValue))} UVAs aprox.</p>}
@@ -1158,26 +1150,26 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
                   {/* Cambiado de <label> a <div> */}
-                  <div className="text-[11px] sm:text-[13px] font-black text-indigo-500 mb-2 uppercase tracking-widest flex items-center justify-center gap-1.5 leading-none">
-                    CUOTAS RESTANTES
+                  <div className="text-[11px] sm:text-[13px] font-semibold text-indigo-500 mb-2 flex items-center justify-center gap-1.5 leading-none">
+                    Cuotas restantes
                   </div>
-                  <input type="text" inputMode="numeric" value={(remFocused && (remInstallments === 0 || remInstallments === '')) ? '' : remInstallments} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setRemInstallments(num !== '' && num > 600 ? 600 : num); }} onFocus={(e) => { setRemFocused(true); e.target.select(); }} onBlur={() => setRemFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+                  <input type="text" inputMode="numeric" value={(remFocused && (remInstallments === 0 || remInstallments === '')) ? '' : remInstallments} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setRemInstallments(num !== '' && num > 600 ? 600 : num); }} onFocus={(e) => { setRemFocused(true); e.target.select(); }} onBlur={() => setRemFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border dark:border-slate-800 text-center">
                   {/* Cambiado de <label> a <div> */}
-                  <div className="text-[13px] font-black text-indigo-500 mb-2 uppercase tracking-widest leading-none flex items-center justify-center gap-1.5">
+                  <div className="text-[13px] font-semibold text-indigo-500 mb-2 leading-none flex items-center justify-center gap-1.5">
                     TNA (%)
                     <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
                         Este dato lo define cada banco. Podés averiguarlo mirando su web o simulando tu crédito ahí mismo. Al final de esta columna tenés los links a los principales bancos del país para que consultes.
                       </Tooltip>
                   </div>
-                  <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+                  <input type="text" inputMode="numeric" value={(rateFocused && (rate === 0 || rate === '0')) ? '' : rate} onChange={(e) => { const v = e.target.value.replace(',','.'); if(v==='' || /^\d*\.?\d*$/.test(v)) setRate(e.target.value); }} onFocus={(e) => { setRateFocused(true); e.target.select(); }} onBlur={() => setRateFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
                 </div>
               </div>
 
               <div className="pt-4 border-t dark:border-slate-800">
                 <CurrencyInput
-                  label="CUOTA QUE TE COBRA EL BANCO (OPCIONAL)"
+                  label="Cuota que te cobra el banco (opcional)"
                   value={bankInstallment}
                   onChange={setBankInstallment}
                   sublabel="El total de tu último resumen. Sirve para ver cuánto se aparta la simulación de lo que pagás de verdad."
@@ -1188,10 +1180,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                       ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
                       : 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800'
                   }`}>
-                    <div className="flex items-center justify-between text-[12px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between text-[12px] font-semibold text-slate-500 dark:text-slate-400">
                       <span>Cuota simulada</span><span className="font-mono">{money(totals.cuotaInicial)}</span>
                     </div>
-                    <div className={`flex items-center justify-between text-[12px] font-black uppercase tracking-widest ${Math.abs(gapPct) <= 5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                    <div className={`flex items-center justify-between text-[12px] font-semibold ${Math.abs(gapPct) <= 5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                       <span className="flex items-center gap-2"><ArrowRightLeft className="w-3.5 h-3.5"/> Diferencia</span>
                       <span className="text-base leading-none font-mono">{gapPct > 0 ? '+' : ''}{gapPct.toFixed(1)}%</span>
                     </div>
@@ -1208,14 +1200,14 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           
           <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
-                <TrendingUp className="w-3 h-3 shrink-0"/> INFLACIÓN PROYECTADA
+              <label className="text-[12px] font-semibold text-slate-400 flex items-center gap-2 min-w-0 overflow-visible">
+                <TrendingUp className="w-3 h-3 shrink-0"/> Inflación proyectada
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="indigo">
                     <p className="mb-3 text-indigo-300 font-bold">💡 La inflación que usamos para proyectar cómo va a aumentar tu cuota mes a mes.</p>
                     <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Primeros meses</b></div>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400">Primeros meses</b></div>
                       <p className="mb-3">Los meses ya cerrados usan el <span className="text-white">IPC del INDEC</span> y los que vienen, el <span className="text-white">REM del BCRA</span>: el Relevamiento de Expectativas de Mercado, donde el Banco Central le pregunta a las principales consultoras cuánta inflación esperan. Es la opción por defecto y la más fundada.</p>
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Meses restantes</b></div>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400">Meses restantes</b></div>
                       <p className="mb-3">El REM llega hasta unos dos años. Para los que siguen no hay dato oficial de nadie, así que se repite el último valor del REM.</p>
                       <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-white font-bold">Propia:</span> en cualquiera de los dos tramos podés poner tu propio número anual y ver qué pasa. Ojo que ahí dejás de mirar una proyección oficial y pasás a mirar un supuesto tuyo.</p></div>
                     </div>
@@ -1228,12 +1220,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               {/* Tramo 1: los meses que tienen dato oficial */}
               <div className="pb-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">
+                  <p className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 leading-none">
                     {mesesOficiales === 0 ? 'Primeros meses' : mesesSinDato === 0 ? `Los ${mesesOficiales} meses` : `Primeros ${mesesOficiales} meses`}
                   </p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
-                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>PROPIA</button>
+                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflFirstMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflFirstMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>Propia</button>
                   </div>
                 </div>
                 {inflFirstMode === 'rem' ? (
@@ -1243,8 +1235,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                       <div className="flex gap-5">
                         {inflacionAnual.map(a => (
                           <div key={a.año} className="text-left">
-                            <p className="text-[12px] font-black uppercase text-slate-400 leading-none mb-1.5">{a.año}{a.parcial && <span className="normal-case opacity-70"> (parcial)</span>}</p>
-                            <p className="text-[16px] font-black font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
+                            <p className="text-[12px] font-semibold text-slate-400 leading-none mb-1.5">{a.año}{a.parcial && <span className="normal-case opacity-70"> (parcial)</span>}</p>
+                            <p className="text-[16px] font-semibold font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
                           </div>
                         ))}
                       </div>
@@ -1253,15 +1245,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 ) : (
                   <div className="animate-in fade-in">
                     <div className="flex items-center gap-2">
-                      <span className="text-[12px] font-black uppercase text-slate-500 leading-none shrink-0">Anual</span>
+                      <span className="text-[12px] font-semibold text-slate-500 leading-none shrink-0">Anual</span>
                       <div className="relative flex-1">
                         <input
                           type="text" inputMode="decimal" value={inflFirstAnnual}
                           onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflFirstAnnual(e.target.value); }}
                           onFocus={(e) => e.target.select()}
-                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
+                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-semibold outline-none focus:border-indigo-500 dark:text-white"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-slate-400 pointer-events-none">%</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-slate-400 pointer-events-none">%</span>
                       </div>
                     </div>
                     <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">Reemplaza el dato oficial por tu número. Equivale a {(anualAMensual(Number(String(inflFirstAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
@@ -1274,10 +1266,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               {mesesSinDato > 0 && (
               <div className="pt-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
+                  <p className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
-                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>PROPIA</button>
+                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[11px] font-semibold rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>Propia</button>
                   </div>
                 </div>
                 {inflLongMode === 'rem' ? (
@@ -1289,15 +1281,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 ) : (
                   <div className="animate-in fade-in">
                     <div className="flex items-center gap-2">
-                      <span className="text-[12px] font-black uppercase text-slate-500 leading-none shrink-0">Anual</span>
+                      <span className="text-[12px] font-semibold text-slate-500 leading-none shrink-0">Anual</span>
                       <div className="relative flex-1">
                         <input
                           type="text" inputMode="decimal" value={inflLongAnnual}
                           onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflLongAnnual(e.target.value); }}
                           onFocus={(e) => e.target.select()}
-                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
+                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-semibold outline-none focus:border-indigo-500 dark:text-white"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-slate-400 pointer-events-none">%</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-slate-400 pointer-events-none">%</span>
                       </div>
                     </div>
                     <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">Equivale a {(anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0) * 100).toFixed(2).replace('.', ',')}% mensual.</p>
@@ -1311,7 +1303,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           {/* BLOQUE RCI AL FONDO */}
           <div className="pt-4 border-t dark:border-slate-800 animate-in fade-in slide-in-from-bottom-2">
             <CurrencyInput 
-              label="SUELDO NETO MENSUAL (OPCIONAL)" 
+              label="Sueldo neto mensual (opcional)" 
               value={salary} 
               onChange={setSalary} 
               sublabel="Para ver qué porcentaje de tu sueldo se lleva la primera cuota." 
@@ -1319,7 +1311,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
             {salary > 0 && totals.cuotaInicial > 0 && (
               <div className="space-y-3 mt-4">
-                <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
+                <div className={`p-4 rounded-2xl text-[12px] font-semibold flex items-center justify-between border-2 transition-colors ${
                   (totals.cuotaInicial / salary) > 0.3 
                     ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
                     : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
@@ -1339,22 +1331,22 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         </div>
 
           {/* BANCOS */}
-        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left text-[13px]">
-          <h4 className="font-black uppercase text-slate-800 dark:text-white flex items-center gap-2 leading-none"><Globe className="w-3 h-3 text-indigo-500" /> Webs de los principales bancos argentinos</h4>
+        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent space-y-4 text-left text-[13px]">
+          <h4 className="font-semibold text-slate-800 dark:text-white flex items-center gap-2 leading-none"><Globe className="w-3 h-3 text-indigo-500" /> Webs de los principales bancos argentinos</h4>
           <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2">
             {[
-              { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/bconacion.png" },
-              { n: "Bco. Provincia", u: "https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l: "/logos/provincia.png" },
-              { n: "Galicia", u: "https://www.galicia.ar/personas/prestamos/hipotecarios", l: "/logos/galicia.png" },
-              { n: "Santander", u: "https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
-              { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" },
-              { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l: "/logos/bbva.png" },
-              { n: "Credicoop", u: "https://www.bancocredicoop.coop/personas/asalariados/creditos-para-la-vivienda/compra-uvas", l: "/logos/credicoop.png" },
-              { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
-              { n: "ICBC", u: "https://www.icbc.com.ar/personas/productos-servicios/prestamos/hipotecarios", l: "/logos/icbc.png" },
-              { n: "Supervielle", u: "https://www.supervielle.com.ar/personas/prestamos/hipotecarios", l: "/logos/supervielle.png" },
-              { n: "Patagonia", u: "https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios", l: "/logos/patagonia.png" },
-              { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" }
+              { n:"Bco. Nación", u:"https://www.bna.com.ar/Personas/CreditosHipotecarios", l:"/logos/bconacion.png" },
+              { n:"Bco. Provincia", u:"https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l:"/logos/provincia.png" },
+              { n:"Galicia", u:"https://www.galicia.ar/personas/prestamos/hipotecarios", l:"/logos/galicia.png" },
+              { n:"Santander", u:"https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l:"/logos/santander.png" },
+              { n:"Macro", u:"https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l:"/logos/macro.png" },
+              { n:"BBVA", u:"https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l:"/logos/bbva.png" },
+              { n:"Credicoop", u:"https://www.bancocredicoop.coop/personas/asalariados/creditos-para-la-vivienda/compra-uvas", l:"/logos/credicoop.png" },
+              { n:"Bco. Ciudad", u:"https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l:"/logos/ciudad.png" },
+              { n:"ICBC", u:"https://www.icbc.com.ar/personas/productos-servicios/prestamos/hipotecarios", l:"/logos/icbc.png" },
+              { n:"Supervielle", u:"https://www.supervielle.com.ar/personas/prestamos/hipotecarios", l:"/logos/supervielle.png" },
+              { n:"Patagonia", u:"https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios", l:"/logos/patagonia.png" },
+              { n:"Hipotecario", u:"https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l:"/logos/hipotecario.png" }
             ].map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
           </div>
         </div>
@@ -1363,12 +1355,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       {/* --- COLUMNA DERECHA: RESULTADOS --- */}
       <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={loanType === 'new' ? "Inicio" : "Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
+          <SummaryCard title={loanType === 'new' ?"Inicio" :"Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
           <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado; el que está en UVA es el que mide de verdad cuánto te cuesta el crédito." />
-          <SummaryCard title={loanType === 'new' ? "Total" : "Restante"} value={moneyCompact(totals.totalPagadoFinal)} sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null} icon={CheckCircle2} colorClass="slate" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar también el total en UVA." />
+          <SummaryCard title={loanType === 'new' ?"Total" :"Restante"} value={moneyCompact(totals.totalPagadoFinal)} sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null} icon={CheckCircle2} colorClass="slate" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar también el total en UVA." />
           <SummaryCard
             title="Costo real"
-            value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` : "---"}
+            value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` :"---"}
             sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x en pesos nominales` : null}
             icon={Activity}
             colorClass="slate"
@@ -1379,13 +1371,13 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
             <div className="flex items-center gap-3">
-               <h3 className="font-black text-lg md:text-xl tracking-tight uppercase dark:text-white leading-none">Proyección de pagos del crédito</h3>
+               <h3 className="font-semibold text-lg md:text-xl tracking-tight dark:text-white leading-none">Proyección de pagos del crédito</h3>
                <button onClick={() => setIsFullscreen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver en Pantalla Completa" aria-label="Ver en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto max-w-full no-scrollbar">
               {['1y', '2y', '3y', '10y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>
-                  {t === 'all' ? 'TODO' : t === '1y' ? '1 AÑO' : t.replace('y', ' AÑOS')}
+                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-semibold transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>
+                  {t === 'all' ? 'Todo' : t === '1y' ? '1 año' : t.replace('y', ' años')}
                 </button>
               ))}
             </div>
@@ -1401,32 +1393,32 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         <div className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> TABLA DE AMORTIZACIÓN</span>
+              <span className="text-[14px] font-semibold text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> Tabla de amortización</span>
               <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
             
             <div className="flex w-full lg:w-auto gap-2 items-stretch">
               <div className="flex flex-col justify-center px-3 bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 rounded-xl shrink-0">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Exportar</label>
-                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} className="bg-transparent text-[12px] font-black uppercase outline-none text-slate-800 dark:text-white cursor-pointer leading-none">
+                <label className="text-[10px] font-semibold text-slate-400 leading-none mb-1">Exportar</label>
+                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} className="bg-transparent text-[12px] font-semibold outline-none text-slate-800 dark:text-white cursor-pointer leading-none">
                   {[['all', 'Todo'], ['1', '1 año'], ['2', '2 años'], ['3', '3 años'], ['5', '5 años'], ['10', '10 años']].map(([v, l]) => (
                     <option key={v} value={v} className={OPTION_CLASS}>{l}</option>
                   ))}
                 </select>
               </div>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
                  <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-semibold rounded-xl hover:scale-105 transition-all leading-none">
                  <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:scale-105 transition-all leading-none whitespace-nowrap">
                  <FileText className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">PDF</span> 
               </button>
-              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
+              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
                  {copiedWP ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
               </button>
-              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
+              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
                  {copiedShare ? <Check className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -1670,22 +1662,22 @@ function RentCalculator({ remData, dolarOficial }) {
   
   // CALCULO PRI (Período de Recuperación de la Inversión)
   const pri = grossYield > 0 ? 100 / grossYield : 0;
-  let yieldColor = "slate";
+  let yieldColor ="slate";
   let yieldIcon = Activity;
   if (propertyValueUsd > 0) {
-      if (grossYield < 3) { yieldColor = "rose"; yieldIcon = AlertTriangle; }        // Malo
-      else if (grossYield < 5) { yieldColor = "orange"; yieldIcon = TrendingUp; }     // Normal
-      else if (grossYield <= 8) { yieldColor = "emerald"; yieldIcon = CheckCircle2; } // Bueno
-      else { yieldColor = "sky"; yieldIcon = Flame; }                                  // Excelente
+      if (grossYield < 3) { yieldColor ="rose"; yieldIcon = AlertTriangle; }        // Malo
+      else if (grossYield < 5) { yieldColor ="orange"; yieldIcon = TrendingUp; }     // Normal
+      else if (grossYield <= 8) { yieldColor ="emerald"; yieldIcon = CheckCircle2; } // Bueno
+      else { yieldColor ="sky"; yieldIcon = Flame; }                                  // Excelente
   }
 
   const exportToCSV = () => {
     if (schedule.length === 0) return;
-    const headers = ["Periodo", "Total Mes", "Alquiler", "Expensas", "Inflación"];
+    const headers = ["Periodo","Total Mes","Alquiler","Expensas","Inflación"];
     const rows = schedule.map(d => [
       d.label, Math.round(d.cuotaTotal), Math.round(d.principal), Math.round(d.interes), d.source
     ]);
-    const csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
+    const csvContent ="data:text/csv;charset=utf-8," + headers.join(";") +"\n" + rows.map(e => e.join(";")).join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
     link.setAttribute("download", `ProyectAR_Alquiler_${new Date().getTime()}.csv`);
@@ -1696,15 +1688,10 @@ function RentCalculator({ remData, dolarOficial }) {
 
   const exportToExcel = () => {
     if (schedule.length === 0) return;
-    const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({
- "Periodo": d.label,
- "Total Mes": Math.round(d.cuotaTotal),
- "Alquiler": Math.round(d.principal),
- "Expensas": Math.round(d.interes),
- "Inflación": d.source
+    const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({"Periodo": d.label,"Total Mes": Math.round(d.cuotaTotal),"Alquiler": Math.round(d.principal),"Expensas": Math.round(d.interes),"Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Alquileres");
+    XLSX.utils.book_append_sheet(wb, ws,"Alquileres");
     XLSX.writeFile(wb, `ProyectAR_Alquiler_${new Date().getTime()}.xlsx`);
   };
 
@@ -1735,7 +1722,7 @@ function RentCalculator({ remData, dolarOficial }) {
           }}
           downloadLink={
             <PDFDownloadLink document={<RentPDFDocument data={schedule} summary={totals} role={rentRole} />} fileName={`ProyectAR_Alquileres_${new Date().getTime()}.pdf`}>
-              {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
+              {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
             </PDFDownloadLink>
           }
         />
@@ -1747,15 +1734,15 @@ function RentCalculator({ remData, dolarOficial }) {
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Pagos Mensuales">
         <table className="w-full text-left border-collapse text-[13px]" style={{ minWidth: 600 }}>
-          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-black uppercase text-[12px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
+          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-semibold text-[12px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
             <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-center">
             {schedule.map((d) => (
               <tr key={d.mes} className="transition-colors hover:bg-white/5">
                 <td className="p-4 font-bold text-slate-200">{d.label}</td>
-                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
-                <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
+                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
+                <td className="p-4 font-semibold text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                 <td className="p-4 text-emerald-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
                 <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
               </tr>
@@ -1768,12 +1755,12 @@ function RentCalculator({ remData, dolarOficial }) {
       <div className="lg:col-span-4 space-y-4">
         
         {/* BLOQUE INICIO ALQUILERES (INTEGRADO) */}
-        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl"><CalendarDays className="w-4 h-4" /></div>
-              <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none flex items-center gap-2">
-                INICIO Y TIPO
+              <CalendarDays className="w-4 h-4 text-slate-400 shrink-0" />
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white leading-none flex items-center gap-2">
+                Inicio y tipo
                 <Tooltip iconClass="w-3.5 h-3.5 text-emerald-400" color="emerald">
                     <p className="mb-3"><b className="text-emerald-400 font-bold">Fecha Exacta:</b> Si sabés en qué mes vas a pagar, elegí esta opción. Nos permite sincronizar tu cuota con la inflación oficial (IPC real + REM proyectado) para ese mes puntual.</p>
                     <p><b className="text-emerald-200 font-bold">Sin Fecha Fija:</b> Ideal si recién estás averiguando y querés hacer una proyección estimada. Al no haber un mes específico, usás una inflación manual.</p>
@@ -1784,15 +1771,15 @@ function RentCalculator({ remData, dolarOficial }) {
           </div>
           
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
-            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>FECHA EXACTA</button>
-            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>SIN FECHA FIJA</button>
+            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Fecha exacta</button>
+            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Sin fecha fija</button>
           </div>
 
           {dateMode === 'calendar' && (
              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-               <button onClick={() => setRentType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${rentType === 'new' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>NUEVO</button>
-               <button onClick={() => setRentType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all flex items-center justify-center gap-1 ${rentType === 'ongoing' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>
-                 EN CURSO 
+               <button onClick={() => setRentType('new')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${rentType === 'new' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Nuevo</button>
+               <button onClick={() => setRentType('ongoing')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all flex items-center justify-center gap-1 ${rentType === 'ongoing' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>
+                 En curso
                  <Tooltip iconClass="w-3 h-3 text-slate-400" color="indigo">
                      Simulá contratos vigentes ajustados a la inflación actual.
                    </Tooltip>
@@ -1803,7 +1790,7 @@ function RentCalculator({ remData, dolarOficial }) {
           {dateMode === 'generic' && (
             <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl flex items-start gap-3 animate-pulse mb-4">
               <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-              <p className="text-[12px] font-black uppercase tracking-tighter text-rose-600 leading-tight">Sin fecha fija, usás inflación manual y no se conecta al calendario REM.</p>
+              <p className="text-[12px] font-semibold tracking-tighter text-rose-600 leading-tight">Sin fecha fija, usás inflación manual y no se conecta al calendario REM.</p>
             </div>
           )}
 
@@ -1819,30 +1806,30 @@ function RentCalculator({ remData, dolarOficial }) {
                 </div>
              ) : (
                 <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800 text-center animate-in fade-in">
-                   <span className="text-[12px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
+                   <span className="text-[12px] font-semibold text-emerald-600 dark:text-emerald-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
                 </div>
              )
           )}
         </div>
 
         {/* BLOQUE DATOS DEL CONTRATO */}
-        <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left">
+        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-transparent space-y-4 text-left">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl"><Settings2 className="w-4 h-4" /></div>
-              <h3 className="text-sm font-black uppercase tracking-widest dark:text-white leading-none">DATOS DEL CONTRATO</h3>
+              <Settings2 className="w-4 h-4 text-slate-400 shrink-0" />
+              <h3 className="text-sm font-semibold dark:text-white leading-none">Datos del contrato</h3>
             </div>
           </div>
 
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 z-10"></div>
-            <button onClick={() => setRentRole('tenant')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'tenant' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>MODO INQUILINO</button>
-            <button onClick={() => setRentRole('owner')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'owner' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>MODO PROPIETARIO</button>
+            <button onClick={() => setRentRole('tenant')} className={`flex-1 py-1.5 text-[11px] font-semibold rounded transition-all ${rentRole === 'tenant' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Modo inquilino</button>
+            <button onClick={() => setRentRole('owner')} className={`flex-1 py-1.5 text-[11px] font-semibold rounded transition-all ${rentRole === 'owner' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Modo propietario</button>
           </div>
 
           <div className="space-y-4 animate-in fade-in">
             <div className="group text-left">
-              <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentType === 'new' ? (rentRole === 'owner' ? 'INGRESO DEL ALQUILER' : 'MONTO DEL ALQUILER') : 'ALQUILER ACTUAL (MES EN CURSO)'}</label>
+              <label className="text-[12px] font-semibold text-slate-400 block mb-2">{rentType === 'new' ? (rentRole === 'owner' ? 'Ingreso del alquiler' : 'Monto del alquiler') : 'ALQUILER ACTUAL (MES EN CURSO)'}</label>
               <div className="relative">
                 <input type="text" inputMode="numeric" value={amountFocused && rentAmount === 0 ? '' : money(rentAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setRentAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
@@ -1851,74 +1838,74 @@ function RentCalculator({ remData, dolarOficial }) {
             </div>
 
             <div className="group text-left">
-              <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentRole === 'owner' ? 'EXPENSAS A CARGO INQUILINO' : 'EXPENSAS INICIALES'}</label>
+              <label className="text-[12px] font-semibold text-slate-400 block mb-2">{rentRole === 'owner' ? 'EXPENSAS A CARGO INQUILINO' : 'Expensas iniciales'}</label>
               <div className="relative mb-2">
                 <input type="text" inputMode="numeric" value={expFocused && expensesAmount === 0 ? '' : money(expensesAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setExpensesAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setExpFocused(true); e.target.select(); }} onBlur={() => setExpFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
               </div>
               <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border dark:border-slate-700">
-                <span className="text-[12px] font-black uppercase text-slate-500 leading-tight">¿Ajustar por inflación? (Mensual)</span>
+                <span className="text-[12px] font-semibold text-slate-500 leading-tight">¿Ajustar por inflación? (Mensual)</span>
                 <button onClick={() => setAdjustExpenses(!adjustExpenses)} className={`w-10 h-5 rounded-full transition-all relative ${adjustExpenses ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}><div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${adjustExpenses ? 'left-5' : 'left-0.5'}`} /></button>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
-                <label className="text-[13px] font-black text-emerald-600 block mb-2 uppercase leading-none">{rentType === 'new' ? 'DURACIÓN (MESES)' : 'MESES RESTANTES'}</label>
-                <input type="text" inputMode="numeric" value={(durFocused && (durationMonths === 0 || durationMonths === '')) ? '' : durationMonths} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setDurationMonths(num !== '' && num > 240 ? 240 : num); }} onFocus={(e) => { setDurFocused(true); e.target.select(); }} onBlur={() => setDurFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+                <label className="text-[13px] font-semibold text-emerald-600 block mb-2 leading-none">{rentType === 'new' ? 'Duración (meses)' : 'MESES RESTANTES'}</label>
+                <input type="text" inputMode="numeric" value={(durFocused && (durationMonths === 0 || durationMonths === '')) ? '' : durationMonths} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setDurationMonths(num !== '' && num > 240 ? 240 : num); }} onFocus={(e) => { setDurFocused(true); e.target.select(); }} onBlur={() => setDurFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
-                <label className="text-[13px] font-black text-emerald-600 block mb-2 uppercase leading-none">AJUSTA CADA (MESES)</label>
-                <input type="text" inputMode="numeric" value={(adjFocused && (adjustPeriod === 0 || adjustPeriod === '')) ? '' : adjustPeriod} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setAdjustPeriod(num !== '' && num > 120 ? 120 : num); }} onFocus={(e) => { setAdjFocused(true); e.target.select(); }} onBlur={() => setAdjFocused(false)} className="w-full bg-transparent font-mono text-xl font-black outline-none text-center dark:text-white" />
+                <label className="text-[13px] font-semibold text-emerald-600 block mb-2 leading-none">Ajusta cada (meses)</label>
+                <input type="text" inputMode="numeric" value={(adjFocused && (adjustPeriod === 0 || adjustPeriod === '')) ? '' : adjustPeriod} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setAdjustPeriod(num !== '' && num > 120 ? 120 : num); }} onFocus={(e) => { setAdjFocused(true); e.target.select(); }} onBlur={() => setAdjFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
               </div>
             </div>
 
             {rentType === 'ongoing' && (
               <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-emerald-500/20 text-center animate-in fade-in slide-in-from-top-2">
-                <label className="text-[13px] font-black text-emerald-600 mb-2 uppercase flex justify-center items-center gap-1.5">
-                  MESES DESDE EL ÚLTIMO AJUSTE
+                <label className="text-[13px] font-semibold text-emerald-600 mb-2 flex justify-center items-center gap-1.5">
+                  Meses desde el último ajuste
                   <Tooltip iconClass="w-3 h-3 text-emerald-400" color="emerald">
-                      Ej: Si firmaste o tuviste el último aumento hace 2 meses exactos, ingresá "2". Esto permite calcular con precisión el próximo mes de ajuste.
+                      Ej: Si firmaste o tuviste el último aumento hace 2 meses exactos, ingresá"2". Esto permite calcular con precisión el próximo mes de ajuste.
                     </Tooltip>
                 </label>
-                <input type="text" inputMode="numeric" value={(sinceFocused && (monthsSinceLastAdjust === 0 || monthsSinceLastAdjust === '')) ? '' : monthsSinceLastAdjust} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); const maxVal = Number(adjustPeriod) > 0 ? Number(adjustPeriod) - 1 : 11; setMonthsSinceLastAdjust(num !== '' && num > maxVal ? maxVal : num); }} onFocus={(e) => { setSinceFocused(true); e.target.select(); }} onBlur={() => setSinceFocused(false)} className="w-full bg-transparent font-mono text-2xl font-black outline-none text-center text-emerald-700 dark:text-emerald-400" />
+                <input type="text" inputMode="numeric" value={(sinceFocused && (monthsSinceLastAdjust === 0 || monthsSinceLastAdjust === '')) ? '' : monthsSinceLastAdjust} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); const maxVal = Number(adjustPeriod) > 0 ? Number(adjustPeriod) - 1 : 11; setMonthsSinceLastAdjust(num !== '' && num > maxVal ? maxVal : num); }} onFocus={(e) => { setSinceFocused(true); e.target.select(); }} onBlur={() => setSinceFocused(false)} className="w-full bg-transparent font-mono text-2xl font-semibold outline-none text-center text-emerald-700 dark:text-emerald-400" />
               </div>
             )}
           </div>
           
           <div className="pt-4 border-t dark:border-slate-800">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[12px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 min-w-0 overflow-visible">
-                INFLACIÓN PROYECTADA
+              <label className="text-[12px] font-semibold text-slate-400 flex items-center gap-2 min-w-0 overflow-visible">
+                Inflación proyectada
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="emerald">
                     <p className="mb-3 text-emerald-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu alquiler mes a mes.</p>
                     <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400 uppercase tracking-wider">Modo REM (Oficial)</b></div>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400">Modo REM (Oficial)</b></div>
                       <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-emerald-300">mes a mes</span> automáticamente.</p>
-                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-emerald-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
+                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-emerald-300 font-bold tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
                     <div className="h-px w-full bg-white/5 mb-3"></div>
                     <div>
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Modo Manual</b></div>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400">Modo Manual</b></div>
                       <p><span className="text-white font-bold">Control total.</span> Definí una tasa fija para todo el contrato. Ideal para simular escenarios propios.</p>
                     </div>
                   </div>
                 </Tooltip>
               </label>
               <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0">
-                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[11px] font-black rounded-xl ${inflationMode === 'rem' ? 'bg-emerald-600 text-white' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
-                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[11px] font-black rounded-xl ${inflationMode === 'manual' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>MANUAL</button>
+                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[11px] font-semibold rounded-xl ${inflationMode === 'rem' ? 'bg-emerald-600 text-white' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
+                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[11px] font-semibold rounded-xl ${inflationMode === 'manual' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Manual</button>
               </div>
             </div>
             
             <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
               {inflationMode === 'manual' ? (
                 <div className="animate-in fade-in space-y-2">
-                    <div className="flex justify-between items-center"><span className="text-[12px] font-black text-emerald-600 uppercase leading-none">Tasa fija anual estimada</span><span className="text-[13px] font-mono font-black dark:text-white leading-none">{manualInf}%</span></div>
+                    <div className="flex justify-between items-center"><span className="text-[12px] font-semibold text-emerald-600 leading-none">Tasa fija anual estimada</span><span className="text-[13px] font-mono font-semibold dark:text-white leading-none">{manualInf}%</span></div>
                     <input type="range" min="0" max="100" step="1" value={Number(String(manualInf).replace(',', '.')) || 0} onChange={(e)=>setManualInf(String(e.target.value).replace('.', ','))} className="w-full accent-emerald-500" />
                 </div>
               ) : (
                 <div className="flex flex-col gap-4 animate-in fade-in">
-                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[12px] font-black text-emerald-600 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[10px] font-black rounded-xl ${remStabilizedMode === 'auto' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[10px] font-black rounded-xl ${remStabilizedMode === 'custom' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>FIJA</button></div></div>
-                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[12px] font-black dark:text-white uppercase leading-tight">
+                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[12px] font-semibold text-emerald-600 flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[10px] font-semibold rounded-xl ${remStabilizedMode === 'auto' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Auto</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[10px] font-semibold rounded-xl ${remStabilizedMode === 'custom' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Fija</button></div></div>
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[12px] font-semibold dark:text-white leading-tight">
                     {remStabilizedMode === 'auto' ? `Aplicando el último dato oficial (${(remData && remData.length > 0 ? remData[remData.length-1].valor : '---')}%) para los meses restantes.` : 
                       <div>
                         <div className="flex justify-between mb-1"><span>Tasa Fija mensual estimada para los meses restantes:</span><span>{remStabilizedValue}%</span></div>
@@ -1935,8 +1922,8 @@ function RentCalculator({ remData, dolarOficial }) {
           <div className="pt-4 border-t dark:border-slate-800 animate-in fade-in slide-in-from-bottom-2">
             {rentRole === 'owner' ? (
               <div className="group text-left">
-                <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">
-                  VALOR DE LA PROPIEDAD (USD)
+                <label className="text-[12px] font-semibold text-slate-400 block mb-2">
+                  Valor de la propiedad (USD)
                 </label>
                 <div className="relative">
                   <input
@@ -1947,7 +1934,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     placeholder="USD 0"
                     className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white"
                   />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-black text-xs dark:text-slate-400">USD</div>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-semibold text-xs dark:text-slate-400">USD</div>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
                   Para calcular la Rentabilidad Bruta Anual (Gross Yield) de manera aproximada.
@@ -1956,7 +1943,7 @@ function RentCalculator({ remData, dolarOficial }) {
             ) : (
               <div>
                 <CurrencyInput 
-                  label="SUELDO NETO MENSUAL (OPCIONAL)" 
+                  label="Sueldo neto mensual (opcional)" 
                   value={salary} 
                   onChange={setSalary} 
                   sublabel="Para calcular qué porcentaje de tu sueldo se va en el primer alquiler + expensas (RCI)."
@@ -1967,7 +1954,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     <p className="text-[12px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
                       ⚠️ Importante: Este cálculo es del primer mes. Si tu sueldo sube menos que el alquiler, el impacto sobre tu bolsillo será mayor con el tiempo.
                     </p>
-                    <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
+                    <div className={`p-4 rounded-2xl text-[12px] font-semibold flex items-center justify-between border-2 transition-colors ${
                       (totals.cuotaTotalInicial / salary) > 0.3 
                         ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
                         : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
@@ -1983,7 +1970,7 @@ function RentCalculator({ remData, dolarOficial }) {
             {/* Yield abajo de los inputs en modo propietario */}
             {rentRole === 'owner' && propertyValueUsd > 0 && rentAmount > 0 && (
               <div className="mt-4">
-                <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
+                <div className={`p-4 rounded-2xl text-[12px] font-semibold flex items-center justify-between border-2 transition-colors ${
                   yieldColor === 'rose' 
                     ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800'
                     : yieldColor === 'orange'
@@ -1993,7 +1980,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     : 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800'
                 }`}>
                   <span className="flex items-center gap-2">
-                    {React.createElement(yieldIcon, { className: "w-4 h-4" })}
+                    {React.createElement(yieldIcon, { className:"w-4 h-4" })}
                     Rentabilidad Anual
                   </span>
                   <span className="text-lg leading-none">{grossYield.toFixed(1)}%</span>
@@ -2010,33 +1997,33 @@ function RentCalculator({ remData, dolarOficial }) {
       {/* --- COLUMNA DERECHA: RESULTADOS ALQUILERES --- */}
       <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ? "Primer Ingreso" : "Primer Pago") : "Alquiler Actual"} value={moneyCompact(totals.alquilerInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
+          <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ?"Primer Ingreso" :"Primer Pago") :"Alquiler Actual"} value={moneyCompact(totals.alquilerInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
           <SummaryCard title="Expensas" value={moneyCompact(totals.totalExpensas)} icon={TrendingUp} colorClass="orange" tooltip="Proyección de todas las expensas sumadas a lo largo de la simulación." />
-          <SummaryCard title={rentRole === 'owner' ? "Ingreso Est." : " Total"} value={moneyCompact(totals.totalContrato)} icon={CheckCircle2} colorClass="slate" tooltip="La suma de todos los alquileres y expensas a pagar (o cobrar, si sos dueño) mes a mes hasta el final del contrato." />
+          <SummaryCard title={rentRole === 'owner' ?"Ingreso Est." :" Total"} value={moneyCompact(totals.totalContrato)} icon={CheckCircle2} colorClass="slate" tooltip="La suma de todos los alquileres y expensas a pagar (o cobrar, si sos dueño) mes a mes hasta el final del contrato." />
           
           {rentRole === 'owner' ? (
              <SummaryCard 
                 title="PRI" 
-                value={propertyValueUsd > 0 && pri > 0 ? `${pri.toFixed(1)} años` : "---"} 
+                value={propertyValueUsd > 0 && pri > 0 ? `${pri.toFixed(1)} años` :"---"} 
                 icon={Clock} 
                 colorClass={pri > 0 && pri <= 15 ? 'emerald' : pri <= 25 ? 'amber' : 'rose'} 
                 tooltip="Período de Recuperación de la Inversión (PRI). Años estimados para recuperar la inversión inicial solo con el ingreso del alquiler, sin expensas ni gastos extra." 
              />
           ) : (
-             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="slate" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
+             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` :"---"} icon={Activity} colorClass="slate" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
           )}
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
              <div className="flex items-center gap-3">
-               <h3 className="font-black text-lg md:text-xl uppercase tracking-tight dark:text-white leading-none">Proyección de pagos del alquiler</h3>
+               <h3 className="font-semibold text-lg md:text-xl tracking-tight dark:text-white leading-none">Proyección de pagos del alquiler</h3>
                <button onClick={() => setIsFullscreen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-xl transition-all active:scale-95" title="Ver en Pantalla Completa" aria-label="Ver en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
              </div>
              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto max-w-full no-scrollbar">
               {['1y', '2y', '3y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-emerald-600 text-white' : 'text-slate-400'}`}>
-                  {t === 'all' ? 'TODO' : t.replace('y', ' AÑO' + (parseInt(t) > 1 ? 'S' : ''))}
+                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-semibold transition-all whitespace-nowrap ${timeframe === t ? 'bg-emerald-600 text-white' : 'text-slate-400'}`}>
+                  {t === 'all' ? 'Todo' : t.replace('y', ' año' + (parseInt(t) > 1 ? 's' : ''))}
                 </button>
               ))}
             </div>
@@ -2048,24 +2035,24 @@ function RentCalculator({ remData, dolarOficial }) {
         <div className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> TABLA DE PAGOS MENSUALES</span>
+              <span className="text-[14px] font-semibold text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> Tabla de pagos mensuales</span>
               <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-xl transition-all active:scale-95" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
             
             <div className="flex w-full lg:w-auto gap-2">
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
                  <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-semibold rounded-xl hover:scale-105 transition-all leading-none">
                  <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:scale-105 transition-all leading-none whitespace-nowrap">
                  <FileText className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">PDF</span> 
               </button>
-              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
+              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
                  {copiedWP ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
               </button>
-              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
+              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
                  {copiedShare ? <Check className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -2073,15 +2060,15 @@ function RentCalculator({ remData, dolarOficial }) {
           <div className="max-h-[400px] md:max-h-[850px] overflow-auto w-full no-scrollbar">
             <div className="inline-block min-w-full align-middle">
               <table className="w-full text-left border-collapse min-w-[700px] md:min-w-[900px]">
-                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-black uppercase text-[12px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
+                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-semibold text-[12px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
                   <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
                 </thead>
                 <tbody className="divide-y dark:divide-slate-800 text-center">
                   {schedule.map((d) => (
                     <tr key={d.mes} className="transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/40">
                       <td className="p-4 font-bold text-slate-800 dark:text-slate-200">{d.label}</td>
-                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
-                      <td className="p-4 font-black text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
+                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
+                      <td className="p-4 font-semibold text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                       <td className="p-4 text-emerald-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
                       <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
                     </tr>
@@ -2102,7 +2089,7 @@ function FAQItem({ question, children, isOpen, onClick }) {
   return (
     <div className={`border dark:border-slate-800 rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-white dark:bg-slate-800 border-amber-500/30 dark:border-amber-500/30' : 'bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/80'}`}>
       <button onClick={onClick} className="w-full text-left p-5 md:p-6 flex justify-between items-center gap-4 outline-none">
-        <h4 className="font-black text-sm md:text-base uppercase tracking-tight text-slate-800 dark:text-white leading-none">{question}</h4>
+        <h4 className="font-semibold text-sm md:text-base tracking-tight text-slate-800 dark:text-white leading-none">{question}</h4>
         <div className={`p-2 rounded-full transition-all duration-300 shrink-0 ${isOpen ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rotate-180' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </div>
@@ -2133,7 +2120,7 @@ function FAQ() {
       <div className="lg:col-span-12 space-y-8">
         <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
           <div className="flex flex-col mb-10 gap-2">
-            <h2 className="font-black text-3xl md:text-4xl uppercase tracking-tighter dark:text-white flex items-center gap-3">
+            <h2 className="font-semibold text-3xl md:text-4xl tracking-tighter dark:text-white flex items-center gap-3">
               <HelpCircle className="w-8 h-8 md:w-10 md:h-10 text-amber-500" />
               Preguntas Frecuentes
             </h2>
@@ -2185,7 +2172,7 @@ export default function App() {
   }, [darkMode]);
 
   useEffect(() => {
-    if (GA_MEASUREMENT_ID) { ReactGA.initialize(GA_MEASUREMENT_ID); ReactGA.send({ hitType: "pageview", page: window.location.pathname }); }
+    if (GA_MEASUREMENT_ID) { ReactGA.initialize(GA_MEASUREMENT_ID); ReactGA.send({ hitType:"pageview", page: window.location.pathname }); }
     try {
       const hasSeenWelcome = localStorage.getItem(`proyectar_welcome_v${APP_VERSION}`);
       if (!hasSeenWelcome) setShowWelcome(true);
@@ -2238,14 +2225,14 @@ export default function App() {
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         </Helmet>
         <div className={darkMode ? 'dark' : ''}>
-          <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+          <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative" style={{ fontFamily:"'Inter', system-ui, -apple-system, sans-serif" }}>
             
             {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
             <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 leading-none">
               <div className="flex items-center gap-3 md:gap-5">
                 <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-sm" />
-                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none">Proyect<span className="text-indigo-500">AR</span></span><span className="text-[11px] md:text-[13px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
+                <div className="flex flex-col text-left leading-none"><span className="font-semibold text-lg md:text-3xl tracking-tighter leading-none">Proyect<span className="text-indigo-500">AR</span></span><span className="text-[11px] md:text-[13px] font-semibold tracking-[0.2em] text-slate-500 mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
               </div>
 
               <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
@@ -2258,7 +2245,7 @@ export default function App() {
 
             <main className="max-w-[1800px] mx-auto p-6 md:p-10 flex-grow w-full">
               {loading ? (
-                <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[14px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse text-center">Sincronizando Mercados...</p></div>
+                <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[14px] font-semibold tracking-[0.4em] text-slate-400 animate-pulse text-center">Sincronizando Mercados...</p></div>
               ) : (
                 <div className="animate-in fade-in zoom-in-95 duration-1000">
                   <Routes>
@@ -2271,16 +2258,7 @@ export default function App() {
                         <Helmet>
                           <title>ProyectAR | Calculadora de Créditos UVA </title>
                           <meta name="description" content="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Proyectá cuánto sube tu cuota mes a mes con el sistema francés en UVA." />
-                          <script type="application/ld+json">{JSON.stringify({
- "@context": "https://schema.org",
- "@type": "WebApplication",
- "name": "ProyectAR - Calculadora de Créditos UVA",
- "url": "https://proyectar.io/calculadora-creditos-uva",
- "description": "Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés, exportación a PDF/Excel.",
- "applicationCategory": "FinanceApplication",
- "operatingSystem": "Web",
- "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
- "author": { "@type": "Person", "name": "Maxi Navarro" }
+                          <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Créditos UVA","url":"https://proyectar.io/calculadora-creditos-uva","description":"Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés, exportación a PDF/Excel.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }
                           })}</script>
                         </Helmet>
                         <MortgageCalculator uvaValue={uvaValue} remData={remData} dolarOficial={dolarOficial} />
@@ -2293,16 +2271,7 @@ export default function App() {
                         <Helmet>
                           <title>ProyectAR | Calculadora de Alquileres </title>
                           <meta name="description" content="Calculá la actualización de tu contrato de alquiler, expensas e inflación. Ideal para inquilinos y propietarios en Argentina." />
-                          <script type="application/ld+json">{JSON.stringify({
- "@context": "https://schema.org",
- "@type": "WebApplication",
- "name": "ProyectAR - Calculadora de Alquileres",
- "url": "https://proyectar.io/calculadora-alquileres",
- "description": "Simulador de contratos de alquiler con ajuste por inflación (IPC + REM BCRA), cálculo de expensas, yield para propietarios.",
- "applicationCategory": "FinanceApplication",
- "operatingSystem": "Web",
- "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
- "author": { "@type": "Person", "name": "Maxi Navarro" }
+                          <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Alquileres","url":"https://proyectar.io/calculadora-alquileres","description":"Simulador de contratos de alquiler con ajuste por inflación (IPC + REM BCRA), cálculo de expensas, yield para propietarios.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }
                           })}</script>
                         </Helmet>
                         <RentCalculator remData={remData} dolarOficial={dolarOficial} />
@@ -2316,13 +2285,7 @@ export default function App() {
                           <title>ProyectAR | FAQ - Preguntas Frecuentes</title>
                           <meta name="description" content="Por qué sube tu cuota UVA, de dónde sale la inflación proyectada (IPC + REM del BCRA) y qué no incluye la simulación." />
                           {/* El structured data se arma con las mismas preguntas que se muestran en pantalla. */}
-                          <script type="application/ld+json">{JSON.stringify({
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": faqsOperativas.map(f => ({
- "@type": "Question",
- "name": f.q,
- "acceptedAnswer": { "@type": "Answer", "text": f.resumen }
+                          <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity": faqsOperativas.map(f => ({"@type":"Question","name": f.q,"acceptedAnswer": {"@type":"Answer","text": f.resumen }
                             }))
                           })}</script>
                         </Helmet>
@@ -2340,23 +2303,23 @@ export default function App() {
             <div className="max-w-[1800px] mx-auto px-6 md:px-10 mt-10">
                <div className="bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 dark:from-indigo-500/5 dark:to-emerald-500/5 rounded-2xl p-8 md:p-12 text-center border border-indigo-500/20 relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12"><HeartHandshake className="w-40 h-40 text-indigo-500" /></div>
-                  <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mb-2">¿Te sirvió ProyectAR?</h3>
+                  <h3 className="text-xl md:text-2xl font-semibold tracking-tight mb-2">¿Te sirvió ProyectAR?</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-2xl mx-auto">Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.</p>
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
-                     <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
-                     <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
+                     <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-semibold rounded-xl text-xs transition-all hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
+                     <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-semibold rounded-xl text-xs transition-all hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
                   </div>
                </div>
             </div>
 
             <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col gap-8">
               <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
-                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
-                <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[12px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
-                <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[13px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
+                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 tracking-[0.2em] opacity-50">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
+                <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[12px] leading-relaxed tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-semibold text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
+                <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[13px] font-bold text-slate-400 opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
               </div>
               <div className="border-t dark:border-slate-800 pt-6 text-center">
-                <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 opacity-40 mb-3">Fuentes de datos · Últ. act. {formatDateTime(lastUpdate)}</p>
+                <p className="text-[11px] font-semibold text-slate-400 opacity-40 mb-3">Fuentes de datos · Últ. act. {formatDateTime(lastUpdate)}</p>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12px] font-bold text-slate-400 opacity-50">
                   <a href="https://www.bcra.gob.ar/relevamiento-expectativas-mercado-rem/" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">BCRA (REM {remDateLabel || '---'})</a>
                   <span className="text-slate-700">·</span>
