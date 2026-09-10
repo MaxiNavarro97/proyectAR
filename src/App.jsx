@@ -310,7 +310,7 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
       let bg = "bg-indigo-600 hover:bg-indigo-700";
       if (exportType === 'excel') { icon = <FileSpreadsheet className="w-4 h-4"/>; bg = "bg-emerald-600 hover:bg-emerald-700"; }
       return (
-        <button onClick={handleStandardDownload} disabled={downloading} className={`w-full py-3.5 ${bg} text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg flex items-center justify-center gap-2`}>
+        <button onClick={handleStandardDownload} disabled={downloading} className={`w-full py-3.5 ${bg} text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2`}>
             {icon} {downloading ? 'Generando...' : label}
         </button>
       );
@@ -318,7 +318,7 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-4 pb-6 sm:pb-0 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-indigo-500/20 shadow-2xl w-full max-w-md overflow-hidden relative animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-indigo-500/20 shadow-sm w-full max-w-md overflow-hidden relative animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
         <div className="p-6 sm:p-8 text-center relative overflow-hidden">
            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 dark:from-indigo-950/30 to-transparent -z-10"></div>
            <HeartHandshake className="w-12 h-12 text-indigo-500 mx-auto mb-4 drop-shadow-sm animate-bounce-slow" />
@@ -328,10 +328,10 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
            </p>
            
            <div className="flex flex-col gap-3 mb-6">
-              <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all  hover:-translate-y-0.5">
                   <Coffee className="w-4 h-4"/> Invitar un Cafecito
               </a>
-              <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all  hover:-translate-y-0.5">
                   <Handshake className="w-4 h-4"/> Aportar por Mercado Pago
               </a>
            </div>
@@ -352,12 +352,12 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
 function WelcomeModal({ onClose }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-indigo-500/20 shadow-2xl w-full max-w-lg overflow-hidden relative animate-in zoom-in-95 duration-300">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-indigo-500/20 shadow-sm w-full max-w-lg overflow-hidden relative animate-in zoom-in-95 duration-300">
         <div className="h-32 bg-indigo-600 relative overflow-hidden flex items-center justify-center">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-indigo-500 rounded-full blur-2xl opacity-50"></div>
             <div className="absolute top-10 left-10 w-16 h-16 bg-white/10 rounded-full blur-xl"></div>
-            <Rocket className="w-12 h-12 text-white relative z-10 drop-shadow-lg" />
+            <Rocket className="w-12 h-12 text-white relative z-10 drop-shadow-sm" />
         </div>
         <div className="p-8 text-left">
            <div className="flex items-center gap-2 mb-2">
@@ -368,11 +368,11 @@ function WelcomeModal({ onClose }) {
              Seguimos mejorando ProyectAR para que tengas la mejor experiencia de análisis financiero:
            </p>
            <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[12px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Más Bancos</h4><p className="text-[12px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-lg text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Modo Cine Mejorado</h4><p className="text-[12px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[12px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Más Bancos</h4><p className="text-[12px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
+              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-black uppercase dark:text-white">Modo Cine Mejorado</h4><p className="text-[12px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
            </div>
-           <button onClick={onClose} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 group">
+           <button onClick={onClose} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all active:scale-95 flex items-center justify-center gap-2 group">
              <span>¡A simular!</span> <Sparkles className="w-3 h-3 text-indigo-300 group-hover:text-white transition-colors"/>
            </button>
         </div>
@@ -384,9 +384,9 @@ function WelcomeModal({ onClose }) {
 
 // --- COMPONENTE DE BOTON DE NAVEGACIÓN ---
 const NAV_THEMES = {
-  indigo: 'text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-indigo-500/30 scale-105',
-  emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105',
-  amber: 'text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800 shadow-md border-amber-100 dark:border-amber-500/30 scale-105',
+  indigo: 'text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 shadow-sm border-indigo-100 dark:border-indigo-500/30 scale-105',
+  emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-sm border-emerald-100 dark:border-emerald-500/30 scale-105',
+  amber: 'text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800 shadow-sm border-amber-100 dark:border-amber-500/30 scale-105',
 };
 
 const NavBtn = React.memo(function NavBtn({ to, currentPath, icon, label, color }) {
@@ -402,7 +402,7 @@ const NavBtn = React.memo(function NavBtn({ to, currentPath, icon, label, color 
 function NavigationMenu() {
   const location = useLocation();
   return (
-    <div className="flex gap-1.5 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner overflow-x-auto no-scrollbar max-w-full">
+    <div className="flex gap-1.5 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto no-scrollbar max-w-full">
       <NavBtn currentPath={location.pathname} to="/calculadora-creditos-uva" icon={<Home />} label="CRÉDITOS" color="indigo"/>
       <NavBtn currentPath={location.pathname} to="/calculadora-alquileres" icon={<ArrowRightLeft />} label="ALQUILERES" color="emerald"/>
       <NavBtn currentPath={location.pathname} to="/faq" icon={<HelpCircle />} label="FAQ" color="amber"/>
@@ -437,7 +437,7 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent, color 
           onFocus={(e) => { setIsFocused(true); e.target.select(); }} 
           onBlur={() => setIsFocused(false)} 
           placeholder="$ 0" 
-          className={`w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent ${focusBorderColor} shadow-inner transition-all dark:text-white`}
+          className={`w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent ${focusBorderColor}  transition-all dark:text-white`}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
       </div>
@@ -473,7 +473,7 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
   }, [value]);
 
   return (
-    <div className={`bg-white dark:bg-slate-900 p-3 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-2.5 transition-all min-w-0 flex-1 relative hover:-translate-y-0.5 ${sticky ? 'sticky top-[85px] md:top-[128px] z-30 hover:z-[60] shadow-xl border-indigo-500/30 dark:border-indigo-500/30' : 'hover:shadow-md hover:z-[60]'}`}>
+    <div className={`bg-white dark:bg-slate-900 p-3 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-2.5 transition-all min-w-0 flex-1 relative hover:-translate-y-0.5 ${sticky ? 'sticky top-[85px] md:top-[128px] z-30 hover:z-[60] shadow-sm border-indigo-500/30 dark:border-indigo-500/30' : ' hover:z-[60]'}`}>
       <div className={`p-2 rounded-xl shrink-0 ${SUMMARY_COLOR_MAP[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
       <div className="min-w-0 text-left flex-1 relative"> 
         <div className="flex items-center justify-between gap-1 mb-0.5">
@@ -494,7 +494,7 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
 const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
   const [imgError, setImgError] = useState(false);
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="group relative flex flex-col items-center justify-center p-2 md:p-3 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500/50 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden aspect-square">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="group relative flex flex-col items-center justify-center p-2 md:p-3 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500/50  transition-all duration-500 overflow-hidden aspect-square">
       <div className="relative z-10 h-10 md:h-12 w-full flex items-center justify-center bg-white">
         {!imgError ? (
           <img src={logoUrl} alt={name} onError={() => setImgError(true)} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
@@ -548,7 +548,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
 
   if (!data || data.length === 0) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50 gap-3 p-4">
+      <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 gap-3 p-4">
         <Calculator className="w-8 h-8 md:w-10 md:h-10 text-slate-300 dark:text-slate-700" />
         <p className="text-[12px] md:text-[13px] font-black uppercase tracking-widest text-slate-400 text-center">Completá el monto y el plazo para ver tu proyección</p>
       </div>
@@ -1006,14 +1006,14 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const exportToExcel = () => {
     if (datosExport.length === 0) return;
     const ws = XLSX.utils.json_to_sheet(datosExport.map(d => ({
-      "Periodo": d.label,
-      "Cuota UVA": Number(d.cuotaUva.toFixed(2)),
-      "Valor UVA": Number(d.valorUva.toFixed(2)),
-      "Cuota Total": Math.round(d.cuotaTotal),
-      "Interés": Math.round(d.interes),
-      "Capital": Math.round(d.principal),
-      "Saldo Pendiente": Math.round(d.saldo),
-      "Inflación": d.source
+ "Periodo": d.label,
+ "Cuota UVA": Number(d.cuotaUva.toFixed(2)),
+ "Valor UVA": Number(d.valorUva.toFixed(2)),
+ "Cuota Total": Math.round(d.cuotaTotal),
+ "Interés": Math.round(d.interes),
+ "Capital": Math.round(d.principal),
+ "Saldo Pendiente": Math.round(d.saldo),
+ "Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Proyeccion");
@@ -1048,7 +1048,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           downloadLink={
             <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
               {({ loading }) => (
-                <button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg flex items-center justify-center gap-2">
+                <button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
                    <FileText className="w-4 h-4"/> {loading ? 'Generando Archivo...' : 'Descargar PDF Ahora'}
                 </button>
               )}
@@ -1072,7 +1072,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-lg"><CalendarDays className="w-4 h-4" /></div>
+              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-xl"><CalendarDays className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none flex items-center gap-2">
                 TIPO DE CRÉDITO
                 <Tooltip iconClass="w-3.5 h-3.5 text-slate-400">
@@ -1081,12 +1081,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 </Tooltip>
               </h3>
             </div>
-            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-lg transition-colors text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
+            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-xl transition-colors text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
           </div>
 
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
-            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>EN CURSO</button>
+            <button onClick={() => setLoanType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${loanType === 'new' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>NUEVO</button>
+            <button onClick={() => setLoanType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${loanType === 'ongoing' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>EN CURSO</button>
           </div>
 
           <p className="text-[13px] font-bold text-slate-400 text-center leading-none flex items-center justify-center gap-1.5">
@@ -1098,7 +1098,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-lg"><Settings2 className="w-4 h-4" /></div>
+              <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-xl"><Settings2 className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest dark:text-white leading-none">DATOS DEL CRÉDITO</h3>
             </div>
           </div>
@@ -1133,9 +1133,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                         Buscá tu Saldo Deudor actual en tu Home Banking. Podés elegir ingresarlo en Pesos o en cantidad de UVAs.
                       </Tooltip>
                   </label>
-                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg border dark:border-slate-600">
-                    <button onClick={() => setBalanceCurrency('ars')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'ars' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500'}`}>$ ARS</button>
-                    <button onClick={() => setBalanceCurrency('uva')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'uva' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500'}`}>UVA</button>
+                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl border dark:border-slate-600">
+                    <button onClick={() => setBalanceCurrency('ars')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'ars' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>$ ARS</button>
+                    <button onClick={() => setBalanceCurrency('uva')} className={`px-3 py-1 text-[11px] font-black rounded ${balanceCurrency === 'uva' ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white' : 'text-slate-500'}`}>UVA</button>
                   </div>
                 </div>
                 <div className="relative">
@@ -1145,7 +1145,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                     onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setAmount(v === '' ? 0 : Number(v)); }}
                     onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)}
                     placeholder={balanceCurrency === 'ars' ? "$ 0" : "0"}
-                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent focus:border-indigo-500/50 dark:focus:border-indigo-400/30 shadow-inner transition-all dark:text-white"
+                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-lg md:text-xl font-bold outline-none border-2 border-transparent focus:border-indigo-500/50 dark:focus:border-indigo-400/30  transition-all dark:text-white"
                   />
                   {balanceCurrency === 'uva' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-black text-xs dark:text-slate-400">UVAs</div>}
                   {balanceCurrency === 'ars' && <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>}
@@ -1230,7 +1230,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">
                     {mesesOficiales > 0 ? `Primeros ${mesesOficiales} meses` : 'Primeros meses'}
                   </p>
-                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
+                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
                     <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
                     <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>PROPIA</button>
                   </div>
@@ -1241,7 +1241,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                     {inflacionAnual.length > 0 && (
                       <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${inflacionAnual.length}, minmax(0, 1fr))` }}>
                         {inflacionAnual.map(a => (
-                          <div key={a.año} className="bg-white dark:bg-slate-900 rounded-lg py-2 px-1 text-center border dark:border-slate-700">
+                          <div key={a.año} className="bg-white dark:bg-slate-900 rounded-xl py-2 px-1 text-center border dark:border-slate-700">
                             <p className="text-[12px] font-black uppercase text-slate-400 leading-none mb-1">{a.año}</p>
                             <p className="text-[15px] font-black font-mono text-emerald-600 dark:text-emerald-400 leading-none">{a.valor.toFixed(0)}%</p>
                             {a.parcial && <p className="text-[10px] font-bold uppercase text-slate-400 leading-none mt-1">parcial</p>}
@@ -1259,7 +1259,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                           type="text" inputMode="decimal" value={inflFirstAnnual}
                           onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflFirstAnnual(e.target.value); }}
                           onFocus={(e) => e.target.select()}
-                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
+                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-slate-400 pointer-events-none">%</span>
                       </div>
@@ -1273,7 +1273,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <div className="p-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
-                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
+                  <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-xl shrink-0">
                     <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
                     <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>PROPIA</button>
                   </div>
@@ -1293,7 +1293,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                           type="text" inputMode="decimal" value={inflLongAnnual}
                           onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflLongAnnual(e.target.value); }}
                           onFocus={(e) => e.target.select()}
-                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
+                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-slate-400 pointer-events-none">%</span>
                       </div>
@@ -1373,15 +1373,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           />
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
+        <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
             <div className="flex items-center gap-3">
                <h3 className="font-black text-lg md:text-xl tracking-tight uppercase dark:text-white leading-none">Proyección de pagos del crédito</h3>
                <button onClick={() => setIsFullscreen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 rounded-xl transition-all active:scale-95" title="Ver en Pantalla Completa" aria-label="Ver en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
             </div>
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner overflow-x-auto max-w-full no-scrollbar">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto max-w-full no-scrollbar">
               {['1y', '2y', '3y', '10y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>
                   {t === 'all' ? 'TODO' : t === '1y' ? '1 AÑO' : t.replace('y', ' AÑOS')}
                 </button>
               ))}
@@ -1395,7 +1395,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
             <div className="flex items-center gap-3">
               <span className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-indigo-500"/> TABLA DE AMORTIZACIÓN</span>
@@ -1411,19 +1411,19 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   ))}
                 </select>
               </div>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
                  <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl shadow-sm hover:scale-105 transition-all uppercase tracking-widest leading-none">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none">
                  <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl shadow-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
                  <FileText className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">PDF</span> 
               </button>
-              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl shadow-sm transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
+              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
                  {copiedWP ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
               </button>
-              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl shadow-sm transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
+              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
                  {copiedShare ? <Check className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -1694,11 +1694,11 @@ function RentCalculator({ remData, dolarOficial }) {
   const exportToExcel = () => {
     if (schedule.length === 0) return;
     const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({
-      "Periodo": d.label,
-      "Total Mes": Math.round(d.cuotaTotal),
-      "Alquiler": Math.round(d.principal),
-      "Expensas": Math.round(d.interes),
-      "Inflación": d.source
+ "Periodo": d.label,
+ "Total Mes": Math.round(d.cuotaTotal),
+ "Alquiler": Math.round(d.principal),
+ "Expensas": Math.round(d.interes),
+ "Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Alquileres");
@@ -1732,7 +1732,7 @@ function RentCalculator({ remData, dolarOficial }) {
           }}
           downloadLink={
             <PDFDownloadLink document={<RentPDFDocument data={schedule} summary={totals} role={rentRole} />} fileName={`ProyectAR_Alquileres_${new Date().getTime()}.pdf`}>
-              {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
+              {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
             </PDFDownloadLink>
           }
         />
@@ -1751,7 +1751,7 @@ function RentCalculator({ remData, dolarOficial }) {
             {schedule.map((d) => (
               <tr key={d.mes} className="transition-colors hover:bg-white/5">
                 <td className="p-4 font-bold text-slate-200">{d.label}</td>
-                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
+                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
                 <td className="p-4 font-black text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                 <td className="p-4 text-emerald-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
                 <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
@@ -1768,7 +1768,7 @@ function RentCalculator({ remData, dolarOficial }) {
         <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-left">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg"><CalendarDays className="w-4 h-4" /></div>
+              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl"><CalendarDays className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white leading-none flex items-center gap-2">
                 INICIO Y TIPO
                 <Tooltip iconClass="w-3.5 h-3.5 text-emerald-400" color="emerald">
@@ -1777,18 +1777,18 @@ function RentCalculator({ remData, dolarOficial }) {
                   </Tooltip>
               </h3>
             </div>
-            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-lg transition-colors text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
+            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-xl transition-colors text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
           </div>
           
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
-            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>FECHA EXACTA</button>
-            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>SIN FECHA FIJA</button>
+            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>FECHA EXACTA</button>
+            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>SIN FECHA FIJA</button>
           </div>
 
           {dateMode === 'calendar' && (
              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-               <button onClick={() => setRentType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all ${rentType === 'new' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>NUEVO</button>
-               <button onClick={() => setRentType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-lg transition-all flex items-center justify-center gap-1 ${rentType === 'ongoing' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>
+               <button onClick={() => setRentType('new')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all ${rentType === 'new' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>NUEVO</button>
+               <button onClick={() => setRentType('ongoing')} className={`flex-1 py-2 text-[12px] font-black rounded-xl transition-all flex items-center justify-center gap-1 ${rentType === 'ongoing' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>
                  EN CURSO 
                  <Tooltip iconClass="w-3 h-3 text-slate-400" color="indigo">
                      Simulá contratos vigentes ajustados a la inflación actual.
@@ -1826,22 +1826,22 @@ function RentCalculator({ remData, dolarOficial }) {
         <div className="bg-slate-100/70 dark:bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 text-left">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg"><Settings2 className="w-4 h-4" /></div>
+              <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl"><Settings2 className="w-4 h-4" /></div>
               <h3 className="text-sm font-black uppercase tracking-widest dark:text-white leading-none">DATOS DEL CONTRATO</h3>
             </div>
           </div>
 
           <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 z-10"></div>
-            <button onClick={() => setRentRole('tenant')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'tenant' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500'}`}>MODO INQUILINO</button>
-            <button onClick={() => setRentRole('owner')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'owner' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500'}`}>MODO PROPIETARIO</button>
+            <button onClick={() => setRentRole('tenant')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'tenant' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>MODO INQUILINO</button>
+            <button onClick={() => setRentRole('owner')} className={`flex-1 py-1.5 text-[11px] font-black rounded transition-all ${rentRole === 'owner' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>MODO PROPIETARIO</button>
           </div>
 
           <div className="space-y-4 animate-in fade-in">
             <div className="group text-left">
               <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentType === 'new' ? (rentRole === 'owner' ? 'INGRESO DEL ALQUILER' : 'MONTO DEL ALQUILER') : 'ALQUILER ACTUAL (MES EN CURSO)'}</label>
               <div className="relative">
-                <input type="text" inputMode="numeric" value={amountFocused && rentAmount === 0 ? '' : money(rentAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setRentAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50 shadow-inner dark:text-white" />
+                <input type="text" inputMode="numeric" value={amountFocused && rentAmount === 0 ? '' : money(rentAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setRentAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
               </div>
               {rentAmount > 0 && <p className="text-[12px] text-emerald-600 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(rentAmount / dolarOficial))} <span className="text-[10px] opacity-70">(Oficial)</span></p>}
@@ -1850,7 +1850,7 @@ function RentCalculator({ remData, dolarOficial }) {
             <div className="group text-left">
               <label className="text-[12px] font-black text-slate-400 block mb-2 uppercase tracking-widest">{rentRole === 'owner' ? 'EXPENSAS A CARGO INQUILINO' : 'EXPENSAS INICIALES'}</label>
               <div className="relative mb-2">
-                <input type="text" inputMode="numeric" value={expFocused && expensesAmount === 0 ? '' : money(expensesAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setExpensesAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setExpFocused(true); e.target.select(); }} onBlur={() => setExpFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50 shadow-inner dark:text-white" />
+                <input type="text" inputMode="numeric" value={expFocused && expensesAmount === 0 ? '' : money(expensesAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setExpensesAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setExpFocused(true); e.target.select(); }} onBlur={() => setExpFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
               </div>
               <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border dark:border-slate-700">
                 <span className="text-[12px] font-black uppercase text-slate-500 leading-tight">¿Ajustar por inflación? (Mensual)</span>
@@ -1901,8 +1901,8 @@ function RentCalculator({ remData, dolarOficial }) {
                 </Tooltip>
               </label>
               <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0">
-                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[11px] font-black rounded-lg ${inflationMode === 'rem' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
-                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[11px] font-black rounded-lg ${inflationMode === 'manual' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>MANUAL</button>
+                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[11px] font-black rounded-xl ${inflationMode === 'rem' ? 'bg-emerald-600 text-white' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
+                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[11px] font-black rounded-xl ${inflationMode === 'manual' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>MANUAL</button>
               </div>
             </div>
             
@@ -1914,8 +1914,8 @@ function RentCalculator({ remData, dolarOficial }) {
                 </div>
               ) : (
                 <div className="flex flex-col gap-4 animate-in fade-in">
-                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[12px] font-black text-emerald-600 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[10px] font-black rounded-lg ${remStabilizedMode === 'auto' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[10px] font-black rounded-lg ${remStabilizedMode === 'custom' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}>FIJA</button></div></div>
-                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[12px] font-black dark:text-white uppercase leading-tight ">
+                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[12px] font-black text-emerald-600 uppercase flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[10px] font-black rounded-xl ${remStabilizedMode === 'auto' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>AUTO</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[10px] font-black rounded-xl ${remStabilizedMode === 'custom' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>FIJA</button></div></div>
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[12px] font-black dark:text-white uppercase leading-tight">
                     {remStabilizedMode === 'auto' ? `Aplicando el último dato oficial (${(remData && remData.length > 0 ? remData[remData.length-1].valor : '---')}%) para los meses restantes.` : 
                       <div>
                         <div className="flex justify-between mb-1"><span>Tasa Fija mensual estimada para los meses restantes:</span><span>{remStabilizedValue}%</span></div>
@@ -1942,7 +1942,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setPropertyValueUsd(v === '' ? 0 : Number(v)); }}
                     onFocus={(e) => { setPropFocused(true); e.target.select(); }} onBlur={() => setPropFocused(false)}
                     placeholder="USD 0"
-                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50 shadow-inner dark:text-white"
+                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white"
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-black text-xs dark:text-slate-400">USD</div>
                 </div>
@@ -2024,15 +2024,15 @@ function RentCalculator({ remData, dolarOficial }) {
           )}
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-3xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
+        <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
              <div className="flex items-center gap-3">
                <h3 className="font-black text-lg md:text-xl uppercase tracking-tight dark:text-white leading-none">Proyección de pagos del alquiler</h3>
                <button onClick={() => setIsFullscreen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-xl transition-all active:scale-95" title="Ver en Pantalla Completa" aria-label="Ver en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
              </div>
-             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700 shadow-inner overflow-x-auto max-w-full no-scrollbar">
+             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto max-w-full no-scrollbar">
               {['1y', '2y', '3y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-black transition-all whitespace-nowrap ${timeframe === t ? 'bg-emerald-600 text-white' : 'text-slate-400'}`}>
                   {t === 'all' ? 'TODO' : t.replace('y', ' AÑO' + (parseInt(t) > 1 ? 'S' : ''))}
                 </button>
               ))}
@@ -2042,7 +2042,7 @@ function RentCalculator({ remData, dolarOficial }) {
         </div>
 
         {/* TABLA DE ALQUILERES */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
           <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
             <div className="flex items-center gap-3">
               <span className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> TABLA DE PAGOS MENSUALES</span>
@@ -2050,19 +2050,19 @@ function RentCalculator({ remData, dolarOficial }) {
             </div>
             
             <div className="flex w-full lg:w-auto gap-2">
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl shadow-md transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl transition-all uppercase tracking-widest leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
                  <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl shadow-sm hover:scale-105 transition-all uppercase tracking-widest leading-none">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none">
                  <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl shadow-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
+              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-black rounded-xl hover:scale-105 transition-all uppercase tracking-widest leading-none whitespace-nowrap">
                  <FileText className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">PDF</span> 
               </button>
-              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl shadow-sm transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
+              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
                  {copiedWP ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
               </button>
-              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl shadow-sm transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
+              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-black rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
                  {copiedShare ? <Check className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -2077,7 +2077,7 @@ function RentCalculator({ remData, dolarOficial }) {
                   {schedule.map((d) => (
                     <tr key={d.mes} className="transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/40">
                       <td className="p-4 font-bold text-slate-800 dark:text-slate-200">{d.label}</td>
-                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
+                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
                       <td className="p-4 font-black text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
                       <td className="p-4 text-emerald-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
                       <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
@@ -2097,7 +2097,7 @@ function RentCalculator({ remData, dolarOficial }) {
 // --- VISTA PREGUNTAS FRECUENTES (FAQ) ---
 function FAQItem({ question, children, isOpen, onClick }) {
   return (
-    <div className={`border dark:border-slate-800 rounded-3xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-white dark:bg-slate-800 shadow-xl border-amber-500/30 dark:border-amber-500/30' : 'bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/80'}`}>
+    <div className={`border dark:border-slate-800 rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-white dark:bg-slate-800 border-amber-500/30 dark:border-amber-500/30' : 'bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/80'}`}>
       <button onClick={onClick} className="w-full text-left p-5 md:p-6 flex justify-between items-center gap-4 outline-none">
         <h4 className="font-black text-sm md:text-base uppercase tracking-tight text-slate-800 dark:text-white leading-none">{question}</h4>
         <div className={`p-2 rounded-full transition-all duration-300 shrink-0 ${isOpen ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rotate-180' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
@@ -2128,7 +2128,7 @@ function FAQ() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500 max-w-full">
       <div className="lg:col-span-12 space-y-8">
-        <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-3xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
+        <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
           <div className="flex flex-col mb-10 gap-2">
             <h2 className="font-black text-3xl md:text-4xl uppercase tracking-tighter dark:text-white flex items-center gap-3">
               <HelpCircle className="w-8 h-8 md:w-10 md:h-10 text-amber-500" />
@@ -2239,17 +2239,17 @@ export default function App() {
             
             {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
-            <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 shadow-sm leading-none">
+            <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 leading-none">
               <div className="flex items-center gap-3 md:gap-5">
-                <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-md" />
-                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-indigo-500">AR</span></span><span className="text-[11px] md:text-[13px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
+                <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-sm" />
+                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none">Proyect<span className="text-indigo-500">AR</span></span><span className="text-[11px] md:text-[13px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
               </div>
 
               <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
 
               <div className="flex items-center gap-2 md:gap-10 w-full md:w-auto justify-between md:justify-end">
                 <NavigationMenu />
-                <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" className="p-2.5 md:p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 shadow-md active:scale-90">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
+                <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" className="p-2.5 md:p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700 active:scale-90">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
               </div>
             </nav>
 
@@ -2269,15 +2269,15 @@ export default function App() {
                           <title>ProyectAR | Calculadora de Créditos UVA </title>
                           <meta name="description" content="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Proyectá cuánto sube tu cuota mes a mes con el sistema francés en UVA." />
                           <script type="application/ld+json">{JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "WebApplication",
-                            "name": "ProyectAR - Calculadora de Créditos UVA",
-                            "url": "https://proyectar.io/calculadora-creditos-uva",
-                            "description": "Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés, exportación a PDF/Excel.",
-                            "applicationCategory": "FinanceApplication",
-                            "operatingSystem": "Web",
-                            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
-                            "author": { "@type": "Person", "name": "Maxi Navarro" }
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "ProyectAR - Calculadora de Créditos UVA",
+ "url": "https://proyectar.io/calculadora-creditos-uva",
+ "description": "Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés, exportación a PDF/Excel.",
+ "applicationCategory": "FinanceApplication",
+ "operatingSystem": "Web",
+ "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
+ "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
                         <MortgageCalculator uvaValue={uvaValue} remData={remData} dolarOficial={dolarOficial} />
@@ -2291,15 +2291,15 @@ export default function App() {
                           <title>ProyectAR | Calculadora de Alquileres </title>
                           <meta name="description" content="Calculá la actualización de tu contrato de alquiler, expensas e inflación. Ideal para inquilinos y propietarios en Argentina." />
                           <script type="application/ld+json">{JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "WebApplication",
-                            "name": "ProyectAR - Calculadora de Alquileres",
-                            "url": "https://proyectar.io/calculadora-alquileres",
-                            "description": "Simulador de contratos de alquiler con ajuste por inflación (IPC + REM BCRA), cálculo de expensas, yield para propietarios.",
-                            "applicationCategory": "FinanceApplication",
-                            "operatingSystem": "Web",
-                            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
-                            "author": { "@type": "Person", "name": "Maxi Navarro" }
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "ProyectAR - Calculadora de Alquileres",
+ "url": "https://proyectar.io/calculadora-alquileres",
+ "description": "Simulador de contratos de alquiler con ajuste por inflación (IPC + REM BCRA), cálculo de expensas, yield para propietarios.",
+ "applicationCategory": "FinanceApplication",
+ "operatingSystem": "Web",
+ "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
+ "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
                         <RentCalculator remData={remData} dolarOficial={dolarOficial} />
@@ -2314,12 +2314,12 @@ export default function App() {
                           <meta name="description" content="Por qué sube tu cuota UVA, de dónde sale la inflación proyectada (IPC + REM del BCRA) y qué no incluye la simulación." />
                           {/* El structured data se arma con las mismas preguntas que se muestran en pantalla. */}
                           <script type="application/ld+json">{JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": faqsOperativas.map(f => ({
-                              "@type": "Question",
-                              "name": f.q,
-                              "acceptedAnswer": { "@type": "Answer", "text": f.resumen }
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": faqsOperativas.map(f => ({
+ "@type": "Question",
+ "name": f.q,
+ "acceptedAnswer": { "@type": "Answer", "text": f.resumen }
                             }))
                           })}</script>
                         </Helmet>
@@ -2335,20 +2335,20 @@ export default function App() {
             </main>
 
             <div className="max-w-[1800px] mx-auto px-6 md:px-10 mt-10">
-               <div className="bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 dark:from-indigo-500/5 dark:to-emerald-500/5 rounded-3xl p-8 md:p-12 text-center border border-indigo-500/20 relative overflow-hidden">
+               <div className="bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 dark:from-indigo-500/5 dark:to-emerald-500/5 rounded-2xl p-8 md:p-12 text-center border border-indigo-500/20 relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12"><HeartHandshake className="w-40 h-40 text-indigo-500" /></div>
                   <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mb-2">¿Te sirvió ProyectAR?</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-2xl mx-auto">Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.</p>
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
-                     <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
-                     <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all shadow-lg hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
+                     <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all hover:-translate-y-1"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
+                     <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-black rounded-xl uppercase tracking-widest text-xs transition-all hover:-translate-y-1"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
                   </div>
                </div>
             </div>
 
             <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col gap-8">
               <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
-                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50 ">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
+                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-50">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
                 <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[12px] leading-relaxed uppercase tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-black text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
                 <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[13px] font-bold text-slate-400 uppercase opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
               </div>
