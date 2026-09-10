@@ -53,6 +53,8 @@ const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currenc
 
 const OPTION_CLASS = "bg-white text-slate-900 dark:bg-slate-800 dark:text-white";
 
+const moneyDec = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+
 const uvas = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 }).format(v);
 
 const moneyCompact = (v) => {
@@ -722,6 +724,51 @@ function AmortizationTable({ data, conSueldo = false, dark = false }) {
         </tr>
       </tfoot>
     </table>
+  );
+}
+
+// Contexto macro de un vistazo. Todo sale de los datos que ya se descargan:
+// market_status.json para UVA y dolar, el CSV unificado para IPC y REM.
+function MacroStrip({ uvaValue, dolarOficial, remData, lastUpdate }) {
+  const datos = useMemo(() => {
+    if (!remData || remData.length === 0) return { ipc: null, rem12: null };
+    const ipc = [...remData].reverse().find(d => d.origen === 'IPC') || null;
+    const hoy = new Date();
+    const futuros = remData
+      .filter(d => d.año > hoy.getFullYear() || (d.año === hoy.getFullYear() && d.mes > hoy.getMonth() + 1))
+      .slice(0, 12);
+    const rem12 = futuros.length === 12
+      ? (futuros.reduce((f, d) => f * (1 + d.valor / 100), 1) - 1) * 100
+      : null;
+    return { ipc, rem12 };
+  }, [remData]);
+
+  const tarjetas = [
+    { icon: Landmark, label: 'Valor UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', pie: 'Ajusta por CER', color: 'text-indigo-500' },
+    { icon: DollarSign, label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', pie: 'ARS / USD', color: 'text-emerald-500' },
+    { icon: Activity, label: 'Inflación mensual', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', pie: datos.ipc ? `IPC, ${MESES[datos.ipc.mes - 1].toLowerCase()} ${datos.ipc.año}` : 'INDEC', color: 'text-amber-500' },
+    { icon: TrendingUp, label: 'Inflación esperada', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', pie: 'REM, próximos 12 meses', color: 'text-sky-500' },
+  ];
+
+  return (
+    <div className="mb-6 md:mb-8">
+      <div className="flex items-center gap-1.5 mb-3 text-slate-400">
+        <Clock className="w-3 h-3 shrink-0" />
+        <span className="text-[11px] font-bold uppercase tracking-widest leading-none">Actualizado {formatDateTime(lastUpdate)}</span>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {tarjetas.map(t => (
+          <div key={t.label} className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 p-4 text-left">
+            <div className="flex items-center gap-1.5 mb-2">
+              <t.icon className={`w-3.5 h-3.5 shrink-0 ${t.color}`} />
+              <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 leading-none truncate">{t.label}</span>
+            </div>
+            <p className="text-xl md:text-2xl font-black font-mono tracking-tight leading-none dark:text-white">{t.valor}</p>
+            <p className="text-[11px] font-medium text-slate-400 leading-none mt-1.5 truncate">{t.pie}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -2258,16 +2305,6 @@ export default function App() {
             
             {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
-            <div className="bg-slate-900 text-white py-2.5 border-b border-white/5 relative z-40 px-4 md:px-10 leading-none">
-              <div className="max-w-[1800px] mx-auto flex justify-between items-center text-[12px] font-black tracking-widest uppercase text-slate-500 leading-none">
-                <div className="flex items-center gap-1.5 text-slate-400"><Clock className="w-3 h-3 text-indigo-500 shrink-0" /><span className="text-[10px] sm:text-[12px]">{formatDateTime(lastUpdate)}</span></div>
-                <div className="flex gap-3 sm:gap-8 items-center font-mono leading-none text-[10px] sm:text-[12px]">
-                  <div>DÓLAR <span className="text-emerald-400 font-black">${dolarOficial}</span></div>
-                  <div>UVA <span className="text-indigo-400 font-black">${uvaValue}</span></div>
-                </div>
-              </div>
-            </div>
-
             <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 shadow-sm leading-none">
               <div className="flex items-center gap-3 md:gap-5">
                 <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-md" />
@@ -2306,6 +2343,7 @@ export default function App() {
                             "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
+                        <MacroStrip uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
                         <MortgageCalculator uvaValue={uvaValue} remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
@@ -2328,6 +2366,7 @@ export default function App() {
                             "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
+                        <MacroStrip uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
                         <RentCalculator remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
