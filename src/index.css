@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Se usa en las tiras que scrollean de costado (selector de plazo, tabla,
+     datos del encabezado en movil). Estaba aplicada en varios lugares pero
+     nunca definida, asi que no hacia nada. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
