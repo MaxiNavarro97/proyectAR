@@ -516,9 +516,6 @@ function TooltipContent({ data, isRent }) {
         <div className="flex justify-between items-center gap-4 text-orange-400 font-bold uppercase tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="uppercase">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
       </div>
       <div className="space-y-1.5 text-[14px]">
-        {data.rci > 0 && (
-          <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">% del sueldo:</span><span className={`font-black ${data.rci > 30 ? 'text-rose-400' : 'text-emerald-400'}`}>{data.rci.toFixed(1)}%</span></div>
-        )}
         <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Mensual:</span><span className={`font-black ${data.varMensual > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varMensual > 0 ? '+' : ''}{data.varMensual.toFixed(1)}%</span></div>
         <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Acumulado YTD:</span><span className={`font-black ${data.varYTD > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varYTD > 0 ? '+' : ''}{data.varYTD.toFixed(1)}%</span></div>
         <div className="flex justify-between items-center"><span className="text-slate-400 font-bold uppercase tracking-wide">Var. Total:</span><span className={`font-black ${data.varTotal > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varTotal > 0 ? '+' : ''}{data.varTotal.toFixed(1)}%</span></div>
@@ -527,7 +524,7 @@ function TooltipContent({ data, isRent }) {
   );
 }
 
-function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fullscreen = false, showRci = false }) {
+function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fullscreen = false }) {
   const [hovered, setHovered] = useState(null);
   const touchTimer = useRef(null);
 
@@ -557,15 +554,10 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
   }
 
   const maxVal = Math.max(...data.map(d => d.cuotaTotal)) * 1.15;
-  const w = 1000, h = 320, padL = 138, padB = 55;
-  // El eje derecho solo existe cuando se superpone la linea de sueldo.
-  const conRci = showRci && data.some(d => d.rci > 0);
-  const padT = conRci ? 30 : 15; // deja aire arriba para el rotulo del eje derecho
-  const padR = conRci ? 78 : 0;
+  const w = 1000, h = 320, padL = 138, padB = 55, padT = 15, padR = 0;
   const anchoUtil = w - padL - padR;
   const step = Math.max(1, Math.ceil(data.length / (isRent ? 40 : 60)));
   const sampled = data.filter((_, i) => i % step === 0);
-  const maxRci = conRci ? Math.max(Math.max(...data.map(d => d.rci)), 40) * 1.1 : 0;
 
   return (
     <div className="relative w-full h-full">
@@ -592,7 +584,6 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
           <g key={p}>
             <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w - padR} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
             <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[14px] fill-slate-400 font-mono font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
-            {conRci && <text x={w - padR + 12} y={h - padB - (h - padB - padT) * p + 5} textAnchor="start" className="text-[14px] fill-indigo-400 font-mono font-bold">{(maxRci * p).toFixed(0)}%</text>}
           </g>
         ))}
         {sampled.map((d, i) => {
@@ -624,22 +615,6 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
             </g>
           );
         })}
-        {/* Cuota como % del sueldo, eje derecho. Usa todos los meses: muestrear borra la sierra. */}
-        {conRci && (() => {
-          const barAreaW = anchoUtil / sampled.length;
-          const xr = (k) => padL + (k / Math.max(1, data.length - 1)) * (anchoUtil - barAreaW) + barAreaW / 2;
-          const yr = (rci) => h - padB - (rci / maxRci) * (h - padB - padT);
-          const linea = data.map((d, k) => `${k === 0 ? 'M' : 'L'} ${xr(k).toFixed(1)} ${yr(d.rci).toFixed(1)}`).join(' ');
-          return (
-            <g style={{ pointerEvents: 'none' }}>
-              {maxRci > 30 && <line x1={padL} y1={yr(30)} x2={w - padR} y2={yr(30)} stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.65"/>}
-              <path d={linea} fill="none" stroke="#a5b4fc" strokeWidth="4" strokeLinejoin="round" opacity="0.35"/>
-              <path d={linea} fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinejoin="round"/>
-              <text x={w} y={14} textAnchor="end" className="text-[14px] fill-indigo-500 font-black uppercase">% sueldo</text>
-            </g>
-          );
-        })()}
-
         {/* Línea divisoria IPC → REM */}
         {showRemMarker && (() => {
           const transIdx = sampled.findIndex(d => d.source === 'REM' || d.source === 'INERCIA');
@@ -662,7 +637,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
 
 // Tabla de amortizacion del credito UVA. La usan la vista normal y el modal a
 // pantalla completa; `dark` es el modal, que siempre va sobre fondo oscuro.
-function AmortizationTable({ data, conSueldo = false, dark = false }) {
+function AmortizationTable({ data, dark = false }) {
   const th = `p-4 text-center ${dark ? '' : ''}`;
   const totalCuotas = data.reduce((a, d) => a + d.cuotaTotal, 0);
   const totalInteres = data.reduce((a, d) => a + d.interes, 0);
@@ -681,7 +656,6 @@ function AmortizationTable({ data, conSueldo = false, dark = false }) {
           <th className={th}>Interés</th>
           <th className={th}>Capital</th>
           <th className={th}>Saldo</th>
-          {conSueldo && <th className={th}>% Sueldo</th>}
         </tr>
       </thead>
       <tbody className={`text-center ${dark ? 'divide-y divide-white/5' : 'divide-y dark:divide-slate-800'}`}>
@@ -695,7 +669,6 @@ function AmortizationTable({ data, conSueldo = false, dark = false }) {
                 <span className="flex items-center justify-center gap-1.5">
                   {d.label}
                   {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
-                  {conSueldo && d.ajusteSueldo && <span title="Mes en que se ajusta tu sueldo"><Wallet className="w-3 h-3 text-emerald-500" /></span>}
                 </span>
               </td>
               <td className="p-4">
@@ -709,7 +682,6 @@ function AmortizationTable({ data, conSueldo = false, dark = false }) {
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(d.interes)}</td>
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(d.principal)}</td>
               <td className={`p-4 font-black font-mono whitespace-nowrap ${dark ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{money(d.saldo)}</td>
-              {conSueldo && <td className={`p-4 font-black font-mono whitespace-nowrap ${d.rci > 30 ? 'text-rose-500' : 'text-emerald-500'}`}>{d.rci.toFixed(1)}%</td>}
             </tr>
           );
         })}
@@ -724,7 +696,6 @@ function AmortizationTable({ data, conSueldo = false, dark = false }) {
           <td className={`p-4 text-center whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(totalInteres)}</td>
           <td className={`p-4 text-center whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(totalCapital)}</td>
           <td className="p-4"></td>
-          {conSueldo && <td className="p-4"></td>}
         </tr>
       </tfoot>
     </table>
@@ -817,9 +788,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [inflFirstAnnual, setInflFirstAnnual] = useState("25");
   const [inflLongMode, setInflLongMode] = useState('rem');
   const [inflLongAnnual, setInflLongAnnual] = useState("25");
-  // Cada cuantos meses te ajustan el sueldo. Entre ajuste y ajuste el sueldo
-  // queda quieto mientras la UVA sigue subiendo: de ahi sale el diente de sierra.
-  const [salaryAdjustPeriod, setSalaryAdjustPeriod] = useState(6);
   const [timeframe, setTimeframe] = useState(() => {
     try { return localStorage.getItem('proyectar_tf_mortgage') || 'all'; } catch { return 'all'; }
   });
@@ -892,7 +860,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     const restantesMensual = inflLongMode === 'rem'
       ? ultimoRemMensual / 100
       : anualAMensual(Number(String(inflLongAnnual).replace(',', '.')) || 0);
-    const periodoAjuste = Number(salaryAdjustPeriod) || 1;
     
     let capitalUvaInicial;
     if (loanType === 'new') {
@@ -912,8 +879,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
     const data = [];
     let projUva = currentUva;
-    let projIngreso = salary;
-    let factorSueldo = 1; // inflacion acumulada desde el ultimo ajuste
     let currentDate = new Date(startYear, startMonth, 1);
     let halfWayTriggered = false;
 
@@ -931,13 +896,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       const sourceName = inflMatch
         ? (inflFirstMode === 'custom' ? 'PROPIA' : (inflMatch.origen === 'IPC' ? 'IPC' : 'REM'))
         : (inflLongMode === 'custom' ? 'PROPIA' : 'INERCIA');
-
-      // El sueldo recupera de una sola vez toda la inflacion acumulada desde el ajuste anterior.
-      const esMesDeAjuste = i > 1 && (i - 1) % periodoAjuste === 0;
-      if (esMesDeAjuste) {
-        projIngreso *= factorSueldo;
-        factorSueldo = 1;
-      }
 
       let isHalfWay = false;
       if (!halfWayTriggered && balanceUva <= capitalUvaInicial / 2) {
@@ -970,9 +928,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         interesUva: interestUva,
         valorUva: projUva,
         oficial: !!inflMatch,
-        ajusteSueldo: esMesDeAjuste,
-        ingreso: projIngreso,
-        rci: projIngreso > 0 ? (cuotaTotal / projIngreso) * 100 : 0,
         source: sourceName,
         isHalfWay: isHalfWay,
         varMensual: varMensual || 0,
@@ -987,11 +942,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         ? (inflFirstMode === 'custom' ? primerosMensual : inflMatch.valor / 100)
         : restantesMensual;
       projUva *= (1 + currentMonthInf);
-      factorSueldo *= (1 + currentMonthInf);
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [amount, years, rate, inflFirstMode, inflFirstAnnual, inflLongMode, inflLongAnnual, ultimoRemMensual, salaryAdjustPeriod, salary, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
+  }, [amount, years, rate, inflFirstMode, inflFirstAnnual, inflLongMode, inflLongAnnual, ultimoRemMensual, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
   const totals = useMemo(() => {
       const montoOriginalPesos = loanType === 'new' ? amount : (balanceCurrency === 'ars' ? amount : amount * uvaValue);
@@ -1061,8 +1015,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       "Interés": Math.round(d.interes),
       "Capital": Math.round(d.principal),
       "Saldo Pendiente": Math.round(d.saldo),
-      "Inflación": d.source,
-      ...(salary > 0 ? { "% Sueldo": Number(d.rci.toFixed(1)) } : {})
+      "Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Proyeccion");
@@ -1107,11 +1060,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del crédito">
-          <CompositionChart data={filteredData} dateMode="calendar" showRemMarker showRci={salary > 0} fullscreen />
+          <CompositionChart data={filteredData} dateMode="calendar" showRemMarker fullscreen />
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
-        <AmortizationTable data={schedule} conSueldo={salary > 0} dark />
+        <AmortizationTable data={schedule} dark />
       </TableModal>
 
       {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
@@ -1346,37 +1299,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               label="SUELDO NETO MENSUAL (OPCIONAL)" 
               value={salary} 
               onChange={setSalary} 
-              sublabel="Para ver qué porcentaje de tu sueldo se lleva la cuota, ahora y a lo largo del crédito." 
+              sublabel="Para ver qué porcentaje de tu sueldo se lleva la primera cuota." 
             />
-
-            {salary > 0 && (
-              <div className="mt-4 animate-in fade-in">
-                <div className="text-[12px] font-black text-indigo-500 uppercase mb-2.5 flex items-center gap-1.5 leading-none">
-                  ¿Cada cuánto te ajustan?
-                  <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
-                    Entre un ajuste y el siguiente tu sueldo queda quieto, pero la UVA sigue subiendo todos los días. Por eso la cuota te pesa cada vez más hasta que llega el aumento, ahí baja de golpe, y vuelve a empezar. Cuanto más espaciado el ajuste, más profundo el pozo.
-                  </Tooltip>
-                </div>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {[1, 3, 4, 6, 12].map(m => (
-                    <button key={m} onClick={() => setSalaryAdjustPeriod(m)} className={`py-2 text-[11px] font-black rounded-lg transition-all leading-none ${salaryAdjustPeriod === m ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-                      {m === 1 ? 'MES' : m}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[11px] text-slate-400 font-medium leading-tight mt-2">
-                  {salaryAdjustPeriod === 1
-                    ? 'Tu sueldo sigue a la inflación mes a mes.'
-                    : `Tu sueldo recupera la inflación acumulada cada ${salaryAdjustPeriod} meses.`}
-                </p>
-              </div>
-            )}
 
             {salary > 0 && totals.cuotaInicial > 0 && (
               <div className="space-y-3 mt-4">
-                <p className="text-[12px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
-                  Este número es el de la primera cuota. Cómo evoluciona después lo ves en el gráfico "Cuota sobre tus ingresos".
-                </p>
                 <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                   (totals.cuotaInicial / salary) > 0.3 
                     ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
@@ -1385,6 +1312,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   <span className="flex items-center gap-2"><Activity className="w-4 h-4"/> Afectación (RCI)</span>
                   <span className="text-lg leading-none">{((totals.cuotaInicial / salary) * 100).toFixed(1)}%</span>
                 </div>
+                <p className="text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-tight px-1">
+                  Los bancos suelen pedir que la primera cuota no supere el <b>25-30% de tus ingresos netos</b>. Si estás por encima, es probable que te pidan sumar un codeudor o bajar el monto.
+                </p>
+                <p className="text-[11px] text-slate-400 italic font-medium leading-tight px-1">
+                  Es solo la primera cuota. Si tu sueldo sube menos que la inflación, con el tiempo te va a pesar más.
+                </p>
               </div>
             )}
           </div>
@@ -1454,25 +1387,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <p className="text-[13px] text-amber-600 dark:text-amber-400/80 font-medium leading-tight flex-1">No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.</p>
           </div>
-          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker showRci={salary > 0} /></div>
+          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode="calendar" showRemMarker /></div>
 
-          {salary > 0 && filteredData.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t dark:border-slate-800 animate-in fade-in">
-              {(() => {
-                const rcis = filteredData.map(d => d.rci);
-                return [
-                  { t: 'Cuota sobre sueldo hoy', v: rcis[0] },
-                  { t: 'Peor momento', v: Math.max(...rcis) },
-                  { t: 'Última cuota', v: rcis[rcis.length - 1] },
-                ];
-              })().map(k => (
-                <div key={k.t} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-3 border dark:border-slate-800 text-center">
-                  <p className="text-[12px] font-black uppercase tracking-widest text-slate-400 leading-tight mb-1.5">{k.t}</p>
-                  <p className={`text-xl font-black font-mono leading-none ${k.v > 30 ? 'text-rose-500' : 'text-emerald-500'}`}>{k.v.toFixed(1)}%</p>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
@@ -1510,7 +1426,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
           <div className="max-h-[400px] md:max-h-[850px] overflow-auto w-full no-scrollbar">
             <div className="inline-block min-w-full align-middle">
-              <AmortizationTable data={schedule} conSueldo={salary > 0} />
+              <AmortizationTable data={schedule} />
             </div>
           </div>
         </div>
