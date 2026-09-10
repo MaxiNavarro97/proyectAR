@@ -384,7 +384,7 @@ function WelcomeModal({ onClose }) {
 
 // --- COMPONENTE DE BOTON DE NAVEGACIÓN ---
 const NAV_THEMES = {
-  indigo: 'text-indigo-600 dark:text-sky-400 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-sky-500/30 scale-105',
+  indigo: 'text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 shadow-md border-indigo-100 dark:border-indigo-500/30 scale-105',
   emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-md border-emerald-100 dark:border-emerald-500/30 scale-105',
   amber: 'text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800 shadow-md border-amber-100 dark:border-amber-500/30 scale-105',
 };
@@ -448,14 +448,16 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent, color 
 }
 
 // Fuera del componente: no cambia nunca, no tiene sentido recrearlo en cada render
+// Cada color tiene un unico significado en todo el sitio. Las tarjetas que no
+// senalan nada van en slate: cuatro colores distintos para cuatro tarjetas es
+// decoracion, y hace que el color deje de querer decir algo cuando importa.
 const SUMMARY_COLOR_MAP = {
-  indigo: 'bg-indigo-500/10 text-indigo-500',
-  orange: 'bg-orange-500/10 text-orange-500',
-  emerald: 'bg-emerald-500/10 text-emerald-500',
-  rose: 'bg-rose-500/10 text-rose-500',
-  sky: 'bg-sky-500/10 text-sky-500',
-  amber: 'bg-amber-500/10 text-amber-500',
   slate: 'bg-slate-500/10 text-slate-500',
+  orange: 'bg-orange-500/10 text-orange-500',   // interes / expensas: lo que se paga de mas
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400', // bien
+  amber: 'bg-amber-500/10 text-amber-500',      // atencion
+  rose: 'bg-rose-500/10 text-rose-500',         // mal
+  indigo: 'bg-indigo-500/10 text-indigo-500',   // identidad de seccion
 };
 
 const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, colorClass, sticky, tooltip, sub }) {
@@ -471,7 +473,7 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
   }, [value]);
 
   return (
-    <div className={`bg-white dark:bg-slate-900 p-3 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-2.5 transition-all min-w-0 flex-1 relative hover:-translate-y-0.5 ${sticky ? 'sticky top-[85px] md:top-[128px] z-30 hover:z-[60] shadow-xl border-indigo-500/30 dark:border-sky-500/30' : 'hover:shadow-md hover:z-[60]'}`}>
+    <div className={`bg-white dark:bg-slate-900 p-3 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-2.5 transition-all min-w-0 flex-1 relative hover:-translate-y-0.5 ${sticky ? 'sticky top-[85px] md:top-[128px] z-30 hover:z-[60] shadow-xl border-indigo-500/30 dark:border-indigo-500/30' : 'hover:shadow-md hover:z-[60]'}`}>
       <div className={`p-2 rounded-xl shrink-0 ${SUMMARY_COLOR_MAP[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
       <div className="min-w-0 text-left flex-1 relative"> 
         <div className="flex items-center justify-between gap-1 mb-0.5">
@@ -664,16 +666,21 @@ function AmortizationTable({ data, dark = false }) {
           // las 240 filas es ruido.
           const cambiaOrigen = i === 0 || data[i - 1].source !== d.source;
           return (
-            <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? (dark ? 'bg-sky-900/20 border-l-4 border-sky-500' : 'bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500') : (dark ? 'hover:bg-white/5' : 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40')}`}>
+            <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? (dark ? 'bg-indigo-900/20 border-l-4 border-indigo-500' : 'bg-indigo-50 dark:bg-indigo-900/20 border-l-4 border-indigo-500') : (dark ? 'hover:bg-white/5' : 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40')}`}>
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-slate-200' : 'text-slate-800 dark:text-slate-200'}`}>
                 <span className="flex items-center justify-center gap-1.5">
                   {d.label}
-                  {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
+                  {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
                 </span>
               </td>
               <td className="p-4">
                 {cambiaOrigen
-                  ? <span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase shadow-sm ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : d.source === 'PROPIA' ? 'bg-amber-600 text-white' : (dark ? 'bg-slate-600 text-white' : 'bg-slate-500 text-white')}`}>{d.source}</span>
+                  ? (
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-black uppercase ${dark ? 'bg-white/5 text-slate-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${d.oficial ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                      {d.source}
+                    </span>
+                  )
                   : <span className="text-slate-300 dark:text-slate-700">·</span>}
               </td>
               <td className={`p-4 font-mono font-bold whitespace-nowrap ${dark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}`}>{uvas(d.cuotaUva)}</td>
@@ -725,7 +732,7 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
     { label: 'UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', color: 'text-indigo-500 dark:text-indigo-400', title: 'Unidad de Valor Adquisitivo. Se ajusta a diario por el CER, que sigue a la inflación del INDEC.' },
     { label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', color: 'text-emerald-600 dark:text-emerald-400', title: 'Cotización oficial del peso contra el dólar.' },
     { label: datos.ipc ? `IPC ${MESES[datos.ipc.mes - 1].toLowerCase()} ${String(datos.ipc.año).slice(-2)}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', color: 'text-amber-600 dark:text-amber-400', title: 'Último dato de inflación mensual publicado por el INDEC.' },
-    { label: 'REM 12m', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', color: 'text-sky-600 dark:text-sky-400', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
+    { label: 'REM 12m', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', color: 'text-indigo-600 dark:text-indigo-400', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
   ];
 
   return (
@@ -1224,8 +1231,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                     {mesesOficiales > 0 ? `Primeros ${mesesOficiales} meses` : 'Primeros meses'}
                   </p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
-                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'custom' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
+                    <button onClick={() => setInflFirstMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflFirstMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflFirstMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>PROPIA</button>
                   </div>
                 </div>
                 {inflFirstMode === 'rem' ? (
@@ -1252,7 +1259,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                           type="text" inputMode="decimal" value={inflFirstAnnual}
                           onChange={(e) => { const v = e.target.value.replace(',', '.'); if (v === '' || /^\d*\.?\d*$/.test(v)) setInflFirstAnnual(e.target.value); }}
                           onFocus={(e) => e.target.select()}
-                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-emerald-500 dark:text-white"
+                          className="w-full py-2 pl-3 pr-7 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 font-mono text-[14px] font-black outline-none focus:border-indigo-500 dark:text-white"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-slate-400 pointer-events-none">%</span>
                       </div>
@@ -1267,8 +1274,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-[12px] font-black uppercase text-slate-600 dark:text-slate-300 leading-none">Meses restantes</p>
                   <div className="flex bg-slate-200 dark:bg-slate-700 p-0.5 rounded-lg shrink-0">
-                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>REM</button>
-                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}>PROPIA</button>
+                    <button onClick={() => setInflLongMode('rem')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'rem' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>REM</button>
+                    <button onClick={() => setInflLongMode('custom')} className={`px-2.5 py-1 text-[11px] font-black rounded transition-all ${inflLongMode === 'custom' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>PROPIA</button>
                   </div>
                 </div>
                 {inflLongMode === 'rem' ? (
@@ -1312,7 +1319,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 <div className={`p-4 rounded-2xl text-[12px] font-black uppercase tracking-widest flex items-center justify-between border-2 transition-colors ${
                   (totals.cuotaInicial / salary) > 0.3 
                     ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
-                    : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
+                    : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
                 }`}>
                   <span className="flex items-center gap-2"><Activity className="w-4 h-4"/> Afectación (RCI)</span>
                   <span className="text-lg leading-none">{((totals.cuotaInicial / salary) * 100).toFixed(1)}%</span>
@@ -1353,15 +1360,15 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       {/* --- COLUMNA DERECHA: RESULTADOS --- */}
       <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={loanType === 'new' ? "Inicio" : "Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="indigo" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
+          <SummaryCard title={loanType === 'new' ? "Inicio" : "Próxima"} value={moneyCompact(totals.cuotaInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto estimado de la primera o próxima cuota a pagar, sumando capital e intereses." />
           <SummaryCard title="Intereses" value={moneyCompact(totals.totalIntereses)} sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null} icon={TrendingUp} colorClass="orange" tooltip="Costo financiero puro cobrado por el banco durante toda la proyección. No incluye la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado; el que está en UVA es el que mide de verdad cuánto te cuesta el crédito." />
-          <SummaryCard title={loanType === 'new' ? "Total" : "Restante"} value={moneyCompact(totals.totalPagadoFinal)} sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null} icon={CheckCircle2} colorClass="sky" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar también el total en UVA." />
+          <SummaryCard title={loanType === 'new' ? "Total" : "Restante"} value={moneyCompact(totals.totalPagadoFinal)} sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null} icon={CheckCircle2} colorClass="slate" tooltip="Suma total proyectada de todo el dinero que vas a desembolsar (Capital + Intereses) hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar también el total en UVA." />
           <SummaryCard
             title="Costo real"
             value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` : "---"}
             sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x en pesos nominales` : null}
             icon={Activity}
-            colorClass="amber"
+            colorClass="slate"
             tooltip={<><p className="mb-3">Cuántas veces el capital terminás devolviendo, <b className="text-white">medido en UVA</b>. Un 1,50x significa que por cada 100 UVA que te prestaron devolvés 150: esos 50 son el costo real del crédito.</p><p>Abajo está el mismo cociente en pesos nominales, que siempre da mucho más alto porque suma pesos de años distintos sin descontar la inflación. Ese número asusta pero no mide el crédito: mide la inflación.</p></>}
           />
         </div>
@@ -1887,7 +1894,7 @@ function RentCalculator({ remData, dolarOficial }) {
                       <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-emerald-300 font-bold uppercase tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
                     <div className="h-px w-full bg-white/5 mb-3"></div>
                     <div>
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div><b className="text-sky-400 uppercase tracking-wider">Modo Manual</b></div>
+                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400 uppercase tracking-wider">Modo Manual</b></div>
                       <p><span className="text-white font-bold">Control total.</span> Definí una tasa fija para todo el contrato. Ideal para simular escenarios propios.</p>
                     </div>
                   </div>
@@ -1980,7 +1987,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
                     : yieldColor === 'emerald'
                     ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
-                    : 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-900/20 dark:border-sky-800'
+                    : 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800'
                 }`}>
                   <span className="flex items-center gap-2">
                     {React.createElement(yieldIcon, { className: "w-4 h-4" })}
@@ -2000,20 +2007,20 @@ function RentCalculator({ remData, dolarOficial }) {
       {/* --- COLUMNA DERECHA: RESULTADOS ALQUILERES --- */}
       <div ref={resultsRef} className="lg:col-span-8 space-y-5 min-w-0">
         <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ? "Primer Ingreso" : "Primer Pago") : "Alquiler Actual"} value={moneyCompact(totals.alquilerInicial)} icon={Wallet} colorClass={rentRole === 'owner' ? 'emerald' : 'indigo'} sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
+          <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ? "Primer Ingreso" : "Primer Pago") : "Alquiler Actual"} value={moneyCompact(totals.alquilerInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
           <SummaryCard title="Expensas" value={moneyCompact(totals.totalExpensas)} icon={TrendingUp} colorClass="orange" tooltip="Proyección de todas las expensas sumadas a lo largo de la simulación." />
-          <SummaryCard title={rentRole === 'owner' ? "Ingreso Est." : " Total"} value={moneyCompact(totals.totalContrato)} icon={CheckCircle2} colorClass="sky" tooltip="La suma de todos los alquileres y expensas a pagar (o cobrar, si sos dueño) mes a mes hasta el final del contrato." />
+          <SummaryCard title={rentRole === 'owner' ? "Ingreso Est." : " Total"} value={moneyCompact(totals.totalContrato)} icon={CheckCircle2} colorClass="slate" tooltip="La suma de todos los alquileres y expensas a pagar (o cobrar, si sos dueño) mes a mes hasta el final del contrato." />
           
           {rentRole === 'owner' ? (
              <SummaryCard 
                 title="PRI" 
                 value={propertyValueUsd > 0 && pri > 0 ? `${pri.toFixed(1)} años` : "---"} 
                 icon={Clock} 
-                colorClass={pri > 0 && pri <= 12.5 ? 'emerald' : pri > 12.5 && pri <= 20 ? 'orange' : pri > 20 && pri <= 33 ? 'amber' : 'rose'} 
+                colorClass={pri > 0 && pri <= 15 ? 'emerald' : pri <= 25 ? 'amber' : 'rose'} 
                 tooltip="Período de Recuperación de la Inversión (PRI). Años estimados para recuperar la inversión inicial solo con el ingreso del alquiler, sin expensas ni gastos extra." 
              />
           ) : (
-             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="amber" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
+             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` : "---"} icon={Activity} colorClass="slate" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
           )}
         </div>
 
@@ -2235,7 +2242,7 @@ export default function App() {
             <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto md:h-28 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-4 md:py-0 gap-4 md:gap-0 shadow-sm leading-none">
               <div className="flex items-center gap-3 md:gap-5">
                 <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-md" />
-                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-violet-500">AR</span></span><span className="text-[11px] md:text-[13px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
+                <div className="flex flex-col text-left leading-none"><span className="font-black text-lg md:text-3xl tracking-tighter uppercase leading-none ">Proyect<span className="text-indigo-500">AR</span></span><span className="text-[11px] md:text-[13px] font-black tracking-[0.2em] text-slate-500 uppercase mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
               </div>
 
               <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
