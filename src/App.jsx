@@ -614,14 +614,14 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
   );
 }
 
-// Cuanto de tus ingresos se lleva la cuota, mes a mes. Depende del escenario de
-// inflacion a largo plazo y de cuanto le gana (o le pierde) tu sueldo a los precios.
+// Cuanto de tus ingresos se lleva la cuota, mes a mes. La sierra sale de que el
+// sueldo se ajusta cada tantos meses y la UVA, todos los dias.
 function IncomeRatioChart({ data }) {
   if (!data || data.length === 0) return null;
 
   const w = 1000, h = 260, padL = 55, padB = 40, padT = 20;
-  const step = Math.max(1, Math.ceil(data.length / 200));
-  const puntos = data.filter((_, i) => i % step === 0);
+  // Sin muestreo: con ajustes cada pocos meses, saltearse puntos borra la sierra.
+  const puntos = data;
 
   const maxRci = Math.max(...puntos.map(d => d.rci), 40) * 1.1;
   const x = (i) => padL + (i / Math.max(1, puntos.length - 1)) * (w - padL - 10);
@@ -724,8 +724,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [rate, setRate] = useState("0");
   const [convergenceMode, setConvergenceMode] = useState('base');
   const [convergenceAnnual, setConvergenceAnnual] = useState("10");
-  // Cuantos puntos por anio le saca (o le pierde) tu sueldo a la inflacion.
-  const [incomeGrowth, setIncomeGrowth] = useState(0);
+  // Cada cuantos meses te ajustan el sueldo. Entre ajuste y ajuste el sueldo
+  // queda quieto mientras la UVA sigue subiendo: de ahi sale el diente de sierra.
+  const [salaryAdjustPeriod, setSalaryAdjustPeriod] = useState(6);
   const [timeframe, setTimeframe] = useState(() => {
     try { return localStorage.getItem('proyectar_tf_mortgage') || 'all'; } catch { return 'all'; }
   });
@@ -784,8 +785,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       ? (Number(String(convergenceAnnual).replace(',', '.')) || 0)
       : CONVERGENCIA[convergenceMode].anual;
     const convMensual = anualAMensual(convAnual);
-    // Cuanto crecen los ingresos por encima de la inflacion, mes a mes.
-    const incomeMensual = anualAMensual(incomeGrowth);
+    const periodoAjuste = Number(salaryAdjustPeriod) || 1;
     
     let capitalUvaInicial;
     if (loanType === 'new') {
@@ -806,6 +806,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
     const data = [];
     let projUva = currentUva;
     let projIngreso = salary;
+    let factorSueldo = 1; // inflacion acumulada desde el ultimo ajuste
     let currentDate = new Date(startYear, startMonth, 1);
     let halfWayTriggered = false;
 
@@ -821,6 +822,13 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
       const inflMatch = inflacionMap.get((currentDate.getMonth() + 1) + '-' + currentDate.getFullYear()) ?? null;
       const sourceName = inflMatch ? (inflMatch.origen === 'IPC' ? 'IPC' : 'REM') : 'INERCIA';
+
+      // El sueldo recupera de una sola vez toda la inflacion acumulada desde el ajuste anterior.
+      const esMesDeAjuste = i > 1 && (i - 1) % periodoAjuste === 0;
+      if (esMesDeAjuste) {
+        projIngreso *= factorSueldo;
+        factorSueldo = 1;
+      }
 
       let isHalfWay = false;
       if (!halfWayTriggered && balanceUva <= capitalUvaInicial / 2) {
@@ -862,11 +870,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
       const currentMonthInf = inflMatch ? inflMatch.valor / 100 : convMensual;
       projUva *= (1 + currentMonthInf);
-      projIngreso *= (1 + currentMonthInf) * (1 + incomeMensual);
+      factorSueldo *= (1 + currentMonthInf);
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [amount, years, rate, convergenceMode, convergenceAnnual, incomeGrowth, salary, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
+  }, [amount, years, rate, convergenceMode, convergenceAnnual, salaryAdjustPeriod, salary, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
   const totals = useMemo(() => ({
       totalPagadoFinal: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
@@ -1173,23 +1181,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 <p className="text-[9px] text-slate-400 font-medium leading-tight mt-2.5">Se aplica a los meses que quedan después del REM.</p>
               </div>
 
-              <div className="pt-3 border-t dark:border-slate-700">
-                <div className="flex justify-between items-center mb-2 leading-none">
-                  <div className="text-[10px] font-black text-indigo-500 uppercase flex items-center gap-1.5">
-                    Tus ingresos
-                    <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
-                      ¿Tu sueldo le gana o le pierde a la inflación? En cero, tu sueldo sube exactamente lo mismo que los precios y tu cuota se mantiene estable como porcentaje de lo que ganás. En negativo, la cuota te pesa cada vez más.
-                    </Tooltip>
-                  </div>
-                  <span className="text-[10px] font-mono font-black dark:text-white">{incomeGrowth > 0 ? '+' : ''}{incomeGrowth} pp</span>
-                </div>
-                <input type="range" min="-10" max="10" step="0.5" value={incomeGrowth} onChange={(e)=>setIncomeGrowth(Number(e.target.value))} className="w-full accent-indigo-500" />
-                <p className="text-[9px] text-slate-400 font-medium leading-tight mt-2">
-                  {incomeGrowth === 0 ? 'Tu sueldo sigue a la inflación, ni más ni menos.'
-                    : incomeGrowth > 0 ? `Tu sueldo le gana ${incomeGrowth} puntos por año a la inflación.`
-                    : `Tu sueldo le pierde ${Math.abs(incomeGrowth)} puntos por año a la inflación.`}
-                </p>
-              </div>
             </div>
           </div>
           
@@ -1201,6 +1192,30 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               onChange={setSalary} 
               sublabel="Para ver qué porcentaje de tu sueldo se lleva la cuota, ahora y a lo largo del crédito." 
             />
+
+            {salary > 0 && (
+              <div className="mt-4 animate-in fade-in">
+                <div className="text-[10px] font-black text-indigo-500 uppercase mb-2.5 flex items-center gap-1.5 leading-none">
+                  ¿Cada cuánto te ajustan?
+                  <Tooltip iconClass="w-3 h-3 text-indigo-300" color="indigo">
+                    Entre un ajuste y el siguiente tu sueldo queda quieto, pero la UVA sigue subiendo todos los días. Por eso la cuota te pesa cada vez más hasta que llega el aumento, ahí baja de golpe, y vuelve a empezar. Cuanto más espaciado el ajuste, más profundo el pozo.
+                  </Tooltip>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[1, 3, 4, 6, 12].map(m => (
+                    <button key={m} onClick={() => setSalaryAdjustPeriod(m)} className={`py-2 text-[9px] font-black rounded-lg transition-all leading-none ${salaryAdjustPeriod === m ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                      {m === 1 ? 'MES' : m}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[9px] text-slate-400 font-medium leading-tight mt-2">
+                  {salaryAdjustPeriod === 1
+                    ? 'Tu sueldo sigue a la inflación mes a mes.'
+                    : `Tu sueldo recupera la inflación acumulada cada ${salaryAdjustPeriod} meses.`}
+                </p>
+              </div>
+            )}
+
             {salary > 0 && totals.cuotaInicial > 0 && (
               <div className="space-y-3 mt-4">
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
