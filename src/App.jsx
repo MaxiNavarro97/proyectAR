@@ -702,9 +702,10 @@ function AmortizationTable({ data, dark = false }) {
   );
 }
 
-// Contexto macro de un vistazo. Todo sale de los datos que ya se descargan:
-// market_status.json para UVA y dolar, el CSV unificado para IPC y REM.
-function MacroStrip({ uvaValue, dolarOficial, remData, lastUpdate }) {
+// Contexto macro del sitio. No pertenece a ninguna calculadora en particular,
+// asi que vive en el encabezado y se ve en todas las rutas. Todo sale de los
+// datos que ya se descargan: market_status.json y el CSV unificado.
+function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
   const datos = useMemo(() => {
     if (!remData || remData.length === 0) return { ipc: null, rem12: null };
     const ipc = [...remData].reverse().find(d => d.origen === 'IPC') || null;
@@ -718,30 +719,28 @@ function MacroStrip({ uvaValue, dolarOficial, remData, lastUpdate }) {
     return { ipc, rem12 };
   }, [remData]);
 
-  const tarjetas = [
-    { icon: Landmark, label: 'Valor UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', pie: 'Ajusta por CER', color: 'text-indigo-500' },
-    { icon: DollarSign, label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', pie: 'ARS / USD', color: 'text-emerald-500' },
-    { icon: Activity, label: 'Inflación mensual', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', pie: datos.ipc ? `IPC, ${MESES[datos.ipc.mes - 1].toLowerCase()} ${datos.ipc.año}` : 'INDEC', color: 'text-amber-500' },
-    { icon: TrendingUp, label: 'Inflación esperada', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', pie: 'REM, próximos 12 meses', color: 'text-sky-500' },
+  // La fecha del dato va dentro de la etiqueta: en una banda de una linea no
+  // hay lugar para un pie, y sin fecha un numero de inflacion no dice nada.
+  const items = [
+    { label: 'UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', color: 'text-indigo-500 dark:text-indigo-400', title: 'Unidad de Valor Adquisitivo. Se ajusta a diario por el CER, que sigue a la inflación del INDEC.' },
+    { label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', color: 'text-emerald-600 dark:text-emerald-400', title: 'Cotización oficial del peso contra el dólar.' },
+    { label: datos.ipc ? `IPC ${MESES[datos.ipc.mes - 1].toLowerCase()} ${String(datos.ipc.año).slice(-2)}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', color: 'text-amber-600 dark:text-amber-400', title: 'Último dato de inflación mensual publicado por el INDEC.' },
+    { label: 'REM 12m', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', color: 'text-sky-600 dark:text-sky-400', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
   ];
 
   return (
-    <div className="mb-6 md:mb-8">
-      <div className="flex items-center gap-1.5 mb-3 text-slate-400">
-        <Clock className="w-3 h-3 shrink-0" />
-        <span className="text-[11px] font-bold uppercase tracking-widest leading-none">Actualizado {formatDateTime(lastUpdate)}</span>
-      </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {tarjetas.map(t => (
-          <div key={t.label} className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 p-4 text-left">
-            <div className="flex items-center gap-1.5 mb-2">
-              <t.icon className={`w-3.5 h-3.5 shrink-0 ${t.color}`} />
-              <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 leading-none truncate">{t.label}</span>
-            </div>
-            <p className="text-xl md:text-2xl font-black font-mono tracking-tight leading-none dark:text-white">{t.valor}</p>
-            <p className="text-[11px] font-medium text-slate-400 leading-none mt-1.5 truncate">{t.pie}</p>
+    <div className="bg-white dark:bg-slate-900 border-b dark:border-slate-800 px-4 md:px-10 py-2.5">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-2 gap-x-4 gap-y-2 md:flex md:items-center md:gap-x-0">
+        {items.map((it, i) => (
+          <div key={it.label} title={it.title} className={`flex items-baseline gap-2 min-w-0 ${i > 0 ? 'md:border-l md:border-slate-200 md:dark:border-slate-800 md:pl-6' : ''} ${i > 0 ? 'md:ml-6' : ''}`}>
+            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 leading-none shrink-0">{it.label}</span>
+            <span className={`text-[14px] font-black font-mono leading-none truncate ${it.color}`}>{it.valor}</span>
           </div>
         ))}
+        <div className="col-span-2 flex items-center gap-1.5 text-slate-400 md:ml-auto">
+          <Clock className="w-3 h-3 shrink-0" />
+          <span className="text-[11px] font-bold uppercase tracking-widest leading-none">{formatDateTime(lastUpdate)}</span>
+        </div>
       </div>
     </div>
   );
@@ -2246,6 +2245,8 @@ export default function App() {
               </div>
             </nav>
 
+            <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
+
             <main className="max-w-[1800px] mx-auto p-6 md:p-10 flex-grow w-full">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[14px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse text-center">Sincronizando Mercados...</p></div>
@@ -2273,7 +2274,6 @@ export default function App() {
                             "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
-                        <MacroStrip uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
                         <MortgageCalculator uvaValue={uvaValue} remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
@@ -2296,7 +2296,6 @@ export default function App() {
                             "author": { "@type": "Person", "name": "Maxi Navarro" }
                           })}</script>
                         </Helmet>
-                        <MacroStrip uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
                         <RentCalculator remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
