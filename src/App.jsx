@@ -542,7 +542,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
         {[0, 0.25, 0.5, 0.75, 1].map(p => (
           <g key={p}>
             <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w - padR} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
-            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[14px] fill-slate-400 font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
+            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[14px] fill-slate-400">{moneyCompact(maxVal * p)}</text>
           </g>
         ))}
         {sampled.map((d, i) => {
@@ -561,15 +561,15 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
               onTouchEnd={handleTouchEnd}
               className="group cursor-pointer"
             >
-              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill={isRent ?"#10b981" :"#6366f1"} rx="1.5" className="transition-all group-hover:brightness-110"/>
-              <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill={isRent ?"#f59e0b" :"#fb923c"} rx="1.5" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill={isRent ?"#10b981" :"#6366f1"} rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill={isRent ?"#f59e0b" :"#fb923c"} rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
               {(i % Math.ceil(sampled.length/10) === 0) && (
-                <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[13px] fill-slate-500 font-semibold tracking-tighter md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
+                <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[13px] fill-slate-500 md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
                   {dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}
                 </text>
               )}
               {(i % Math.ceil(sampled.length/10) === 0) && (
-                <text x={x + barW/2} y={h - padB + 22} textAnchor="middle" className="text-[14px] fill-slate-500 font-semibold tracking-tighter hidden md:block">{dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}</text>
+                <text x={x + barW/2} y={h - padB + 22} textAnchor="middle" className="text-[14px] fill-slate-500 hidden md:block">{dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}</text>
               )}
             </g>
           );
@@ -1250,19 +1250,16 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="p-4">
             <Stat
-              size="display"
               label={loanType === 'new' ? 'Primera cuota' : 'Próxima cuota'}
               value={moneyCompact(totals.cuotaInicial)}
-              aside={<Tooltip iconClass="w-3 h-3 text-faint">Capital más intereses de la primera cuota, o de la próxima si el crédito ya está en curso.</Tooltip>}
+              sub={schedule[0] ? `${uvas(schedule[0].cuotaUva)} UVA por mes` : null}
             />
           </Card>
           <Card className="p-4">
             <Stat
-              tone="interest"
               label="Intereses"
               value={moneyCompact(totals.totalIntereses)}
               sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null}
-              aside={<Tooltip iconClass="w-3 h-3 text-faint">Lo que cobra el banco, sin contar la devolución del capital. El número en pesos suma cuotas de años distintos, así que está inflado: el que mide de verdad es el que está en UVA.</Tooltip>}
             />
           </Card>
           <Card className="p-4">
@@ -1270,14 +1267,13 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               label={loanType === 'new' ? 'Total a pagar' : 'Falta pagar'}
               value={moneyCompact(totals.totalPagadoFinal)}
               sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null}
-              aside={<Tooltip iconClass="w-3 h-3 text-faint">Todo lo que vas a desembolsar hasta quedar libre de deuda. Son pesos de años distintos sumados entre sí, por eso conviene mirar el total en UVA.</Tooltip>}
             />
           </Card>
           <Card className="p-4">
             <Stat
               label="Costo real"
-              value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2)}x` : '---'}
-              sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1)}x en pesos nominales` : null}
+              value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2).replace('.', ',')}x` : '---'}
+              sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1).replace('.', ',')}x en pesos nominales` : null}
               aside={<Tooltip iconClass="w-3 h-3 text-faint"><p className="mb-3">Cuántas veces el capital terminás devolviendo, <b className="text-white">medido en UVA</b>. Un 1,50x significa que por cada 100 UVA prestadas devolvés 150: esos 50 son el costo del crédito.</p><p>Abajo está el mismo cociente en pesos nominales, que siempre da mucho más alto porque suma pesos de años distintos. Ese número asusta pero mide la inflación, no el crédito.</p></Tooltip>}
             />
           </Card>
@@ -1309,18 +1305,24 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             Proyección de pagos
           </SectionTitle>
 
-          <Notice tone="warning" icon={AlertTriangle} className="mb-4">
-            No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.
-          </Notice>
+          <div className="flex items-center gap-4 mb-2 text-micro text-muted dark:text-muted-dark">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-indigo-500" /> Capital</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-orange-400" /> Interés</span>
+          </div>
 
-          <div className="h-[200px] md:h-[420px] w-full">
+          <div className="w-full h-[220px] sm:h-auto sm:aspect-[1000/320]">
             <CompositionChart data={filteredData} dateMode="calendar" showRemMarker />
           </div>
+
+          <Hint className="mt-3 flex items-center gap-1.5">
+            <AlertTriangle className="w-3 h-3 shrink-0" /> No incluye seguros ni gastos administrativos: sumá un 3-5% aproximado según el banco.
+          </Hint>
         </Card>
 
         <Card className="overflow-hidden">
           <div className="p-4 md:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-hair dark:border-hair-dark">
             <SectionTitle
+              className="mb-0"
               icon={FileText}
               aside={
                 <button onClick={() => { if (schedule.length > 0) setIsTableFullscreen(true); }} title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"
@@ -1332,35 +1334,31 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               Tabla de amortización
             </SectionTitle>
 
-            <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap lg:-mt-4">
-              <Field label="Exportar" className="shrink-0">
-                <select value={exportRange} onChange={(e) => setExportRange(e.target.value)}
-                  className="bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-2.5 py-2 text-label text-ink dark:text-ink-dark outline-none cursor-pointer">
-                  {[['all', 'Todo'], ['1', '1 año'], ['2', '2 años'], ['3', '3 años'], ['5', '5 años'], ['10', '10 años']].map(([v, l]) => (
-                    <option key={v} value={v} className={OPTION_CLASS}>{l}</option>
-                  ))}
-                </select>
-              </Field>
+            <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap">
+              <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} aria-label="Rango a exportar" title="Rango a exportar"
+                className="bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-2.5 py-2 text-label text-ink dark:text-ink-dark outline-none cursor-pointer">
+                {[['all', 'Todo el crédito'], ['1', '1 año'], ['2', '2 años'], ['3', '3 años'], ['5', '5 años'], ['10', '10 años']].map(([v, l]) => (
+                  <option key={v} value={v} className={OPTION_CLASS}>{l}</option>
+                ))}
+              </select>
 
               {[
-                { id: 'pdf', icon: FileText, label: 'PDF', primary: true },
-                { id: 'excel', icon: FileSpreadsheet, label: 'Excel' },
-                { id: 'csv', icon: Download, label: 'CSV' },
+                { id: 'pdf', icon: FileText, label: 'PDF', tono: 'text-rose-500' },
+                { id: 'excel', icon: FileSpreadsheet, label: 'Excel', tono: 'text-emerald-600 dark:text-emerald-500' },
+                { id: 'csv', icon: Download, label: 'CSV', tono: 'text-faint dark:text-faint-dark' },
               ].map(b => (
                 <button key={b.id} onClick={() => { if (schedule.length > 0) handleExportClick(b.id); }}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-control text-label transition-colors ${b.primary
-                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    : 'bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'}`}>
-                  <b.icon className="w-4 h-4" /> {b.label}
+                  className="flex items-center gap-2 px-3 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors">
+                  <b.icon className={`w-4 h-4 ${b.tono}`} /> {b.label}
                 </button>
               ))}
 
               <button onClick={copyToWhatsApp} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
-                {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4" />}
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-[#25D366] transition-colors">
+                {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
               </button>
               <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-indigo-500 transition-colors">
                 {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -1952,7 +1950,7 @@ function RentCalculator({ remData, dolarOficial }) {
                 tooltip="Período de Recuperación de la Inversión (PRI). Años estimados para recuperar la inversión inicial solo con el ingreso del alquiler, sin expensas ni gastos extra." 
              />
           ) : (
-             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1)}x` :"---"} icon={Activity} colorClass="slate" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
+             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1).replace('.', ',')}x` :"---"} icon={Activity} colorClass="slate" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
           )}
         </div>
 
