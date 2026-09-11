@@ -601,7 +601,7 @@ function AmortizationTable({ data, dark = false }) {
   // vistazo, y todo en peso normal: la unica cifra destacada es la cuota.
   const tinta = dark ? 'text-slate-100' : 'text-ink dark:text-ink-dark';
   const tenue = dark ? 'text-slate-400' : 'text-muted dark:text-muted-dark';
-  const th = 'px-4 py-3 font-medium text-right whitespace-nowrap';
+  const th = 'px-4 py-3 font-medium whitespace-nowrap';
   const td = 'px-4 py-2.5 text-right whitespace-nowrap';
 
   return (
@@ -610,12 +610,12 @@ function AmortizationTable({ data, dark = false }) {
         <tr>
           <th className={`${th} text-left`}>Periodo</th>
           <th className={`${th} text-left`}>Inflación</th>
-          <th className={th}>Cuota UVA</th>
-          <th className={th}>Valor UVA</th>
-          <th className={th}>Cuota total</th>
-          <th className={th}>Interés</th>
-          <th className={th}>Capital</th>
-          <th className={th}>Saldo</th>
+          <th className={`${th} text-right`}>Cuota UVA</th>
+          <th className={`${th} text-right`}>Valor UVA</th>
+          <th className={`${th} text-right`}>Cuota total</th>
+          <th className={`${th} text-right`}>Interés</th>
+          <th className={`${th} text-right`}>Capital</th>
+          <th className={`${th} text-right`}>Saldo</th>
         </tr>
       </thead>
       <tbody className={dark ? 'divide-y divide-white/5' : 'divide-y divide-hair dark:divide-hair-dark'}>
