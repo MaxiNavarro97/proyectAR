@@ -622,6 +622,11 @@ function AmortizationTable({ data, dark = false }) {
         </tr>
       </thead>
       <tbody className={dark ? 'divide-y divide-white/5' : 'divide-y divide-hair dark:divide-hair-dark'}>
+        {data.length === 0 && (
+          <tr>
+            <td colSpan={8} className="px-4 py-10 text-center text-body text-faint dark:text-faint-dark">Cargá el monto, el plazo y la tasa para ver la tabla mes a mes.</td>
+          </tr>
+        )}
         {data.map((d, i) => {
           // El origen del dato solo se marca cuando cambia.
           const cambiaOrigen = i === 0 || data[i - 1].source !== d.source;
@@ -651,6 +656,7 @@ function AmortizationTable({ data, dark = false }) {
           );
         })}
       </tbody>
+      {data.length > 0 && (
       <tfoot className={`sticky bottom-0 text-label ${dark ? 'bg-slate-950 text-slate-300 border-t border-white/10' : 'bg-card dark:bg-card-dark text-ink dark:text-ink-dark border-t border-hair dark:border-hair-dark'}`}>
         <tr>
           <td className="px-4 py-3 text-left font-medium">Totales</td>
@@ -663,6 +669,7 @@ function AmortizationTable({ data, dark = false }) {
           <td />
         </tr>
       </tfoot>
+      )}
     </table>
   );
 }
@@ -918,6 +925,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         capitalUva: uvaValue > 0 ? montoOriginalPesos / uvaValue : 0,
       };
   }, [schedule, amount, loanType, balanceCurrency, uvaValue]);
+
+  // Sin datos la pantalla conserva toda su estructura y solo muestra "---":
+  // asi, al cargar el credito, nada se mueve de lugar; solo se llena.
+  const sinDatos = schedule.length === 0;
 
   const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
 
@@ -1228,42 +1239,34 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
       {/* --- COLUMNA DERECHA: LO QUE SALE --- */}
       <div ref={resultsRef} className="space-y-4 min-w-0">
-        {schedule.length === 0 ? (
-          <Card className="p-8 md:p-12 text-center">
-            <Calculator className="w-8 h-8 mx-auto mb-4 text-faint dark:text-faint-dark" />
-            <p className="text-title text-ink dark:text-ink-dark">Cargá los datos de tu crédito</p>
-            <p className="text-body text-muted dark:text-muted-dark mt-1.5 max-w-md mx-auto">Con el monto, el plazo y la tasa te mostramos la primera cuota, cuánto vas a pagar en total y cómo evoluciona mes a mes con la inflación.</p>
-          </Card>
-        ) : (
-        <>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="p-4">
             <Stat
               label={loanType === 'new' ? 'Primera cuota' : 'Próxima cuota'}
-              value={moneyCompact(totals.cuotaInicial)}
-              sub={schedule[0] ? `${uvas(schedule[0].cuotaUva)} UVA por mes` : null}
+              value={sinDatos ? '---' : moneyCompact(totals.cuotaInicial)}
+              sub={schedule[0] ? `${uvas(schedule[0].cuotaUva)} UVA por mes` : '\u00a0'}
             />
           </Card>
           <Card className="p-4">
             <Stat
               label="Intereses"
-              value={moneyCompact(totals.totalIntereses)}
-              sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : null}
+              value={sinDatos ? '---' : moneyCompact(totals.totalIntereses)}
+              sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : '\u00a0'}
             />
           </Card>
           <Card className="p-4">
             <Stat
               label={loanType === 'new' ? 'Total a pagar' : 'Falta pagar'}
-              value={moneyCompact(totals.totalPagadoFinal)}
-              sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : null}
+              value={sinDatos ? '---' : moneyCompact(totals.totalPagadoFinal)}
+              sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : '\u00a0'}
             />
           </Card>
           <Card className="p-4">
             <Stat
               label="Costo real"
-              value={totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2).replace('.', ',')}x` : '---'}
-              sub={totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1).replace('.', ',')}x en pesos nominales` : null}
+              value={!sinDatos && totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2).replace('.', ',')}x` : '---'}
+              sub={!sinDatos && totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1).replace('.', ',')}x en pesos nominales` : '\u00a0'}
               aside={<Tooltip iconClass="w-3 h-3 text-faint"><p className="mb-3">Cuántas veces el capital terminás devolviendo, <b className="text-white">medido en UVA</b>. Un 1,50x significa que por cada 100 UVA prestadas devolvés 150: esos 50 son el costo del crédito.</p><p>Abajo está el mismo cociente en pesos nominales, que siempre da mucho más alto porque suma pesos de años distintos. Ese número asusta pero mide la inflación, no el crédito.</p></Tooltip>}
             />
           </Card>
@@ -1359,9 +1362,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             </div>
           </div>
         </Card>
-
-        </>
-        )}
 
         <Card className="p-4 md:p-5">
           <SectionTitle icon={Globe}>Bancos con crédito UVA</SectionTitle>
