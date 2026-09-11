@@ -10,11 +10,11 @@ import { faqsOperativas } from './content/faqs.jsx';
 import { Panel, Card, SectionTitle, Label, Hint, Body, Field, Stat, Segmented, Badge, Notice, NumberField } from './ui/index.jsx';
 
 import { 
-  Calculator, DollarSign, TrendingUp, Globe, ArrowRightLeft, FileText, Zap,
-  Settings2, CalendarDays, AlertTriangle, Activity, Github, Clock, Wallet,
-  CheckCircle2, Download, Sun, Moon, ExternalLink, ShieldAlert, HelpCircle,
-  X, Coffee, HeartHandshake, FileSpreadsheet, Flag, Handshake, RotateCcw,
-  MessageCircle, Check, Flame, Maximize2, Mail, Smartphone
+  Calculator, DollarSign, TrendingUp, Globe, ArrowRightLeft, FileText, Settings2,
+  CalendarDays, AlertTriangle, Activity, Github, Download, Sun, Moon,
+  ExternalLink, HelpCircle, X, Coffee, HeartHandshake, FileSpreadsheet, Flag,
+  Handshake, RotateCcw, MessageCircle, Check, Maximize2, Mail, Smartphone,
+  Home
 } from 'lucide-react';
 
 // --- CONSTANTES GLOBALES ---
@@ -186,7 +186,7 @@ const MortgagePDFDocument = ({ data, summary }) => (
 );
 
 // --- COMPONENTE DOCUMENTO PDF (ALQUILERES) ---
-const RentPDFDocument = ({ data, summary, role }) => (
+const RentPDFDocument = ({ data, summary }) => (
   <Document>
     <Page size="A4" style={pdfStyles.page}>
       <View style={pdfStyles.header}>
@@ -198,9 +198,9 @@ const RentPDFDocument = ({ data, summary, role }) => (
          <Text style={pdfStyles.disclaimerText}>AVISO LEGAL: ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos.</Text>
       </View>
       <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
-          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>{role === 'owner' ? 'Ingreso inicial' : 'Alquiler inicial'}</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.alquilerInicial)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>Alquiler inicial</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.alquilerInicial)}</Text></View>
           <View style={{ flex: 1, backgroundColor: '#fff7ed', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#ea580c', fontWeight: 'bold' }}>Total expensas est.</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalExpensas)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>{role === 'owner' ? 'INGRESO BRUTO EST.' : 'Costo total contrato'}</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalContrato)}</Text></View>
+          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>Costo total contrato</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalContrato)}</Text></View>
       </View>
       <View style={pdfStyles.table}>
         <View style={pdfStyles.tableRow}>
@@ -404,49 +404,6 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent }) {
 }
 
 // Fuera del componente: no cambia nunca, no tiene sentido recrearlo en cada render
-// Cada color tiene un unico significado en todo el sitio. Las tarjetas que no
-// senalan nada van en slate: cuatro colores distintos para cuatro tarjetas es
-// decoracion, y hace que el color deje de querer decir algo cuando importa.
-const SUMMARY_COLOR_MAP = {
-  slate: 'bg-slate-500/10 text-slate-500',
-  orange: 'bg-orange-500/10 text-orange-500',   // interes / expensas: lo que se paga de mas
-  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400', // bien
-  amber: 'bg-amber-500/10 text-amber-500',      // atencion
-  rose: 'bg-rose-500/10 text-rose-500',         // mal
-  indigo: 'bg-indigo-500/10 text-indigo-500',   // identidad de seccion
-};
-
-const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, colorClass, sticky, tooltip, sub }) {
-  const [displayValue, setDisplayValue] = useState(value);
-  const [animating, setAnimating] = useState(false);
-
-  useEffect(() => {
-    if (value !== displayValue) {
-      setAnimating(true);
-      const t = setTimeout(() => { setDisplayValue(value); setAnimating(false); }, 150);
-      return () => clearTimeout(t);
-    }
-  }, [value]);
-
-  return (
-    <div className={`bg-white dark:bg-slate-900 p-3 rounded-2xl border dark:border-slate-800 shadow-sm flex items-start gap-2.5 transition-all min-w-0 flex-1 relative ${sticky ? 'sticky top-[85px] md:top-[128px] z-30 hover:z-[60] shadow-sm border-indigo-500/30 dark:border-indigo-500/30' : ' hover:z-[60]'}`}>
-      <div className={`p-2 rounded-xl shrink-0 ${SUMMARY_COLOR_MAP[colorClass] || 'bg-slate-500/10 text-slate-500'}`}><Icon className="w-4 h-4" /></div>
-      <div className="min-w-0 text-left flex-1 relative"> 
-        <div className="flex items-center justify-between gap-1 mb-0.5">
-          <p className="text-[11px] md:text-[12px] font-semibold text-slate-400 truncate">{title}</p>
-          {tooltip && (
-            <Tooltip iconClass="w-3 h-3 text-slate-300">
-              {tooltip}
-            </Tooltip>
-          )}
-        </div>
-        <p className={`text-xl md:text-2xl font-medium tracking-tight leading-none truncate transition-opacity duration-200 ${animating ? 'opacity-30' : 'opacity-100'} ${colorClass === 'rose' && title.includes('Rentabilidad') ? 'text-rose-500' : 'dark:text-white'}`}>{displayValue}</p>
-        {sub && <p className="text-[11px] font-bold text-slate-400 leading-none truncate mt-1">{sub}</p>}
-      </div>
-    </div>
-  );
-});
-
 const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
   // Logos en gris: son links de referencia, no la informacion principal. En
   // oscuro se invierten y se funden con el fondo, asi el fondo blanco de cada
@@ -1388,47 +1345,120 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 }
 
 // --- VISTA ALQUILERES (INTEGRADA) ---
+// Tabla de pagos del alquiler. Misma forma que la de amortizacion: numeros a la
+// derecha, peso normal y una sola cifra destacada, el total del mes. Los meses
+// en que se ajusta el alquiler llevan una marca con el aumento, porque son los
+// que cambian lo que se paga.
+function RentTable({ data, dark = false }) {
+  const totalMes = data.reduce((a, d) => a + d.cuotaTotal, 0);
+  const totalAlquiler = data.reduce((a, d) => a + d.principal, 0);
+  const totalExpensas = data.reduce((a, d) => a + d.interes, 0);
+
+  const tinta = dark ? 'text-slate-100' : 'text-ink dark:text-ink-dark';
+  const tenue = dark ? 'text-slate-400' : 'text-muted dark:text-muted-dark';
+  const th = 'px-4 py-3 font-medium whitespace-nowrap';
+  const td = 'px-4 py-2.5 text-right whitespace-nowrap';
+
+  return (
+    <table className={`w-full border-collapse text-body ${dark ? '' : 'min-w-[640px]'}`} style={dark ? { minWidth: 720 } : undefined}>
+      <thead className={`sticky top-0 z-10 text-label ${dark ? 'bg-slate-950 text-slate-400 border-b border-white/10' : 'bg-card dark:bg-card-dark text-muted dark:text-muted-dark border-b border-hair dark:border-hair-dark'}`}>
+        <tr>
+          <th className={`${th} text-left`}>Periodo</th>
+          <th className={`${th} text-left`}>Inflación</th>
+          <th className={`${th} text-right`}>Alquiler</th>
+          <th className={`${th} text-right`}>Expensas</th>
+          <th className={`${th} text-right`}>Total del mes</th>
+        </tr>
+      </thead>
+      <tbody className={dark ? 'divide-y divide-white/5' : 'divide-y divide-hair dark:divide-hair-dark'}>
+        {data.length === 0 && (
+          <tr>
+            <td colSpan={5} className="px-4 py-10 text-center text-body text-faint dark:text-faint-dark">Cargá el alquiler, las expensas y la duración para ver los pagos mes a mes.</td>
+          </tr>
+        )}
+        {data.map((d, i) => {
+          // El origen del dato solo se marca cuando cambia.
+          const cambiaOrigen = i === 0 || data[i - 1].source !== d.source;
+          return (
+            <tr key={d.mes} className={`${tenue} ${d.ajuste ? (dark ? 'bg-white/5' : 'bg-indigo-500/5') : ''}`}>
+              <td className={`px-4 py-2.5 text-left whitespace-nowrap ${tinta}`}>
+                <span className="inline-flex items-center gap-1.5">
+                  {d.label}
+                  {d.ajuste && (
+                    <span title="Mes en que se ajusta el alquiler" className="inline-flex items-center gap-1 text-micro text-indigo-500">
+                      <TrendingUp className="w-3 h-3" /> +{d.aumento.toFixed(1).replace('.', ',')}%
+                    </span>
+                  )}
+                </span>
+              </td>
+              <td className="px-4 py-2.5 text-left whitespace-nowrap">
+                {cambiaOrigen && (
+                  <span className={`inline-flex items-center gap-1.5 text-micro px-2 py-0.5 rounded-full ${dark ? 'bg-white/5 text-slate-300' : 'bg-hair dark:bg-hair-dark text-muted dark:text-muted-dark'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${d.oficial ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                    {d.source}
+                  </span>
+                )}
+              </td>
+              <td className={td}>{money(d.principal)}</td>
+              <td className={td}>{money(d.interes)}</td>
+              <td className={`${td} font-semibold ${tinta}`}>{money(d.cuotaTotal)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+      {data.length > 0 && (
+        <tfoot className={`sticky bottom-0 text-label ${dark ? 'bg-slate-950 text-slate-300 border-t border-white/10' : 'bg-card dark:bg-card-dark text-ink dark:text-ink-dark border-t border-hair dark:border-hair-dark'}`}>
+          <tr>
+            <td className="px-4 py-3 text-left font-medium">Totales</td>
+            <td />
+            <td className="px-4 py-3 text-right whitespace-nowrap">{money(totalAlquiler)}</td>
+            <td className="px-4 py-3 text-right whitespace-nowrap">{money(totalExpensas)}</td>
+            <td className="px-4 py-3 text-right whitespace-nowrap font-semibold">{money(totalMes)}</td>
+          </tr>
+        </tfoot>
+      )}
+    </table>
+  );
+}
+
 function RentCalculator({ remData, dolarOficial }) {
   const hoyRef = useRef(new Date());
   const hoy = hoyRef.current;
-  const [rentType, setRentType] = useState('new'); 
-  const [rentRole, setRentRole] = useState('tenant'); 
-  
+
+  const [rentType, setRentType] = useState('new');
   const [rentAmount, setRentAmount] = useState(0);
-  const [expensesAmount, setExpensesAmount] = useState(0); 
-  const [propertyValueUsd, setPropertyValueUsd] = useState(0);
-  const [salary, setSalary] = useState(0); 
-  
-  const [durationMonths, setDurationMonths] = useState(0); 
-  const [adjustPeriod, setAdjustPeriod] = useState(0);
-  const [monthsSinceLastAdjust, setMonthsSinceLastAdjust] = useState(0);
-  
-  const [adjustExpenses, setAdjustExpenses] = useState(true);
-  const [dateMode, setDateMode] = useState('calendar'); 
-  const [startMonth, setStartMonth] = useState(hoy.getMonth());
-  const [startYear, setStartYear] = useState(hoy.getFullYear());
-  
-  const [inflationMode, setInflationMode] = useState('rem');
-  const [manualInf, setManualInf] = useState("0"); 
-  const [remStabilizedMode, setRemStabilizedMode] = useState('auto');
-  const [remStabilizedValue, setRemStabilizedValue] = useState("0");
-  
+  const [expensesAmount, setExpensesAmount] = useState(0);
+  const [salary, setSalary] = useState(0);
+  const [propertyValueUsd, setPropertyValueUsd] = useState('');
+
+  const [durationMonths, setDurationMonths] = useState('');
+  const [adjustPeriod, setAdjustPeriod] = useState('');
+  const [monthsSinceLastAdjust, setMonthsSinceLastAdjust] = useState('');
+
+  // Mismo esquema de inflacion que en creditos: cada tramo decide por separado
+  // si sigue el dato oficial o una inflacion propia.
+  const [inflFirstMode, setInflFirstMode] = useState('rem');
+  const [inflFirstAnnual, setInflFirstAnnual] = useState('25');
+  const [inflLongMode, setInflLongMode] = useState('rem');
+  const [inflLongAnnual, setInflLongAnnual] = useState('25');
+
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [exportType, setExportType] = useState('pdf');
+  const [exportRange, setExportRange] = useState('all');
   const [copiedWP, setCopiedWP] = useState(false);
+  const [copiedShare, setCopiedShare] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTableFullscreen, setIsTableFullscreen] = useState(false);
   const [timeframe, setTimeframe] = useState('all');
 
-  const [amountFocused, setAmountFocused] = useState(false);
-  const [expFocused, setExpFocused] = useState(false);
-  const [propFocused, setPropFocused] = useState(false);
-  const [durFocused, setDurFocused] = useState(false);
-  const [adjFocused, setAdjFocused] = useState(false);
-  const [sinceFocused, setSinceFocused] = useState(false);
-  const [copiedShare, setCopiedShare] = useState(false);
+  // El contrato se proyecta siempre desde hoy.
+  const startMonth = hoy.getMonth();
+  const startYear = hoy.getFullYear();
 
-  // Cargar parámetros desde URL compartida
+  const aNumero = (v) => Number(String(v).replace(',', '.')) || 0;
+
+  // Cargar parametros desde un link compartido. Los links viejos pueden traer
+  // modo propietario, fecha o inflacion manual: se ignoran sin romperse.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const s = params.get('s');
@@ -1439,164 +1469,132 @@ function RentCalculator({ remData, dolarOficial }) {
         if (decoded.ea) setExpensesAmount(decoded.ea);
         if (decoded.dm) setDurationMonths(decoded.dm);
         if (decoded.ap) setAdjustPeriod(decoded.ap);
-        if (decoded.rr) setRentRole(decoded.rr);
         if (decoded.rt) setRentType(decoded.rt);
-        if (decoded.im) setInflationMode(decoded.im);
-        if (decoded.mi) setManualInf(String(decoded.mi));
-        if (decoded.sm !== undefined) setStartMonth(decoded.sm);
-        if (decoded.sy) setStartYear(decoded.sy);
+        if (decoded.ms) setMonthsSinceLastAdjust(decoded.ms);
         window.history.replaceState({}, '', window.location.pathname);
       }
     }
   }, []);
 
   const getShareParams = () => ({
-    t: 'rent', ra: rentAmount, ea: expensesAmount, dm: durationMonths, ap: adjustPeriod,
-    rr: rentRole, rt: rentType, im: inflationMode, mi: manualInf, sm: startMonth, sy: startYear
+    t: 'rent', ra: rentAmount, ea: expensesAmount, dm: durationMonths, ap: adjustPeriod, rt: rentType, ms: monthsSinceLastAdjust
   });
 
   const handleReset = () => {
-    setRentAmount(0); setExpensesAmount(0); setPropertyValueUsd(0); setSalary(0); setDurationMonths(0); setAdjustPeriod(0); setMonthsSinceLastAdjust(0); setManualInf("0");
+    setRentAmount(0); setExpensesAmount(0); setSalary(0); setPropertyValueUsd('');
+    setDurationMonths(''); setAdjustPeriod(''); setMonthsSinceLastAdjust('');
   };
 
-  useEffect(() => {
-    if (rentType === 'ongoing') {
-      setDateMode('calendar');
-      setStartMonth(hoy.getMonth());
-      setStartYear(hoy.getFullYear());
-    }
-  }, [rentType]);
+  const inflacionAnual = useMemo(() => inflacionPorAnio(remData).filter(a => a.año >= hoy.getFullYear()), [remData, hoy]);
+  const ultimoRemMensual = (remData && remData.length > 0) ? remData[remData.length - 1].valor : 0;
+  const ultimoRemAnual = mensualAAnual(ultimoRemMensual);
 
+  // Al elegir "propia" se arranca desde el ultimo dato oficial, no desde un numero suelto.
   useEffect(() => {
-    if (dateMode === 'generic') { setRentType('new'); setInflationMode('manual'); }
-  }, [dateMode]);
-
-  useEffect(() => {
-    if (remData && remData.length > 0) {
-      const lastValue = remData[remData.length - 1].valor;
-      setRemStabilizedValue(String(lastValue).replace('.', ','));
+    if (ultimoRemMensual > 0) {
+      const anual = String(Math.round(mensualAAnual(ultimoRemMensual)));
+      setInflFirstAnnual(anual);
+      setInflLongAnnual(anual);
     }
-  }, [remData]);
+  }, [ultimoRemMensual]);
 
   const schedule = useMemo(() => {
-    if (rentAmount === 0 && expensesAmount === 0) return [];
-    const data = [];
     const totalMonths = Number(durationMonths) || 0;
-    if (totalMonths <= 0) return [];
+    if ((rentAmount === 0 && expensesAmount === 0) || totalMonths <= 0) return [];
 
-    // Un solo Map unificado (IPC pasado + REM futuro ya vienen mergeados del script)
-    const inflacionMap = (dateMode === 'calendar' && inflationMode === 'rem' && remData && remData.length > 0)
+    const periodo = Number(adjustPeriod) || 0;
+    const desdeAjuste = rentType === 'ongoing' ? (Number(monthsSinceLastAdjust) || 0) : 0;
+    const inflacionMap = (remData && remData.length > 0)
       ? new Map(remData.map(d => [d.mes + '-' + d.año, d]))
       : new Map();
+    const primerosMensual = anualAMensual(aNumero(inflFirstAnnual));
+    const restantesMensual = inflLongMode === 'rem' ? ultimoRemMensual / 100 : anualAMensual(aNumero(inflLongAnnual));
 
     let currentRent = rentAmount;
     let currentExpenses = expensesAmount;
-    let accumulatedFactor = 1;
-    let currentDate = new Date(startYear, startMonth, 1);
-    
-    const manualMonthlyInf = Math.pow(1 + (Number(String(manualInf).replace(',', '.')) || 0) / 100, 1 / 12) - 1;
-    let remStabMon = (remStabilizedMode === 'auto' && remData && remData.length > 0) 
-      ? remData[remData.length - 1].valor / 100 
-      : (Number(String(remStabilizedValue).replace(',', '.')) || 0) / 100;
+    let factor = 1; // inflacion acumulada desde el ultimo ajuste
 
-    // Para alquileres en curso: pre-acumular inflación pasada desde el timeline unificado
-    if (rentType === 'ongoing' && Number(monthsSinceLastAdjust) > 0 && inflationMode === 'rem') {
-      const mesesAtras = Number(monthsSinceLastAdjust);
-      for (let j = mesesAtras; j >= 1; j--) {
-        const pastDate = new Date(startYear, startMonth - j, 1);
-        const pastKey = (pastDate.getMonth() + 1) + '-' + pastDate.getFullYear();
-        const match = inflacionMap.get(pastKey);
-        if (match) {
-          accumulatedFactor *= (1 + match.valor / 100);
-        } else {
-          // Fallback: usar inercia
-          accumulatedFactor *= (1 + remStabMon);
-        }
-      }
+    // Contrato en curso: la inflacion desde el ultimo ajuste hasta hoy ya ocurrio.
+    // Sale siempre del dato real, aunque se haya elegido una inflacion propia:
+    // lo que ya paso no es un supuesto.
+    for (let j = desdeAjuste; j >= 1; j--) {
+      const f = new Date(startYear, startMonth - j, 1);
+      const m = inflacionMap.get((f.getMonth() + 1) + '-' + f.getFullYear());
+      factor *= 1 + (m ? m.valor / 100 : restantesMensual);
     }
 
-    let lastMonthVal = 0;
-    let lastDecVal = 0;
-    let firstVal = 0;
+    const data = [];
+    let currentDate = new Date(startYear, startMonth, 1);
+    let tasaAnterior = 0;
+    let firstVal = 0, lastMonthVal = 0, lastDecVal = 0;
 
     for (let i = 1; i <= totalMonths; i++) {
-      const matchKey = (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
-      const inflMatch = inflacionMap.get(matchKey) ?? null;
-      
-      let sourceName = 'MANUAL';
-      if (inflationMode === 'rem') {
-        if (inflMatch) {
-          sourceName = inflMatch.origen === 'IPC' ? 'IPC' : 'REM';
-        } else {
-          sourceName = 'INERCIA';
-        }
+      // La inflacion de un mes se aplica recien al mes siguiente: el aumento
+      // que toca cada N meses cubre exactamente esos N meses, no uno mas.
+      if (i > 1) {
+        currentExpenses *= 1 + tasaAnterior;
+        factor *= 1 + tasaAnterior;
       }
 
-      let monthlyRate;
-      if (dateMode === 'generic' || inflationMode !== 'rem') {
-        monthlyRate = manualMonthlyInf;
-      } else {
-        monthlyRate = inflMatch ? inflMatch.valor / 100 : remStabMon;
+      const transcurridos = desdeAjuste + (i - 1);
+      const ajuste = periodo > 0 && transcurridos > 0 && transcurridos % periodo === 0;
+      const aumento = ajuste ? (factor - 1) * 100 : 0;
+      if (ajuste) {
+        currentRent *= factor;
+        factor = 1;
       }
 
-      if (i > 1 && adjustExpenses) { currentExpenses *= (1 + monthlyRate); }
-      accumulatedFactor *= (1 + monthlyRate);
-
-      let isAdjustMonth = false;
-      if (i > 1 && Number(adjustPeriod) > 0) {
-        if (rentType === 'new') {
-          isAdjustMonth = (i - 1) % Number(adjustPeriod) === 0;
-        } else {
-          isAdjustMonth = (i - 1 + Number(monthsSinceLastAdjust)) % Number(adjustPeriod) === 0;
-        }
-      }
-
-      if (isAdjustMonth) { 
-        currentRent *= accumulatedFactor; 
-        accumulatedFactor = 1; 
-      }
+      const inflMatch = inflacionMap.get((currentDate.getMonth() + 1) + '-' + currentDate.getFullYear()) ?? null;
+      const sourceName = inflMatch
+        ? (inflFirstMode === 'custom' ? 'PROPIA' : (inflMatch.origen === 'IPC' ? 'IPC' : 'REM'))
+        : (inflLongMode === 'custom' ? 'PROPIA' : 'INERCIA');
+      const tasa = inflMatch
+        ? (inflFirstMode === 'custom' ? primerosMensual : inflMatch.valor / 100)
+        : restantesMensual;
 
       const cuotaTotal = currentRent + currentExpenses;
-
-      if (i === 1) {
-          firstVal = cuotaTotal;
-          lastMonthVal = cuotaTotal;
-          lastDecVal = cuotaTotal;
-      }
-
-      const varMensual = i === 1 ? 0 : ((cuotaTotal / lastMonthVal) - 1) * 100;
-      const varYTD = i === 1 ? 0 : ((cuotaTotal / lastDecVal) - 1) * 100;
-      const varTotal = i === 1 ? 0 : ((cuotaTotal / firstVal) - 1) * 100;
+      if (i === 1) { firstVal = cuotaTotal; lastMonthVal = cuotaTotal; lastDecVal = cuotaTotal; }
 
       data.push({
-        mes: i, 
-        label: dateMode === 'calendar' ? `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}` : `Mes ${i}`,
+        mes: i,
+        label: `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}`,
         shortDate: `${MESES[currentDate.getMonth()]} ${String(currentDate.getFullYear()).slice(-2)}`,
-        cuotaTotal: cuotaTotal, 
-        principal: currentRent, 
-        interes: currentExpenses, 
+        cuotaTotal,
+        principal: currentRent,
+        interes: currentExpenses,
         source: sourceName,
-        varMensual: varMensual || 0,
-        varYTD: varYTD || 0,
-        varTotal: varTotal || 0
+        oficial: !!inflMatch,
+        ajuste,
+        aumento,
+        varMensual: i === 1 ? 0 : ((cuotaTotal / lastMonthVal) - 1) * 100 || 0,
+        varYTD: i === 1 ? 0 : ((cuotaTotal / lastDecVal) - 1) * 100 || 0,
+        varTotal: i === 1 ? 0 : ((cuotaTotal / firstVal) - 1) * 100 || 0,
       });
 
       lastMonthVal = cuotaTotal;
-      if (currentDate.getMonth() === 11) {
-          lastDecVal = cuotaTotal;
-      }
-
+      if (currentDate.getMonth() === 11) lastDecVal = cuotaTotal;
+      tasaAnterior = tasa;
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [rentAmount, expensesAmount, durationMonths, adjustPeriod, monthsSinceLastAdjust, inflationMode, manualInf, remStabilizedMode, remStabilizedValue, dateMode, startMonth, startYear, remData, adjustExpenses, rentType]);
+  }, [rentAmount, expensesAmount, durationMonths, adjustPeriod, monthsSinceLastAdjust, rentType, inflFirstMode, inflFirstAnnual, inflLongMode, inflLongAnnual, ultimoRemMensual, remData, startMonth, startYear]);
 
   const totals = useMemo(() => ({
     alquilerInicial: schedule[0]?.principal || 0,
+    expensasIniciales: schedule[0]?.interes || 0,
     cuotaTotalInicial: schedule[0]?.cuotaTotal || 0,
+    ultimoMes: schedule[schedule.length - 1]?.cuotaTotal || 0,
     totalExpensas: schedule.reduce((acc, curr) => acc + curr.interes, 0),
     totalContrato: schedule.reduce((acc, curr) => acc + curr.cuotaTotal, 0),
   }), [schedule]);
+
+  // Sin datos la pantalla conserva su estructura y solo muestra "---".
+  const sinDatos = schedule.length === 0;
+  const proximoAjuste = schedule.find(d => d.ajuste) || null;
+  const mesesOficiales = schedule.filter(d => d.oficial).length;
+  const mesesSinDato = schedule.length - mesesOficiales;
+  const NBSP = ' ';
+  const pct = (v) => v.toFixed(1).replace('.', ',');
 
   const filteredData = useMemo(() => (timeframe === 'all' ? schedule : schedule.slice(0, Math.min(schedule.length, parseInt(timeframe) * 12))), [schedule, timeframe]);
 
@@ -1609,28 +1607,24 @@ function RentCalculator({ remData, dolarOficial }) {
     prevScheduleLen.current = schedule.length;
   }, [schedule.length]);
 
-  // CALCULO RENTABILIDAD (YIELD) - Solo alquiler, SIN expensas
+  // Rentabilidad bruta: solo el alquiler, sin expensas, al dolar oficial.
+  const valorPropiedad = Number(String(propertyValueUsd).replace(/\D/g, '')) || 0;
   const annualRentUsd = dolarOficial > 0 ? (rentAmount * 12) / dolarOficial : 0;
-  const grossYield = propertyValueUsd > 0 ? (annualRentUsd / propertyValueUsd) * 100 : 0;
-  
-  // CALCULO PRI (Período de Recuperación de la Inversión)
+  const grossYield = valorPropiedad > 0 ? (annualRentUsd / valorPropiedad) * 100 : 0;
   const pri = grossYield > 0 ? 100 / grossYield : 0;
-  let yieldColor ="slate";
-  let yieldIcon = Activity;
-  if (propertyValueUsd > 0) {
-      if (grossYield < 3) { yieldColor ="rose"; yieldIcon = AlertTriangle; }        // Malo
-      else if (grossYield < 5) { yieldColor ="orange"; yieldIcon = TrendingUp; }     // Normal
-      else if (grossYield <= 8) { yieldColor ="emerald"; yieldIcon = CheckCircle2; } // Bueno
-      else { yieldColor ="sky"; yieldIcon = Flame; }                                  // Excelente
-  }
+
+  // La tabla en pantalla siempre muestra el contrato completo; lo que se recorta es el archivo.
+  const datosExport = exportRange === 'all'
+    ? schedule
+    : schedule.slice(0, Math.min(schedule.length, parseInt(exportRange) * 12));
 
   const exportToCSV = () => {
-    if (schedule.length === 0) return;
-    const headers = ["Periodo","Total Mes","Alquiler","Expensas","Inflación"];
-    const rows = schedule.map(d => [
-      d.label, Math.round(d.cuotaTotal), Math.round(d.principal), Math.round(d.interes), d.source
+    if (datosExport.length === 0) return;
+    const headers = ["Periodo", "Alquiler", "Expensas", "Total del mes", "Ajuste (%)", "Inflación"];
+    const rows = datosExport.map(d => [
+      d.label, Math.round(d.principal), Math.round(d.interes), Math.round(d.cuotaTotal), d.ajuste ? d.aumento.toFixed(1) : '', d.source
     ]);
-    const csvContent ="data:text/csv;charset=utf-8," + headers.join(";") +"\n" + rows.map(e => e.join(";")).join("\n");
+    const csvContent = "data:text/csv;charset=utf-8," + headers.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
     link.setAttribute("download", `ProyectAR_Alquiler_${new Date().getTime()}.csv`);
@@ -1640,41 +1634,49 @@ function RentCalculator({ remData, dolarOficial }) {
   };
 
   const exportToExcel = () => {
-    if (schedule.length === 0) return;
-    const ws = XLSX.utils.json_to_sheet(schedule.map(d => ({"Periodo": d.label,"Total Mes": Math.round(d.cuotaTotal),"Alquiler": Math.round(d.principal),"Expensas": Math.round(d.interes),"Inflación": d.source
+    if (datosExport.length === 0) return;
+    const ws = XLSX.utils.json_to_sheet(datosExport.map(d => ({
+      "Periodo": d.label,
+      "Alquiler": Math.round(d.principal),
+      "Expensas": Math.round(d.interes),
+      "Total del mes": Math.round(d.cuotaTotal),
+      "Ajuste (%)": d.ajuste ? Number(d.aumento.toFixed(1)) : '',
+      "Inflación": d.source
     })));
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws,"Alquileres");
+    XLSX.utils.book_append_sheet(wb, ws, "Alquiler");
     XLSX.writeFile(wb, `ProyectAR_Alquiler_${new Date().getTime()}.xlsx`);
   };
 
   const handleExportClick = (type) => {
-      if (schedule.length === 0) return;
-      setExportType(type);
-      setShowDonationModal(true);
+    if (datosExport.length === 0) return;
+    setExportType(type);
+    setShowDonationModal(true);
   };
 
   const copyToWhatsApp = () => {
-      if (schedule.length === 0) return;
-      const text = `🏠 *Proyección ProyectAR*\n\n${rentRole === 'tenant' ? '💸 A Pagar (Mes 1)' : '💰 A Cobrar (Mes 1)'}: ${money(totals.alquilerInicial)}\n📈 ${rentRole === 'tenant' ? 'Costo Total Contrato' : 'Ingreso Bruto Est.'}: ${money(totals.totalContrato)}${rentRole === 'owner' && propertyValueUsd > 0 ? `\n🔥 Rentabilidad Anual: ${grossYield.toFixed(1)}%` : ''}\n\nSimulá gratis en proyectar.io`;
-      navigator.clipboard.writeText(text);
-      setCopiedWP(true);
-      setTimeout(() => setCopiedWP(false), 2000);
+    if (schedule.length === 0) return;
+    const text = `Proyección de alquiler - ProyectAR\n\nPrimer mes: ${money(totals.cuotaTotalInicial)}\n${proximoAjuste ? `Próximo aumento: ${proximoAjuste.label}, +${pct(proximoAjuste.aumento)}%\n` : ''}Total del contrato: ${money(totals.totalContrato)}\n\nSimulá el tuyo gratis en proyectar.io`;
+    navigator.clipboard.writeText(text);
+    setCopiedWP(true);
+    setTimeout(() => setCopiedWP(false), 2000);
   };
+
+  const soloNumeros = (v) => v.replace(/\D/g, '');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-6 xl:gap-8 max-w-full">
-      
+
       {showDonationModal && (
-        <DonationModal 
+        <DonationModal
           onClose={() => setShowDonationModal(false)}
           exportType={exportType}
           onDownload={() => {
-              if(exportType === 'excel') exportToExcel();
-              if(exportType === 'csv') exportToCSV();
+            if (exportType === 'excel') exportToExcel();
+            if (exportType === 'csv') exportToCSV();
           }}
           downloadLink={
-            <PDFDownloadLink document={<RentPDFDocument data={schedule} summary={totals} role={rentRole} />} fileName={`ProyectAR_Alquileres_${new Date().getTime()}.pdf`}>
+            <PDFDownloadLink document={<RentPDFDocument data={datosExport} summary={totals} />} fileName={`ProyectAR_Alquiler_${new Date().getTime()}.pdf`}>
               {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
             </PDFDownloadLink>
           }
@@ -1682,356 +1684,317 @@ function RentCalculator({ remData, dolarOficial }) {
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del alquiler">
-          <CompositionChart data={schedule} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} fullscreen />
+        <CompositionChart data={schedule} dateMode="calendar" showRemMarker isRent fullscreen />
       </ChartModal>
 
-      <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Pagos Mensuales">
-        <table className="w-full text-left border-collapse text-[13px]" style={{ minWidth: 600 }}>
-          <thead className="sticky top-0 z-10 bg-slate-950 text-slate-400 font-semibold text-[12px] border-b border-white/10 leading-none shadow-[0_-8px_0_0_#020617]">
-            <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
-          </thead>
-          <tbody className="divide-y divide-white/5 text-center">
-            {schedule.map((d) => (
-              <tr key={d.mes} className="transition-colors hover:bg-white/5">
-                <td className="p-4 font-bold text-slate-200">{d.label}</td>
-                <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-600 text-white'}`}>{d.source}</span></td>
-                <td className="p-4 font-semibold text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
-                <td className="p-4 text-emerald-400 font-bold whitespace-nowrap">{money(d.principal)}</td>
-                <td className="p-4 text-orange-400 font-bold whitespace-nowrap">{money(d.interes)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Pagos mes a mes">
+        <RentTable data={schedule} dark />
       </TableModal>
 
-      {/* --- COLUMNA IZQUIERDA: CONTROLES --- */}
+      {/* --- COLUMNA IZQUIERDA: LO QUE PONES --- */}
       <div className="space-y-4 min-w-0">
-        
-        {/* BLOQUE INICIO ALQUILERES (INTEGRADO) */}
-        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-hair-dark text-left">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <CalendarDays className="w-4 h-4 text-slate-400 shrink-0" />
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-white leading-none flex items-center gap-2">
-                Inicio y tipo
-                <Tooltip iconClass="w-3.5 h-3.5 text-emerald-400" color="emerald">
-                    <p className="mb-3"><b className="text-emerald-400 font-bold">Fecha Exacta:</b> Si sabés en qué mes vas a pagar, elegí esta opción. Nos permite sincronizar tu cuota con la inflación oficial (IPC real + REM proyectado) para ese mes puntual.</p>
-                    <p><b className="text-emerald-200 font-bold">Sin Fecha Fija:</b> Ideal si recién estás averiguando y querés hacer una proyección estimada. Al no haber un mes específico, usás una inflación manual.</p>
-                  </Tooltip>
-              </h3>
-            </div>
-            <button onClick={handleReset} title="Limpiar todo" className="p-2 rounded-xl transition-colors text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800" aria-label="Limpiar formulario"><RotateCcw className="w-4 h-4" /></button>
-          </div>
-          
-          <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
-            <button onClick={() => setDateMode('calendar')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${dateMode === 'calendar' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Fecha exacta</button>
-            <button onClick={() => setDateMode('generic')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${dateMode === 'generic' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Sin fecha fija</button>
-          </div>
 
-          {dateMode === 'calendar' && (
-             <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-               <button onClick={() => setRentType('new')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all ${rentType === 'new' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Nuevo</button>
-               <button onClick={() => setRentType('ongoing')} className={`flex-1 py-2 text-[12px] font-semibold rounded-xl transition-all flex items-center justify-center gap-1 ${rentType === 'ongoing' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>
-                 En curso
-                 <Tooltip iconClass="w-3 h-3 text-slate-400" color="indigo">
-                     Simulá contratos vigentes ajustados a la inflación actual.
-                   </Tooltip>
-               </button>
-             </div>
-          )}
-          
-          {dateMode === 'generic' && (
-            <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl flex items-start gap-3 mb-4">
-              <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-              <p className="text-[12px] font-semibold tracking-tighter text-rose-600 leading-tight">Sin fecha fija, usás inflación manual y no se conecta al calendario REM.</p>
-            </div>
-          )}
+        <Panel className="p-4 md:p-5">
+          <SectionTitle
+            icon={CalendarDays}
+            aside={
+              <button onClick={handleReset} title="Limpiar todo" aria-label="Limpiar formulario" className="p-1.5 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors">
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            }
+          >
+            Tipo de contrato
+            <Tooltip iconClass="w-3.5 h-3.5 text-faint">
+              <p className="mb-3"><b className="text-indigo-400">Nuevo:</b> todavía no lo firmaste o recién empieza. Simulás desde el primer mes.</p>
+              <p><b className="text-indigo-400">En curso:</b> ya lo estás pagando. Proyectás desde lo que pagás hoy y los meses que pasaron desde el último aumento.</p>
+            </Tooltip>
+          </SectionTitle>
 
-          {dateMode === 'calendar' && (
-             rentType === 'new' ? (
-                <div className="grid grid-cols-2 gap-3">
-                  <select value={startYear} onChange={(e) => setStartYear(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">
-                    {[CURRENT_YEAR, CURRENT_YEAR + 1, CURRENT_YEAR + 2].map(y => <option key={y} value={y} className={OPTION_CLASS}>{y}</option>)}
-                  </select>
-                  <select value={startMonth} onChange={(e) => setStartMonth(Number(e.target.value))} className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-bold text-xs border dark:border-slate-700 outline-none">
-                    {MESES.map((m, i) => <option key={m} value={i} className={OPTION_CLASS} disabled={startYear === hoy.getFullYear() && i < hoy.getMonth()}>{m.toUpperCase()}</option>)}
-                  </select>
-                </div>
-             ) : (
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800 text-center">
-                   <span className="text-[12px] font-semibold text-emerald-600 dark:text-emerald-400">Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}</span>
-                </div>
-             )
-          )}
-        </div>
+          <Segmented
+            block
+            value={rentType}
+            onChange={setRentType}
+            options={[{ value: 'new', label: 'Nuevo' }, { value: 'ongoing', label: 'En curso' }]}
+          />
 
-        {/* BLOQUE DATOS DEL CONTRATO */}
-        <div className="bg-slate-100/70 dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-hair-dark space-y-4 text-left">
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <div className="flex items-center gap-3">
-              <Settings2 className="w-4 h-4 text-slate-400 shrink-0" />
-              <h3 className="text-sm font-semibold dark:text-white leading-none">Datos del contrato</h3>
-            </div>
-          </div>
+          <Hint className="mt-3 flex items-center gap-1.5">
+            <CalendarDays className="w-3 h-3 shrink-0" /> Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}
+          </Hint>
+        </Panel>
 
-          <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 z-10"></div>
-            <button onClick={() => setRentRole('tenant')} className={`flex-1 py-1.5 text-[11px] font-semibold rounded transition-all ${rentRole === 'tenant' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Modo inquilino</button>
-            <button onClick={() => setRentRole('owner')} className={`flex-1 py-1.5 text-[11px] font-semibold rounded transition-all ${rentRole === 'owner' ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>Modo propietario</button>
-          </div>
-
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={Settings2}>Datos del contrato</SectionTitle>
           <div className="space-y-4">
-            <div className="group text-left">
-              <label className="text-[12px] font-semibold text-slate-400 block mb-2">{rentType === 'new' ? (rentRole === 'owner' ? 'Ingreso del alquiler' : 'Monto del alquiler') : 'ALQUILER ACTUAL (MES EN CURSO)'}</label>
-              <div className="relative">
-                <input type="text" inputMode="numeric" value={amountFocused && rentAmount === 0 ? '' : money(rentAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setRentAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
-              </div>
-              {rentAmount > 0 && <p className="text-[12px] text-emerald-600 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(rentAmount / dolarOficial))} <span className="text-[10px] opacity-70">(Oficial)</span></p>}
+            <CurrencyInput
+              label={rentType === 'new' ? 'Alquiler mensual' : 'Alquiler que pagás hoy'}
+              value={rentAmount}
+              onChange={setRentAmount}
+              usdEquivalent={dolarOficial > 0 ? rentAmount / dolarOficial : 0}
+            />
+            <CurrencyInput
+              label="Expensas"
+              value={expensesAmount}
+              onChange={setExpensesAmount}
+              sublabel="Se actualizan todos los meses con la inflación."
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Field label={rentType === 'new' ? 'Duración (meses)' : 'Meses que faltan'}>
+                <NumberField
+                  value={durationMonths}
+                  onChange={(v) => { const n = soloNumeros(v); setDurationMonths(n === '' ? '' : Math.min(120, Number(n))); }}
+                />
+              </Field>
+              <Field
+                label="Ajusta cada (meses)"
+                aside={<Tooltip iconClass="w-3 h-3 text-faint">La frecuencia que pactaste en el contrato: 3, 4, 6 o 12 meses son las más comunes. En cada ajuste el alquiler sube lo que acumuló la inflación desde el ajuste anterior.</Tooltip>}
+              >
+                <NumberField
+                  value={adjustPeriod}
+                  onChange={(v) => { const n = soloNumeros(v); setAdjustPeriod(n === '' ? '' : Math.min(24, Number(n))); }}
+                />
+              </Field>
             </div>
-
-            <div className="group text-left">
-              <label className="text-[12px] font-semibold text-slate-400 block mb-2">{rentRole === 'owner' ? 'EXPENSAS A CARGO INQUILINO' : 'Expensas iniciales'}</label>
-              <div className="relative mb-2">
-                <input type="text" inputMode="numeric" value={expFocused && expensesAmount === 0 ? '' : money(expensesAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setExpensesAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setExpFocused(true); e.target.select(); }} onBlur={() => setExpFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
-              </div>
-              <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border dark:border-slate-700">
-                <span className="text-[12px] font-semibold text-slate-500 leading-tight">¿Ajustar por inflación? (Mensual)</span>
-                <button onClick={() => setAdjustExpenses(!adjustExpenses)} className={`w-10 h-5 rounded-full transition-all relative ${adjustExpenses ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}><div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${adjustExpenses ? 'left-5' : 'left-0.5'}`} /></button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
-                <label className="text-[13px] font-semibold text-emerald-600 block mb-2 leading-none">{rentType === 'new' ? 'Duración (meses)' : 'MESES RESTANTES'}</label>
-                <input type="text" inputMode="numeric" value={(durFocused && (durationMonths === 0 || durationMonths === '')) ? '' : durationMonths} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setDurationMonths(num !== '' && num > 240 ? 240 : num); }} onFocus={(e) => { setDurFocused(true); e.target.select(); }} onBlur={() => setDurFocused(false)} className="w-full bg-transparent text-xl font-semibold outline-none text-center dark:text-white" />
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
-                <label className="text-[13px] font-semibold text-emerald-600 block mb-2 leading-none">Ajusta cada (meses)</label>
-                <input type="text" inputMode="numeric" value={(adjFocused && (adjustPeriod === 0 || adjustPeriod === '')) ? '' : adjustPeriod} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setAdjustPeriod(num !== '' && num > 120 ? 120 : num); }} onFocus={(e) => { setAdjFocused(true); e.target.select(); }} onBlur={() => setAdjFocused(false)} className="w-full bg-transparent text-xl font-semibold outline-none text-center dark:text-white" />
-              </div>
-            </div>
-
             {rentType === 'ongoing' && (
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-emerald-500/20 text-center">
-                <label className="text-[13px] font-semibold text-emerald-600 mb-2 flex justify-center items-center gap-1.5">
-                  Meses desde el último ajuste
-                  <Tooltip iconClass="w-3 h-3 text-emerald-400" color="emerald">
-                      Ej: Si firmaste o tuviste el último aumento hace 2 meses exactos, ingresá"2". Esto permite calcular con precisión el próximo mes de ajuste.
-                    </Tooltip>
-                </label>
-                <input type="text" inputMode="numeric" value={(sinceFocused && (monthsSinceLastAdjust === 0 || monthsSinceLastAdjust === '')) ? '' : monthsSinceLastAdjust} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); const maxVal = Number(adjustPeriod) > 0 ? Number(adjustPeriod) - 1 : 11; setMonthsSinceLastAdjust(num !== '' && num > maxVal ? maxVal : num); }} onFocus={(e) => { setSinceFocused(true); e.target.select(); }} onBlur={() => setSinceFocused(false)} className="w-full bg-transparent text-2xl font-semibold outline-none text-center text-emerald-700 dark:text-emerald-400" />
-              </div>
+              <Field label="Meses desde el último aumento" hint="Para saber cuánta inflación ya se acumuló para el próximo.">
+                <NumberField
+                  value={monthsSinceLastAdjust}
+                  onChange={(v) => { const n = soloNumeros(v); const tope = Math.max((Number(adjustPeriod) || 1) - 1, 0); setMonthsSinceLastAdjust(n === '' ? '' : Math.min(tope, Number(n))); }}
+                />
+              </Field>
             )}
           </div>
-          
-          <div className="pt-4 border-t dark:border-slate-800">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <label className="text-[12px] font-semibold text-slate-400 flex items-center gap-2 min-w-0 overflow-visible">
-                Inflación proyectada
-                <Tooltip iconClass="w-3.5 h-3.5 text-slate-300" color="emerald">
-                    <p className="mb-3 text-emerald-300 font-bold">💡 ¿Qué es esto? La inflación que usamos para proyectar cómo va a aumentar tu alquiler mes a mes.</p>
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><b className="text-emerald-400">Modo REM (Oficial)</b></div>
-                      <p className="mb-2">Relevamiento de Expectativas de Mercado del <span className="text-white">BCRA</span>. Expertos proyectan la inflación para el año actual y los dos siguientes. ProyectAR mapea estos datos <span className="text-emerald-300">mes a mes</span> automáticamente.</p>
-                      <div className="p-2.5 bg-white/5 rounded-xl border border-white/5"><p className="text-[13px] leading-snug"><span className="text-emerald-300 font-bold tracking-tighter">Inercia:</span> Para el tiempo restante sin datos oficiales, se aplica el <span className="text-white">último valor del REM</span> (Auto) o tu <span className="text-white">tasa propia</span> (Fija).</p></div>
-                    <div className="h-px w-full bg-white/5 mb-3"></div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div><b className="text-indigo-400">Modo Manual</b></div>
-                      <p><span className="text-white font-bold">Control total.</span> Definí una tasa fija para todo el contrato. Ideal para simular escenarios propios.</p>
-                    </div>
-                  </div>
-                </Tooltip>
-              </label>
-              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0">
-                <button disabled={dateMode === 'generic'} onClick={() => setInflationMode('rem')} className={`px-3 py-1 text-[11px] font-semibold rounded-xl ${inflationMode === 'rem' ? 'bg-emerald-600 text-white' : 'text-slate-500'} ${dateMode === 'generic' ? 'opacity-50 cursor-not-allowed' : ''}`}>REM</button>
-                <button onClick={() => setInflationMode('manual')} className={`px-3 py-1 text-[11px] font-semibold rounded-xl ${inflationMode === 'manual' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Manual</button>
+        </Panel>
+
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={TrendingUp}>
+            Inflación proyectada
+            <Tooltip iconClass="w-3.5 h-3.5 text-faint">
+              <p className="mb-3">La inflación que usamos para proyectar cómo sube el alquiler en cada ajuste y las expensas todos los meses.</p>
+              <p className="mb-3">Los meses ya cerrados usan el <b className="text-white">IPC del INDEC</b> y los que vienen, el <b className="text-white">REM del BCRA</b>. El REM llega hasta unos dos años; para los que siguen se repite su último valor.</p>
+              <p><b className="text-white">Propia:</b> en cualquiera de los dos tramos podés poner tu número. Lo que ya pasó desde el último aumento se calcula siempre con el dato real.</p>
+            </Tooltip>
+          </SectionTitle>
+
+          <div className="divide-y divide-hair dark:divide-hair-dark">
+            <div className="pb-4">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <Label>{sinDatos || mesesOficiales === 0 ? 'Primeros meses' : mesesSinDato === 0 ? `Los ${mesesOficiales} meses` : `Primeros ${mesesOficiales} meses`}</Label>
+                <Segmented size="sm" value={inflFirstMode} onChange={setInflFirstMode}
+                  options={[{ value: 'rem', label: 'REM' }, { value: 'custom', label: 'Propia' }]} />
               </div>
-            </div>
-            
-            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
-              {inflationMode === 'manual' ? (
-                <div className="space-y-2">
-                    <div className="flex justify-between items-center"><span className="text-[12px] font-semibold text-emerald-600 leading-none">Tasa fija anual estimada</span><span className="text-[13px] font-semibold dark:text-white leading-none">{manualInf}%</span></div>
-                    <input type="range" min="0" max="100" step="1" value={Number(String(manualInf).replace(',', '.')) || 0} onChange={(e)=>setManualInf(String(e.target.value).replace('.', ','))} className="w-full accent-emerald-500" />
+              {inflFirstMode === 'rem' ? (
+                <div>
+                  <Body>IPC del INDEC para los meses cerrados, REM del BCRA para los que vienen.</Body>
+                  {inflacionAnual.length > 0 && (
+                    <Body className="mt-2">
+                      Esperada: {inflacionAnual.map((a, i) => (
+                        <span key={a.año}>{i > 0 && ' · '}{a.año} <b className="font-medium text-ink dark:text-ink-dark">{a.valor.toFixed(0)}%</b>{a.parcial && ' (parcial)'}</span>
+                      ))}
+                    </Body>
+                  )}
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3"><p className="text-[12px] font-semibold text-emerald-600 flex items-center gap-1 leading-none"><Zap className="w-3 h-3" /> Inercia Post-REM</p><div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl"><button onClick={() => setRemStabilizedMode('auto')} className={`px-3 py-1.5 text-[10px] font-semibold rounded-xl ${remStabilizedMode === 'auto' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Auto</button><button onClick={() => setRemStabilizedMode('custom')} className={`px-3 py-1.5 text-[10px] font-semibold rounded-xl ${remStabilizedMode === 'custom' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>Fija</button></div></div>
-                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[12px] font-semibold dark:text-white leading-tight">
-                    {remStabilizedMode === 'auto' ? `Aplicando el último dato oficial (${(remData && remData.length > 0 ? remData[remData.length-1].valor : '---')}%) para los meses restantes.` : 
-                      <div>
-                        <div className="flex justify-between mb-1"><span>Tasa Fija mensual estimada para los meses restantes:</span><span>{remStabilizedValue}%</span></div>
-                        <input type="range" min="0" max="10" step="0.1" value={Number(String(remStabilizedValue).replace(',', '.')) || 0} onChange={(e)=>setRemStabilizedValue(String(e.target.value).replace('.', ','))} className="w-full accent-emerald-500" />
-                      </div>
-                    }
-                  </div>
+                <div>
+                  <NumberField value={inflFirstAnnual} suffix="% anual"
+                    onChange={(v) => { const t = v.replace(',', '.'); if (t === '' || /^\d*\.?\d*$/.test(t)) setInflFirstAnnual(v); }} />
+                  <Hint className="mt-1.5">Reemplaza el dato oficial. Equivale a {(anualAMensual(aNumero(inflFirstAnnual)) * 100).toFixed(2).replace('.', ',')}% mensual.</Hint>
                 </div>
               )}
             </div>
-          </div>
 
-          {/* BLOQUE FINAL DE ALQUILERES: RCI O YIELD */}
-          <div className="pt-4 border-t dark:border-slate-800">
-            {rentRole === 'owner' ? (
-              <div className="group text-left">
-                <label className="text-[12px] font-semibold text-slate-400 block mb-2">
-                  Valor de la propiedad (USD)
-                </label>
-                <div className="relative">
-                  <input
-                    type="text" inputMode="numeric"
-                    value={propFocused && propertyValueUsd === 0 ? '' : new Intl.NumberFormat('es-AR').format(propertyValueUsd)}
-                    onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setPropertyValueUsd(v === '' ? 0 : Number(v)); }}
-                    onFocus={(e) => { setPropFocused(true); e.target.select(); }} onBlur={() => setPropFocused(false)}
-                    placeholder="USD 0"
-                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white"
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-semibold text-xs dark:text-slate-400">USD</div>
+            {(sinDatos || mesesSinDato > 0) && (
+              <div className="pt-4">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <Label>Meses restantes</Label>
+                  <Segmented size="sm" value={inflLongMode} onChange={setInflLongMode}
+                    options={[{ value: 'rem', label: 'REM' }, { value: 'custom', label: 'Propia' }]} />
                 </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
-                  Para calcular la Rentabilidad Bruta Anual (Gross Yield) de manera aproximada.
-                </p>
-              </div>
-            ) : (
-              <div>
-                <CurrencyInput 
-                  label="Sueldo neto mensual (opcional)" 
-                  value={salary} 
-                  onChange={setSalary} 
-                  sublabel="Para calcular qué porcentaje de tu sueldo se va en el primer alquiler + expensas (RCI)."
-                  color="emerald"
-                />
-                {salary > 0 && totals.cuotaTotalInicial > 0 && (
-                  <div className="space-y-3 mt-4">
-                    <p className="text-[12px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1">
-                      ⚠️ Importante: Este cálculo es del primer mes. Si tu sueldo sube menos que el alquiler, el impacto sobre tu bolsillo será mayor con el tiempo.
-                    </p>
-                    <div className={`p-4 rounded-2xl text-[12px] font-semibold flex items-center justify-between border-2 transition-colors ${
-                      (totals.cuotaTotalInicial / salary) > 0.3 
-                        ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800' 
-                        : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
-                    }`}>
-                      <span className="flex items-center gap-2"><Activity className="w-4 h-4"/> Afectación (RCI)</span>
-                      <span className="text-lg leading-none">{((totals.cuotaTotalInicial / salary) * 100).toFixed(1)}%</span>
-                    </div>
+                {inflLongMode === 'rem' ? (
+                  <Body>
+                    {ultimoRemMensual > 0
+                      ? `Sigue con el último dato del REM: ${String(ultimoRemMensual).replace('.', ',')}% mensual, ${ultimoRemAnual.toFixed(1).replace('.', ',')}% anual.`
+                      : 'Sigue con el último dato disponible del REM.'}
+                  </Body>
+                ) : (
+                  <div>
+                    <NumberField value={inflLongAnnual} suffix="% anual"
+                      onChange={(v) => { const t = v.replace(',', '.'); if (t === '' || /^\d*\.?\d*$/.test(t)) setInflLongAnnual(v); }} />
+                    <Hint className="mt-1.5">Equivale a {(anualAMensual(aNumero(inflLongAnnual)) * 100).toFixed(2).replace('.', ',')}% mensual.</Hint>
                   </div>
                 )}
               </div>
             )}
-            
-            {/* Yield abajo de los inputs en modo propietario */}
-            {rentRole === 'owner' && propertyValueUsd > 0 && rentAmount > 0 && (
-              <div className="mt-4">
-                <div className={`p-4 rounded-2xl text-[12px] font-semibold flex items-center justify-between border-2 transition-colors ${
-                  yieldColor === 'rose' 
-                    ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800'
-                    : yieldColor === 'orange'
-                    ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
-                    : yieldColor === 'emerald'
-                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
-                    : 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800'
-                }`}>
-                  <span className="flex items-center gap-2">
-                    {React.createElement(yieldIcon, { className:"w-4 h-4" })}
-                    Rentabilidad Anual
-                  </span>
-                  <span className="text-lg leading-none">{grossYield.toFixed(1)}%</span>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-tight px-1 mt-2">
-                  Rentabilidad bruta anual. Solo cuenta el alquiler en dólares (oficial de hoy), sin gastos extras como impuestos o mantenimiento. 
-                </p>
-              </div>
-            )}
           </div>
-        </div>
-      </div>
-      
-      {/* --- COLUMNA DERECHA: RESULTADOS ALQUILERES --- */}
-      <div ref={resultsRef} className="space-y-4 min-w-0">
-        <div className="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full">
-          <SummaryCard title={rentType === 'new' ? (rentRole === 'owner' ?"Primer Ingreso" :"Primer Pago") :"Alquiler Actual"} value={moneyCompact(totals.alquilerInicial)} icon={Wallet} colorClass="slate" sticky={true} tooltip="Monto base del alquiler para el primer mes de la proyección." />
-          <SummaryCard title="Expensas" value={moneyCompact(totals.totalExpensas)} icon={TrendingUp} colorClass="orange" tooltip="Proyección de todas las expensas sumadas a lo largo de la simulación." />
-          <SummaryCard title={rentRole === 'owner' ?"Ingreso Est." :" Total"} value={moneyCompact(totals.totalContrato)} icon={CheckCircle2} colorClass="slate" tooltip="La suma de todos los alquileres y expensas a pagar (o cobrar, si sos dueño) mes a mes hasta el final del contrato." />
-          
-          {rentRole === 'owner' ? (
-             <SummaryCard 
-                title="PRI" 
-                value={propertyValueUsd > 0 && pri > 0 ? `${pri.toFixed(1)} años` :"---"} 
-                icon={Clock} 
-                colorClass={pri > 0 && pri <= 15 ? 'emerald' : pri <= 25 ? 'amber' : 'rose'} 
-                tooltip="Período de Recuperación de la Inversión (PRI). Años estimados para recuperar la inversión inicial solo con el ingreso del alquiler, sin expensas ni gastos extra." 
-             />
-          ) : (
-             <SummaryCard title="Costo Infl." value={totals.alquilerInicial > 0 ? `${(totals.totalContrato / (totals.alquilerInicial * durationMonths)).toFixed(1).replace('.', ',')}x` :"---"} icon={Activity} colorClass="slate" tooltip="Impacto de la inflación sobre tu gasto total. Por ejemplo: 1.3x significa que por la inflación terminás pagando un 30% más de lo que pagarías si el alquiler nunca aumentara." />
+        </Panel>
+
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={Activity}>Tu sueldo</SectionTitle>
+          <CurrencyInput
+            label="Sueldo neto mensual (opcional)"
+            value={salary}
+            onChange={setSalary}
+            sublabel="Para ver si el alquiler entra en lo que te suelen pedir."
+          />
+          {salary > 0 && totals.cuotaTotalInicial > 0 && (
+            <div className="mt-4 space-y-2">
+              <Stat
+                label="Primer mes sobre tu sueldo"
+                value={`${pct((totals.cuotaTotalInicial / salary) * 100)}%`}
+                tone={rentAmount * 3 > salary ? 'negative' : 'neutral'}
+              />
+              <Body>Las inmobiliarias suelen pedir ingresos de <b>al menos 3 veces el alquiler</b>. Con este sueldo, eso es un alquiler de hasta {money(salary / 3)}.</Body>
+            </div>
           )}
+        </Panel>
+
+        <Panel className="p-4 md:p-5">
+          <SectionTitle icon={Home}>Si sos el dueño</SectionTitle>
+          <Field label="Valor de la propiedad en USD (opcional)" hint="Para calcular cuánto rinde el alquiler por año.">
+            <NumberField
+              value={valorPropiedad ? new Intl.NumberFormat('es-AR').format(valorPropiedad) : ''}
+              onChange={(v) => setPropertyValueUsd(soloNumeros(v))}
+            />
+          </Field>
+          {valorPropiedad > 0 && rentAmount > 0 && dolarOficial > 0 && (
+            <div className="mt-4 space-y-2">
+              <Stat
+                label="Rentabilidad bruta"
+                value={`${pct(grossYield)}% anual`}
+                tone={grossYield < 3 ? 'negative' : grossYield >= 5 ? 'positive' : 'neutral'}
+              />
+              <Body>En Argentina lo habitual está entre 3% y 5% anual. Al dólar oficial, recuperás la inversión en <b>{pct(pri)} años</b> solo con el alquiler.</Body>
+              <Hint>Es bruta: no descuenta impuestos, vacancia ni mantenimiento.</Hint>
+            </div>
+          )}
+        </Panel>
+      </div>
+
+      {/* --- COLUMNA DERECHA: LO QUE SALE --- */}
+      <div ref={resultsRef} className="space-y-4 min-w-0">
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <Card className="p-4">
+            <Stat
+              label="Hoy pagás"
+              value={sinDatos ? '---' : moneyCompact(totals.cuotaTotalInicial)}
+              sub={sinDatos ? NBSP : `alquiler ${moneyCompact(totals.alquilerInicial)} + expensas ${moneyCompact(totals.expensasIniciales)}`}
+            />
+          </Card>
+          <Card className="p-4">
+            <Stat
+              label="Próximo aumento"
+              value={proximoAjuste ? `+${pct(proximoAjuste.aumento)}%` : '---'}
+              sub={proximoAjuste ? `en ${proximoAjuste.label}` : (sinDatos ? NBSP : 'sin ajustes en el período')}
+            />
+          </Card>
+          <Card className="p-4">
+            <Stat
+              label="Total del contrato"
+              value={sinDatos ? '---' : moneyCompact(totals.totalContrato)}
+              sub={sinDatos ? NBSP : `${schedule.length} meses`}
+            />
+          </Card>
+          <Card className="p-4">
+            <Stat
+              label="Último mes"
+              value={sinDatos ? '---' : moneyCompact(totals.ultimoMes)}
+              sub={sinDatos || totals.cuotaTotalInicial === 0 ? NBSP : `+${pct(((totals.ultimoMes / totals.cuotaTotalInicial) - 1) * 100)}% contra hoy`}
+            />
+          </Card>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
-             <div className="flex items-center gap-3">
-               <h3 className="font-semibold text-lg md:text-xl tracking-tight dark:text-white leading-none">Proyección de pagos del alquiler</h3>
-               <button onClick={() => setIsFullscreen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-xl transition-all" title="Ver en Pantalla Completa" aria-label="Ver en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
-             </div>
-             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto max-w-full no-scrollbar">
-              {['1y', '2y', '3y', 'all'].map(t => (
-                <button key={t} onClick={()=>setTimeframe(t)} className={`px-5 py-1.5 rounded-xl text-[12px] font-semibold transition-all whitespace-nowrap ${timeframe === t ? 'bg-emerald-600 text-white' : 'text-slate-400'}`}>
-                  {t === 'all' ? 'Todo' : t.replace('y', ' año' + (parseInt(t) > 1 ? 's' : ''))}
+        <Card className="p-4 md:p-5 relative z-40">
+          <SectionTitle
+            aside={
+              <div className="flex items-center gap-2">
+                <Segmented
+                  size="sm"
+                  value={timeframe}
+                  onChange={setTimeframe}
+                  options={[
+                    { value: '1y', label: '1 año' },
+                    { value: '2y', label: '2 años' },
+                    { value: '3y', label: '3 años' },
+                    { value: 'all', label: 'Todo' },
+                  ]}
+                />
+                <button onClick={() => setIsFullscreen(true)} title="Ver en pantalla completa" aria-label="Ver en pantalla completa"
+                  className="p-2 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors shrink-0">
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+              </div>
+            }
+          >
+            Proyección de pagos
+          </SectionTitle>
+
+          <div className="flex items-center gap-4 mb-2 text-micro text-muted dark:text-muted-dark">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-indigo-500" /> Alquiler</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-orange-400" /> Expensas</span>
+          </div>
+
+          <div className="w-full h-[220px] sm:h-auto sm:aspect-[1000/320]">
+            <CompositionChart data={filteredData} dateMode="calendar" showRemMarker isRent />
+          </div>
+
+          <Hint className="mt-3 flex items-center gap-1.5">
+            <AlertTriangle className="w-3 h-3 shrink-0" />
+            {Number(adjustPeriod) > 0
+              ? `El alquiler sube cada ${adjustPeriod} meses con la inflación acumulada; las expensas, todos los meses.`
+              : 'Sin frecuencia de ajuste el alquiler queda fijo; las expensas suben todos los meses.'}
+          </Hint>
+        </Card>
+
+        <Card className="overflow-hidden">
+          <div className="p-4 md:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-hair dark:border-hair-dark">
+            <SectionTitle
+              className="mb-0"
+              icon={FileText}
+              aside={
+                <button onClick={() => { if (schedule.length > 0) setIsTableFullscreen(true); }} title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"
+                  className="p-2 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors shrink-0">
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+              }
+            >
+              Pagos mes a mes
+            </SectionTitle>
+
+            <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap">
+              <select value={exportRange} onChange={(e) => setExportRange(e.target.value)} aria-label="Rango a exportar" title="Rango a exportar"
+                className="bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-2.5 py-2 text-label text-ink dark:text-ink-dark outline-none cursor-pointer">
+                {[['all', 'Todo el contrato'], ['1', '1 año'], ['2', '2 años'], ['3', '3 años']].map(([v, l]) => (
+                  <option key={v} value={v} className={OPTION_CLASS}>{l}</option>
+                ))}
+              </select>
+
+              {[
+                { id: 'pdf', icon: FileText, label: 'PDF', tono: 'text-rose-500' },
+                { id: 'excel', icon: FileSpreadsheet, label: 'Excel', tono: 'text-emerald-600 dark:text-emerald-500' },
+                { id: 'csv', icon: Download, label: 'CSV', tono: 'text-faint dark:text-faint-dark' },
+              ].map(b => (
+                <button key={b.id} onClick={() => { if (schedule.length > 0) handleExportClick(b.id); }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors">
+                  <b.icon className={`w-4 h-4 ${b.tono}`} /> {b.label}
                 </button>
               ))}
-            </div>
-          </div>
-          <div className="h-[200px] md:h-[420px] w-full"><CompositionChart data={filteredData} dateMode={dateMode} showRemMarker={inflationMode === 'rem'} isRent={true} /></div>
-        </div>
 
-        {/* TABLA DE ALQUILERES */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden text-left text-[13px]">
-          <div className="p-6 md:p-8 flex flex-col lg:flex-row justify-between items-center border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-[14px] font-semibold text-slate-800 dark:text-white flex items-center gap-2 leading-none"><FileText className="w-4 h-4 text-emerald-500"/> Tabla de pagos mensuales</span>
-              <button onClick={() => { if(schedule.length > 0) setIsTableFullscreen(true); }} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-xl transition-all" title="Ver tabla en pantalla completa" aria-label="Ver tabla en pantalla completa"><Maximize2 className="w-4 h-4" /></button>
-            </div>
-            
-            <div className="flex w-full lg:w-auto gap-2">
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('excel'); }} className="flex-1 lg:flex-none px-4 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all leading-none" title="Descargar como Excel" aria-label="Descargar Excel">
-                 <FileSpreadsheet className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">EXCEL</span>
+              <button onClick={copyToWhatsApp} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp"
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-[#25D366] transition-colors">
+                {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
               </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('csv'); }} className="flex-1 lg:flex-none px-4 py-4 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-semibold rounded-xl transition-all leading-none">
-                 <Download className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">CSV</span>
-              </button>
-              <button onClick={() => { if(schedule.length > 0) handleExportClick('pdf'); }} className="flex-[2] lg:flex-none px-4 py-4 bg-indigo-600 text-white font-semibold rounded-xl transition-all leading-none whitespace-nowrap">
-                 <FileText className="inline w-4 h-4 lg:mr-2" /> <span className="hidden lg:inline">PDF</span> 
-              </button>
-              <button onClick={copyToWhatsApp} className={`flex-none px-4 py-4 ${copiedWP ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp">
-                 {copiedWP ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
-              </button>
-              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} className={`flex-none px-4 py-4 ${copiedShare ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:text-emerald-500'} font-semibold rounded-xl transition-all`} title="Copiar link de simulación" aria-label="Copiar link para compartir">
-                 {copiedShare ? <Check className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
+              <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-indigo-500 transition-colors">
+                {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
           </div>
-          <div className="max-h-[400px] md:max-h-[850px] overflow-auto w-full no-scrollbar">
+          <div className="h-[420px] md:h-[640px] overflow-auto w-full no-scrollbar">
             <div className="inline-block min-w-full align-middle">
-              <table className="w-full text-left border-collapse min-w-[700px] md:min-w-[900px]">
-                <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-400 font-semibold text-[12px] border-b dark:border-slate-800 z-10 shadow-sm leading-none">
-                  <tr><th className="p-4 text-center">Periodo</th><th className="p-4 text-center">Inflación</th><th className="p-4 text-center">Total Mes</th><th className="p-4 text-center">Alquiler</th><th className="p-4 text-center">Expensas</th></tr>
-                </thead>
-                <tbody className="divide-y dark:divide-slate-800 text-center">
-                  {schedule.map((d) => (
-                    <tr key={d.mes} className="transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/40">
-                      <td className="p-4 font-bold text-slate-800 dark:text-slate-200">{d.label}</td>
-                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold ${d.source === 'IPC' ? 'bg-emerald-600 text-white' : d.source === 'REM' ? 'bg-indigo-600 text-white' : 'bg-slate-500 text-white'}`}>{d.source}</span></td>
-                      <td className="p-4 font-semibold text-slate-900 dark:text-white whitespace-nowrap">{money(d.cuotaTotal)}</td>
-                      <td className="p-4 text-emerald-600 font-bold whitespace-nowrap">{money(d.principal)}</td>
-                      <td className="p-4 text-orange-600 font-bold whitespace-nowrap">{money(d.interes)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <RentTable data={schedule} />
             </div>
           </div>
-        </div>
-
+        </Card>
       </div>
     </div>
   );
