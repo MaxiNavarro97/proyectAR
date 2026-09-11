@@ -2024,16 +2024,14 @@ function RentCalculator({ remData, dolarOficial }) {
 // --- VISTA PREGUNTAS FRECUENTES (FAQ) ---
 function FAQItem({ question, children, isOpen, onClick }) {
   return (
-    <div className={`border dark:border-slate-800 rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-white dark:bg-slate-800 border-amber-500/30 dark:border-amber-500/30' : 'bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/80'}`}>
-      <button onClick={onClick} className="w-full text-left p-5 md:p-6 flex justify-between items-center gap-4 outline-none">
-        <h4 className="font-semibold text-sm md:text-base tracking-tight text-slate-800 dark:text-white leading-none">{question}</h4>
-        <div className={`p-2 rounded-full transition-all duration-300 shrink-0 ${isOpen ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rotate-180' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-        </div>
+    <div className="rounded-surface border border-hair dark:border-hair-dark bg-card dark:bg-card-dark overflow-hidden">
+      <button onClick={onClick} aria-expanded={isOpen} className="w-full text-left px-5 py-4 flex justify-between items-center gap-4 outline-none">
+        <h4 className="text-title text-ink dark:text-ink-dark">{question}</h4>
+        <svg className={`w-4 h-4 shrink-0 text-faint dark:text-faint-dark transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
       </button>
-      <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+      <div className={`grid transition-all duration-200 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <div className="p-5 md:p-6 pt-0 text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-4">
+          <div className="px-5 pb-5 text-body text-muted dark:text-muted-dark space-y-3">
             {children}
           </div>
         </div>
@@ -2053,29 +2051,17 @@ function FAQ() {
 
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-full">
-      <div className="lg:col-span-12 space-y-8">
-        <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-2xl border dark:border-slate-800 shadow-sm relative z-40 text-left">
-          <div className="flex flex-col mb-10 gap-2">
-            <h2 className="font-semibold text-3xl md:text-4xl tracking-tighter dark:text-white flex items-center gap-3">
-              <HelpCircle className="w-8 h-8 md:w-10 md:h-10 text-amber-500" />
-              Preguntas Frecuentes
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Cómo leer los resultados y de dónde sale cada número de la proyección.</p>
-          </div>
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <FAQItem 
-                key={index} 
-                question={faq.q} 
-                isOpen={openIndex === index} 
-                onClick={() => toggle(index)}
-              >
-                {faq.a}
-              </FAQItem>
-            ))}
-          </div>
-        </div>
+    <div className="max-w-3xl mx-auto text-left">
+      <div className="mb-6">
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">Preguntas frecuentes</h2>
+        <p className="text-body text-muted dark:text-muted-dark mt-1.5">Cómo leer los resultados y de dónde sale cada número de la proyección.</p>
+      </div>
+      <div className="space-y-3">
+        {faqs.map((faq, index) => (
+          <FAQItem key={index} question={faq.q} isOpen={openIndex === index} onClick={() => toggle(index)}>
+            {faq.a}
+          </FAQItem>
+        ))}
       </div>
     </div>
   );

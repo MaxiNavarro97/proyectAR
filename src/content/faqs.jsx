@@ -18,7 +18,7 @@ export const faqsOperativas = [
       resumen: "La deuda esta en UVAs, no en pesos. La cuota en UVAs es fija, pero cada UVA vale mas cada dia porque se ajusta por el CER, que sigue a la inflacion del INDEC. Por eso la cuota en pesos sube todos los meses.",
       a: <>
         <p>Porque tu deuda no está en pesos: está en <b>UVAs</b>. La cuota en UVAs es siempre la misma, pero cada UVA vale un poco más cada día, porque se ajusta por el CER, que sigue a la inflación que mide el INDEC.</p>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
+        <div className="p-4 my-3 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark overflow-x-auto text-center text-ink dark:text-ink-dark font-medium">
           Cuota en $ = Cuota en UVAs × Valor UVA del día de pago
         </div>
         <p>De ahí sale todo lo demás: si la inflación se acelera, tu cuota en pesos sube más rápido; si se desacelera, sube más despacio. Lo que nunca cambia es la cantidad de UVAs que pagás por mes.</p>
@@ -38,11 +38,11 @@ export const faqsOperativas = [
       a: <>
         <p>ProyectAR combina <b>dos fuentes oficiales</b> de datos de inflación para armar un timeline unificado:</p>
         <div className="space-y-3 mt-3">
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-emerald-500 mr-2 align-middle"></span><b>IPC (Índice de Precios al Consumidor)</b>: dato real, cerrado. Lo publica el INDEC una vez al mes. Usamos los últimos 12 meses como dato histórico confirmado. Siempre tiene prioridad.</p>
+          <div className="p-3 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark">
+            <p className="text-sm"><span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2 align-middle"></span><b>IPC (Índice de Precios al Consumidor)</b>: dato real, cerrado. Lo publica el INDEC una vez al mes. Usamos los últimos 12 meses como dato histórico confirmado. Siempre tiene prioridad.</p>
           </div>
-          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-xl">
-            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-indigo-500 mr-2 align-middle"></span><b>REM (Relevamiento de Expectativas de Mercado)</b>: proyección. El BCRA encuesta a las principales consultoras y bancos sobre cuánto creen que va a ser la inflación futura. Usamos la mediana de esas estimaciones.</p>
+          <div className="p-3 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark">
+            <p className="text-sm"><span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2 align-middle"></span><b>REM (Relevamiento de Expectativas de Mercado)</b>: proyección. El BCRA encuesta a las principales consultoras y bancos sobre cuánto creen que va a ser la inflación futura. Usamos la mediana de esas estimaciones.</p>
           </div>
         </div>
         <p className="mt-3">Cuando un mes tiene dato IPC (real) y REM (proyectado), siempre priorizamos el IPC. Para los meses futuros donde solo hay REM, usamos esa proyección. Si se agotan ambas fuentes, aplicamos <b>inercia</b>: repetimos el último valor disponible del REM.</p>
@@ -53,7 +53,7 @@ export const faqsOperativas = [
       resumen: "Cuando el REM solo publica el dato anual, se pasa a mensual con la formula (1 + anual/100)^(1/12) - 1. Es una tasa geometrica, no una division por doce, para que al acumular doce meses de exactamente el valor anual.",
       a: <>
         <p>El REM publica estimaciones mensuales para los próximos meses y una estimación interanual (i.a.) para los años venideros. Cuando solo tenemos el dato anual, lo convertimos a mensual con esta fórmula:</p>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
+        <div className="p-4 my-3 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark overflow-x-auto text-center text-ink dark:text-ink-dark font-medium">
           Inflación mensual = (1 + Inflación anual / 100) ^ (1/12) − 1
         </div>
         <p>Por ejemplo, si el REM proyecta 25% anual, la tasa mensual equivalente sería: (1.25)^(1/12) − 1 ≈ 1,88% mensual. Es una <b>tasa geométrica</b>, no una simple división por 12, para que al acumularla 12 meses dé exactamente el valor anual.</p>
@@ -74,7 +74,7 @@ export const faqsOperativas = [
           <li>Durante esos meses, se <b>acumula la inflación mensual</b> (IPC real o REM proyectado).</li>
           <li>Al llegar al mes de ajuste, el alquiler base se multiplica por ese factor acumulado.</li>
         </ol>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-emerald-600 dark:text-emerald-400 font-mono font-bold text-xs md:text-sm">
+        <div className="p-4 my-3 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark overflow-x-auto text-center text-ink dark:text-ink-dark font-medium">
           Factor = (1 + inf₁) × (1 + inf₂) × ... × (1 + infₙ)
           <br/>Nuevo alquiler = Alquiler anterior × Factor
         </div>
@@ -91,15 +91,15 @@ export const faqsOperativas = [
       resumen: "Es cuanto rinde una propiedad por anio respecto de su valor: alquiler anual en dolares sobre valor de la propiedad en dolares, por cien. Es una medida bruta, no descuenta impuestos ni vacancia.",
       a: <>
         <p>Es una métrica estándar del mercado inmobiliario que indica cuánto rinde una propiedad por año en relación a su valor. Se calcula así:</p>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-3 text-emerald-600 dark:text-emerald-400 font-mono font-bold text-xs md:text-sm">
+        <div className="p-4 my-3 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark overflow-x-auto text-center text-ink dark:text-ink-dark font-medium">
           Yield = (Alquiler mensual × 12 / Dólar oficial) / Valor propiedad USD × 100
         </div>
         <p>Es una medida <b>bruta</b> (no descuenta impuestos, vacancia, mantenimiento). En el mercado argentino, los rangos típicos son:</p>
         <ul className="list-disc pl-5 space-y-1 mt-2 text-sm">
-          <li><b className="text-rose-500">Menor a 3%:</b> Rendimiento bajo. La propiedad se valoriza más por plusvalía que por renta.</li>
-          <li><b className="text-orange-500">3% a 5%:</b> Rango normal del mercado argentino actual.</li>
-          <li><b className="text-emerald-500">5% a 8%:</b> Buen rendimiento. Propiedad rentable.</li>
-          <li><b className="text-sky-500">Más de 8%:</b> Excelente y poco frecuente. Suele darse en zonas emergentes o propiedades comerciales.</li>
+          <li><b className="font-medium text-ink dark:text-ink-dark">Menor a 3%:</b> Rendimiento bajo. La propiedad se valoriza más por plusvalía que por renta.</li>
+          <li><b className="font-medium text-ink dark:text-ink-dark">3% a 5%:</b> Rango normal del mercado argentino actual.</li>
+          <li><b className="font-medium text-ink dark:text-ink-dark">5% a 8%:</b> Buen rendimiento. Propiedad rentable.</li>
+          <li><b className="font-medium text-ink dark:text-ink-dark">Más de 8%:</b> Excelente y poco frecuente. Suele darse en zonas emergentes o propiedades comerciales.</li>
         </ul>
       </>
     },
@@ -119,8 +119,8 @@ export const faqsTeoria = [
       q: "¿De dónde sale el valor de la UVA?",
       a: <>
         <p>La UVA fue creada en 2016 con una equivalencia clara: <b>1.000 UVAs = costo promedio de 1 m² de construcción</b>. Hoy se ajusta diariamente por el CER (Coeficiente de Estabilización de Referencia), que sigue a la inflación oficial del INDEC.</p>
-        <div className="p-4 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800 rounded-xl mt-3 space-y-2">
-          <p className="text-sm font-bold">¿Mi cuota en UVAs cambia?</p>
+        <div className="p-4 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark mt-3 space-y-2">
+          <p className="text-title text-ink dark:text-ink-dark">¿Mi cuota en UVAs cambia?</p>
           <p className="text-xs md:text-sm"><b>En Sistema Francés:</b> la cuota en UVAs es constante todo el crédito. <b>En Alemán:</b> baja mes a mes. Pero la cuota en pesos siempre cambia porque se multiplica por el valor diario de la UVA.</p>
         </div>
       </>
@@ -130,23 +130,23 @@ export const faqsTeoria = [
       a: <>
         <p>Primero el banco calcula tu cuota en UVAs puras (sin inflación). Esa cuota tiene dos partes: devolución de capital + intereses. Dependiendo del sistema:</p>
         <div className="space-y-3 mt-3">
-          <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl">
-            <p className="text-sm font-bold mb-2">Sistema Francés (cuota constante en UVAs):</p>
-            <div className="overflow-x-auto text-center text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
+          <div className="p-4 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark">
+            <p className="text-title text-ink dark:text-ink-dark mb-2">Sistema Francés (cuota constante en UVAs):</p>
+            <div className="overflow-x-auto text-center text-ink dark:text-ink-dark font-medium">
               PMT = Saldo × r / (1 − (1 + r) ^ −n)
             </div>
-            <p className="text-xs mt-2 text-slate-500">Donde r = TNA/12 (tasa mensual) y n = cuotas restantes.</p>
+            <p className="text-micro mt-2 text-faint dark:text-faint-dark">Donde r = TNA/12 (tasa mensual) y n = cuotas restantes.</p>
           </div>
-          <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl">
-            <p className="text-sm font-bold mb-2">Sistema Alemán (amortización constante):</p>
-            <div className="overflow-x-auto text-center text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
+          <div className="p-4 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark">
+            <p className="text-title text-ink dark:text-ink-dark mb-2">Sistema Alemán (amortización constante):</p>
+            <div className="overflow-x-auto text-center text-ink dark:text-ink-dark font-medium">
               Amortización = Capital total / n &nbsp;&nbsp;|&nbsp;&nbsp; Cuota = Amortización + Saldo × r
             </div>
-            <p className="text-xs mt-2 text-slate-500">La cuota en UVAs baja cada mes porque el saldo sobre el que calculás intereses se va reduciendo.</p>
+            <p className="text-micro mt-2 text-faint dark:text-faint-dark">La cuota en UVAs baja cada mes porque el saldo sobre el que calculás intereses se va reduciendo.</p>
           </div>
         </div>
         <p className="mt-3">Para convertir a pesos:</p>
-        <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-x-auto text-center my-2 text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs md:text-sm">
+        <div className="p-4 my-3 rounded-control border border-hair dark:border-hair-dark bg-field dark:bg-field-dark overflow-x-auto text-center text-ink dark:text-ink-dark font-medium">
           Cuota en $ = Cuota en UVAs × Valor UVA del día de pago
         </div>
         <p>Como el valor de la UVA sube con la inflación, tu cuota en pesos sube mes a mes aunque la cuota en UVAs sea fija.</p>
