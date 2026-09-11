@@ -1356,7 +1356,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               </button>
             </div>
           </div>
-          <div className="max-h-[400px] md:max-h-[850px] overflow-auto w-full no-scrollbar">
+          <div className="h-[420px] md:h-[640px] overflow-auto w-full no-scrollbar">
             <div className="inline-block min-w-full align-middle">
               <AmortizationTable data={schedule} />
             </div>
