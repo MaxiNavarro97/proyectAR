@@ -23,9 +23,9 @@ export default {
         display: ['1.75rem', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '600' }],
         stat:    ['1.25rem', { lineHeight: '1', letterSpacing: '-0.01em', fontWeight: '500' }],
         title:   ['0.9375rem', { lineHeight: '1.2', fontWeight: '600' }],
-        body:    ['0.8125rem', { lineHeight: '1.45', fontWeight: '400' }],
+        body:    ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
         label:   ['0.75rem', { lineHeight: '1.2', fontWeight: '500' }],
-        micro:   ['0.6875rem', { lineHeight: '1.3', fontWeight: '400' }],
+        micro:   ['0.75rem', { lineHeight: '1.35', fontWeight: '400' }],
       },
       colors: {
         // Texto: cuatro roles. El número de la escala de slate se elige una vez

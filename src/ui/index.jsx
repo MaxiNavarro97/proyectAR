@@ -34,9 +34,11 @@ export function Card({ children, className }) {
 
 /* ---------- Texto ---------- */
 
-export function SectionTitle({ icon: Icon, children, aside }) {
+// `className` reemplaza el margen inferior por defecto, por ejemplo en una
+// cabecera donde el titulo comparte fila con botones y el margen lo desalinea.
+export function SectionTitle({ icon: Icon, children, aside, className }) {
   return (
-    <div className="flex items-center justify-between gap-3 mb-4">
+    <div className={unir('flex items-center justify-between gap-3', className ?? 'mb-4')}>
       <h3 className="text-title text-ink dark:text-ink-dark flex items-center gap-2 min-w-0">
         {Icon && <Icon className="w-4 h-4 text-faint dark:text-faint-dark shrink-0" />}
         {children}
@@ -104,7 +106,7 @@ export function Stat({ label, value, sub, tone = 'neutral', size = 'stat', aside
 export function Segmented({ value, onChange, options, size = 'md', block = false, className }) {
   const alto = size === 'sm' ? 'py-1 px-2.5 text-micro' : 'py-2 px-3 text-label';
   return (
-    <div className={unir('inline-flex p-0.5 bg-hair dark:bg-field-dark rounded-control', block && 'flex w-full', className)}>
+    <div className={unir('inline-flex p-0.5 bg-hair dark:bg-hair-dark rounded-control', block && 'flex w-full', className)}>
       {options.map(o => {
         const activo = o.value === value;
         return (
