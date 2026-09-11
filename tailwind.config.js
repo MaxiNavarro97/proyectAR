@@ -42,6 +42,10 @@ export default {
         card:   { DEFAULT: '#ffffff', dark: '#161f33' },
         field:  { DEFAULT: '#ffffff', dark: '#0a111f' },
         hair:   { DEFAULT: '#dde5ee', dark: '#243044' },
+        // Color de accion de cada seccion: indigo en creditos, verde en
+        // alquileres. Sale de una variable CSS, asi cada pantalla lo cambia
+        // sin que los componentes tengan que saber en que seccion estan.
+        acento: 'rgb(var(--acento) / <alpha-value>)',
       },
       borderRadius: {
         control: '0.625rem',  // botones, inputs, chips

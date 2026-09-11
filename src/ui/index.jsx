@@ -120,7 +120,7 @@ export function Segmented({ value, onChange, options, size = 'md', block = false
               'rounded-control transition-colors whitespace-nowrap',
               block && 'flex-1',
               activo
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-acento text-white'
                 : 'text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'
             )}
           >
@@ -168,7 +168,7 @@ export function Notice({ tone = 'info', icon: Icon, children, className }) {
 
 /* ---------- Controles de entrada ---------- */
 
-const CAMPO = 'w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-colors';
+const CAMPO = 'w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 text-stat text-ink dark:text-ink-dark outline-none focus:border-acento dark:focus:border-acento transition-colors';
 
 // Un número con su unidad pegada al borde (%, UVA, lo que sea).
 export function NumberField({ value, onChange, suffix, prefix, placeholder, align = 'left' }) {

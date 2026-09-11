@@ -366,7 +366,7 @@ function NavigationMenu() {
         const activa = pathname === p.to;
         return (
           <Link key={p.to} to={p.to} aria-current={activa ? 'page' : undefined}
-            className={`flex-1 md:flex-none text-center py-2 px-4 text-label rounded-control transition-colors whitespace-nowrap ${activa ? 'bg-indigo-600 text-white' : 'text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'}`}>
+            className={`flex-1 md:flex-none text-center py-2 px-4 text-label rounded-control transition-colors whitespace-nowrap ${activa ? `${p.to === '/calculadora-alquileres' ? 'bg-emerald-600' : 'bg-indigo-600'} text-white` : 'text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'}`}>
             {p.label}
           </Link>
         );
@@ -392,7 +392,7 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent }) {
           onFocus={(e) => { setEnFoco(true); e.target.select(); }}
           onBlur={() => setEnFoco(false)}
           placeholder="$ 0"
-          className="w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 pr-9 text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 transition-colors"
+          className="w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 pr-9 text-stat text-ink dark:text-ink-dark outline-none focus:border-acento transition-colors"
         />
         <DollarSign className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-faint dark:text-faint-dark pointer-events-none" />
       </div>
@@ -410,7 +410,7 @@ const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
   // imagen deja de ser un rectangulo brillante.
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" title={`Créditos hipotecarios en ${name}`}
-      className="flex items-center justify-center h-12 px-3 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-indigo-500 transition-colors">
+      className="flex items-center justify-center h-12 px-3 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-acento transition-colors">
       <img src={logoUrl} alt={name} loading="lazy" className="max-h-7 max-w-full object-contain grayscale opacity-60 hover:opacity-100 mix-blend-multiply dark:invert dark:mix-blend-screen transition-opacity" />
     </a>
   );
@@ -516,7 +516,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
               onTouchEnd={handleTouchEnd}
               className="group cursor-pointer"
             >
-              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill="#6366f1" rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} rx="1.5" fillOpacity="0.85" className="fill-acento transition-all group-hover:brightness-110"/>
               <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill="#fb923c" rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
               {(i % Math.ceil(sampled.length/10) === 0) && (
                 <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[13px] fill-slate-500 md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
@@ -588,11 +588,11 @@ function AmortizationTable({ data, dark = false }) {
           // El origen del dato solo se marca cuando cambia.
           const cambiaOrigen = i === 0 || data[i - 1].source !== d.source;
           return (
-            <tr key={d.mes} className={`${tenue} ${d.isHalfWay ? (dark ? 'bg-white/5' : 'bg-indigo-500/5') : ''}`}>
+            <tr key={d.mes} className={`${tenue} ${d.isHalfWay ? (dark ? 'bg-white/5' : 'bg-acento/5') : ''}`}>
               <td className={`px-4 py-2.5 text-left whitespace-nowrap ${tinta}`}>
                 <span className="inline-flex items-center gap-1.5">
                   {d.label}
-                  {d.isHalfWay && <span title="Mitad del capital devuelto" className="inline-flex items-center gap-1 text-micro text-indigo-500"><Flag className="w-3 h-3" /> 50%</span>}
+                  {d.isHalfWay && <span title="Mitad del capital devuelto" className="inline-flex items-center gap-1 text-micro text-acento"><Flag className="w-3 h-3" /> 50%</span>}
                 </span>
               </td>
               <td className="px-4 py-2.5 text-left whitespace-nowrap">
@@ -1259,7 +1259,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </SectionTitle>
 
           <div className="flex items-center gap-4 mb-2 text-micro text-muted dark:text-muted-dark">
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-indigo-500" /> Capital</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-acento" /> Capital</span>
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-orange-400" /> Interés</span>
           </div>
 
@@ -1301,7 +1301,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 { id: 'csv', icon: Download, label: 'CSV', tono: 'text-faint dark:text-faint-dark' },
               ].map(b => (
                 <button key={b.id} onClick={() => { if (schedule.length > 0) handleExportClick(b.id); }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors">
+                  className="flex items-center gap-2 px-3 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-acento transition-colors">
                   <b.icon className={`w-4 h-4 ${b.tono}`} /> {b.label}
                 </button>
               ))}
@@ -1311,7 +1311,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                 {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
               </button>
               <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-indigo-500 transition-colors">
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-acento transition-colors">
                 {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -1390,12 +1390,12 @@ function RentTable({ data, dark = false }) {
           // El origen del dato solo se marca cuando cambia.
           const cambiaOrigen = i === 0 || data[i - 1].source !== d.source;
           return (
-            <tr key={d.mes} className={`${tenue} ${d.ajuste ? (dark ? 'bg-white/5' : 'bg-indigo-500/5') : ''}`}>
+            <tr key={d.mes} className={`${tenue} ${d.ajuste ? (dark ? 'bg-white/5' : 'bg-acento/5') : ''}`}>
               <td className={`px-4 py-2.5 text-left whitespace-nowrap ${tinta}`}>
                 <span className="inline-flex items-center gap-1.5">
                   {d.label}
                   {d.ajuste && (
-                    <span title="Mes en que se ajusta el alquiler" className="inline-flex items-center gap-1 text-micro text-indigo-500">
+                    <span title="Mes en que se ajusta el alquiler" className="inline-flex items-center gap-1 text-micro text-acento">
                       <TrendingUp className="w-3 h-3" /> +{d.aumento.toFixed(1).replace('.', ',')}%
                     </span>
                   )}
@@ -1678,7 +1678,7 @@ function RentCalculator({ remData, dolarOficial }) {
   const soloNumeros = (v) => v.replace(/\D/g, '');
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-6 xl:gap-8 max-w-full">
+    <div className="acento-alquileres grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-6 xl:gap-8 max-w-full">
 
       {showDonationModal && (
         <DonationModal
@@ -1942,7 +1942,7 @@ function RentCalculator({ remData, dolarOficial }) {
           </SectionTitle>
 
           <div className="flex items-center gap-4 mb-2 text-micro text-muted dark:text-muted-dark">
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-indigo-500" /> Alquiler</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-acento" /> Alquiler</span>
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-orange-400" /> Expensas</span>
           </div>
 
@@ -1987,7 +1987,7 @@ function RentCalculator({ remData, dolarOficial }) {
                 { id: 'csv', icon: Download, label: 'CSV', tono: 'text-faint dark:text-faint-dark' },
               ].map(b => (
                 <button key={b.id} onClick={() => { if (schedule.length > 0) handleExportClick(b.id); }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors">
+                  className="flex items-center gap-2 px-3 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-acento transition-colors">
                   <b.icon className={`w-4 h-4 ${b.tono}`} /> {b.label}
                 </button>
               ))}
@@ -1997,7 +1997,7 @@ function RentCalculator({ remData, dolarOficial }) {
                 {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
               </button>
               <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-indigo-500 transition-colors">
+                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-acento transition-colors">
                 {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
@@ -2226,8 +2226,8 @@ export default function App() {
                   <p className="text-body text-muted dark:text-muted-dark mt-1 max-w-2xl">Es 100% gratuita y la hacemos a pulmón. Si te aportó algo, una colaboración nos ayuda a pagar los servidores y a seguir mejorándola.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-                  <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors"><Coffee className="w-4 h-4 text-faint" /> Invitar un cafecito</a>
-                  <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors"><Handshake className="w-4 h-4 text-faint" /> Aportar por Mercado Pago</a>
+                  <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-acento transition-colors"><Coffee className="w-4 h-4 text-faint" /> Invitar un cafecito</a>
+                  <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-acento transition-colors"><Handshake className="w-4 h-4 text-faint" /> Aportar por Mercado Pago</a>
                 </div>
               </div>
             </div>

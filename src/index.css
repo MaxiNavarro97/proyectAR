@@ -8,6 +8,10 @@
      formulario no heredan esta propiedad por defecto, asi que se la pasamos. */
   html { font-variant-numeric: tabular-nums; }
   input, select, textarea, button { font-variant-numeric: inherit; }
+
+  /* Acento de cada seccion (ver tailwind.config.js). */
+  :root { --acento: 79 70 229; }             /* indigo-600: creditos y el resto */
+  .acento-alquileres { --acento: 5 150 105; } /* emerald-600: alquileres */
 }
 
 @layer utilities {
