@@ -946,7 +946,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const copyToWhatsApp = () => {
       if (schedule.length === 0) return;
-      const text = `🏦 *Proyección ProyectAR*\n\n💰 Cuota 1: ${money(totals.cuotaInicial)}\n📉 Total Intereses: ${money(totals.totalIntereses)}\n📈 Pago Final Est.: ${money(totals.totalPagadoFinal)}\n\nSimulá tu crédito gratis en proyectar.io`;
+      const text = `Proyección de crédito UVA - ProyectAR\n\nPrimera cuota: ${money(totals.cuotaInicial)}\nIntereses totales: ${money(totals.totalIntereses)}\nTotal a pagar: ${money(totals.totalPagadoFinal)}\n\nSimulá tu crédito gratis en proyectar.io`;
       navigator.clipboard.writeText(text);
       setCopiedWP(true);
       setTimeout(() => setCopiedWP(false), 2000);
