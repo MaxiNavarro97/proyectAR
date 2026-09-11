@@ -49,9 +49,6 @@ const mensualAAnual = (mensual) => (Math.pow(1 + mensual / 100, 12) - 1) * 100;
 
 const money = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
 
-// Credito de ejemplo, para que la pagina no reciba a nadie con ceros y un
-// cartel de"completa los campos".
-const EJEMPLO = { amount: 100000000, years: 20, rate:"4.5" };
 
 const OPTION_CLASS ="bg-white text-slate-900 dark:bg-slate-800 dark:text-white";
 
@@ -737,10 +734,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const [remInstallments, setRemInstallments] = useState(0);
   const [bankInstallment, setBankInstallment] = useState(0);
 
-  const [amount, setAmount] = useState(EJEMPLO.amount); 
+  const [amount, setAmount] = useState(0); 
   const [salary, setSalary] = useState(0); 
-  const [years, setYears] = useState(EJEMPLO.years);
-  const [rate, setRate] = useState(EJEMPLO.rate);
+  const [years, setYears] = useState('');
+  const [rate, setRate] = useState('');
   // Cada tramo de la proyeccion decide por separado si sigue el dato oficial
   // o una inflacion propia. Los valores propios arrancan en el ultimo REM.
   const [inflFirstMode, setInflFirstMode] = useState('rem');
@@ -786,7 +783,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   });
 
   const handleReset = () => {
-      setAmount(0); setSalary(0); setYears(0); setRate("0"); setRemInstallments(0); setBankInstallment(0);
+      setAmount(0); setSalary(0); setYears(''); setRate(''); setRemInstallments(0); setBankInstallment(0);
   };
 
   useEffect(() => { try { localStorage.setItem('proyectar_tf_mortgage', timeframe); } catch { /* ignorar */ } }, [timeframe]);
@@ -1228,6 +1225,14 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
       {/* --- COLUMNA DERECHA: LO QUE SALE --- */}
       <div ref={resultsRef} className="space-y-4 min-w-0">
+        {schedule.length === 0 ? (
+          <Card className="p-8 md:p-12 text-center">
+            <Calculator className="w-8 h-8 mx-auto mb-4 text-faint dark:text-faint-dark" />
+            <p className="text-title text-ink dark:text-ink-dark">Cargá los datos de tu crédito</p>
+            <p className="text-body text-muted dark:text-muted-dark mt-1.5 max-w-md mx-auto">Con el monto, el plazo y la tasa te mostramos la primera cuota, cuánto vas a pagar en total y cómo evoluciona mes a mes con la inflación.</p>
+          </Card>
+        ) : (
+        <>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="p-4">
@@ -1351,6 +1356,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             </div>
           </div>
         </Card>
+
+        </>
+        )}
 
         <Card className="p-4 md:p-5">
           <SectionTitle icon={Globe}>Bancos con crédito UVA</SectionTitle>
