@@ -1344,6 +1344,13 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   );
 }
 
+// Helmet no esta inyectando nada en el <head> (bug aparte, previo a esta rama),
+// asi que el titulo de la pestania se fija a mano desde cada ruta.
+function TituloPagina({ titulo }) {
+  useEffect(() => { document.title = titulo; }, [titulo]);
+  return null;
+}
+
 // --- VISTA ALQUILERES (INTEGRADA) ---
 // Tabla de pagos del alquiler. Misma forma que la de amortizacion: numeros a la
 // derecha, peso normal y una sola cifra destacada, el total del mes. Los meses
@@ -2159,11 +2166,12 @@ export default function App() {
                     <Route path="/calculadora-creditos-uva" element={
                       <>
                         <Helmet>
-                          <title>ProyectAR | Calculadora de Créditos UVA </title>
+                          <title>Calculadora de créditos UVA · ProyectAR</title>
                           <meta name="description" content="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Proyectá cuánto sube tu cuota mes a mes con el sistema francés en UVA." />
                           <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Créditos UVA","url":"https://proyectar.io/calculadora-creditos-uva","description":"Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés, exportación a PDF/Excel.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }
                           })}</script>
                         </Helmet>
+                        <TituloPagina titulo="Calculadora de créditos UVA · ProyectAR" />
                         <MortgageCalculator uvaValue={uvaValue} remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
@@ -2172,11 +2180,12 @@ export default function App() {
                     <Route path="/calculadora-alquileres" element={
                       <>
                         <Helmet>
-                          <title>ProyectAR | Calculadora de Alquileres </title>
+                          <title>Calculadora de alquileres · ProyectAR</title>
                           <meta name="description" content="Calculá la actualización de tu contrato de alquiler, expensas e inflación. Ideal para inquilinos y propietarios en Argentina." />
                           <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Alquileres","url":"https://proyectar.io/calculadora-alquileres","description":"Simulador de contratos de alquiler con ajuste por inflación (IPC + REM BCRA), cálculo de expensas, yield para propietarios.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }
                           })}</script>
                         </Helmet>
+                        <TituloPagina titulo="Calculadora de alquileres · ProyectAR" />
                         <RentCalculator remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
@@ -2185,13 +2194,14 @@ export default function App() {
                     <Route path="/faq" element={
                       <>
                         <Helmet>
-                          <title>ProyectAR | FAQ - Preguntas Frecuentes</title>
+                          <title>Preguntas frecuentes · ProyectAR</title>
                           <meta name="description" content="Por qué sube tu cuota UVA, de dónde sale la inflación proyectada (IPC + REM del BCRA) y qué no incluye la simulación." />
                           {/* El structured data se arma con las mismas preguntas que se muestran en pantalla. */}
                           <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity": faqsOperativas.map(f => ({"@type":"Question","name": f.q,"acceptedAnswer": {"@type":"Answer","text": f.resumen }
                             }))
                           })}</script>
                         </Helmet>
+                        <TituloPagina titulo="Preguntas frecuentes · ProyectAR" />
                         <FAQ />
                       </>
                     } />
