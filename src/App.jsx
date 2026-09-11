@@ -962,7 +962,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const mesesSinDato = schedule.length - mesesOficiales;
   // Meses que cubre el dato oficial desde hoy. No depende del plazo: se sabe
   // antes de cargar nada, y es el numero que va en "Primeros N meses".
-  const mesesConREM = (remData || []).filter(d => d.año > hoy.getFullYear() || (d.año === hoy.getFullYear() && d.mes >= hoy.getMonth() + 1)).length;
+  const mesesConREM = (remData || []).filter(d => d.año > startYear || (d.año === startYear && d.mes >= startMonth + 1)).length;
 
   // Cuanto se aparta la simulacion de lo que el banco cobra de verdad.
   const gapAbs = (bankInstallment > 0 && totals.cuotaInicial > 0) ? bankInstallment - totals.cuotaInicial : 0;
@@ -1677,7 +1677,7 @@ function RentCalculator({ remData, dolarOficial }) {
   const mesesSinDato = schedule.length - mesesOficiales;
   // Meses que cubre el dato oficial desde hoy. No depende del plazo: se sabe
   // antes de cargar nada, y es el numero que va en "Primeros N meses".
-  const mesesConREM = (remData || []).filter(d => d.año > hoy.getFullYear() || (d.año === hoy.getFullYear() && d.mes >= hoy.getMonth() + 1)).length;
+  const mesesConREM = (remData || []).filter(d => d.año > startYear || (d.año === startYear && d.mes >= startMonth + 1)).length;
   const NBSP = ' ';
   const pct = (v) => v.toFixed(1).replace('.', ',');
 
