@@ -597,69 +597,72 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
 // Tabla de amortizacion del credito UVA. La usan la vista normal y el modal a
 // pantalla completa; `dark` es el modal, que siempre va sobre fondo oscuro.
 function AmortizationTable({ data, dark = false }) {
-  const th = `p-4 text-center ${dark ? '' : ''}`;
   const totalCuotas = data.reduce((a, d) => a + d.cuotaTotal, 0);
   const totalInteres = data.reduce((a, d) => a + d.interes, 0);
   const totalCapital = data.reduce((a, d) => a + d.principal, 0);
   const totalUva = data.reduce((a, d) => a + d.cuotaUva, 0);
 
+  // Los numeros van alineados a la derecha, que es como se comparan de un
+  // vistazo, y todo en peso normal: la unica cifra destacada es la cuota.
+  const tinta = dark ? 'text-slate-100' : 'text-ink dark:text-ink-dark';
+  const tenue = dark ? 'text-slate-400' : 'text-muted dark:text-muted-dark';
+  const th = 'px-4 py-3 font-medium text-right whitespace-nowrap';
+  const td = 'px-4 py-2.5 text-right whitespace-nowrap';
+
   return (
-    <table className={`w-full text-left border-collapse text-[13px] ${dark ? '' : 'min-w-[900px] md:min-w-[1100px]'}`} style={dark ? { minWidth: 1000 } : undefined}>
-      <thead className={`sticky top-0 z-10 font-semibold text-[12px] leading-none ${dark ? 'bg-slate-950 text-slate-400 border-b border-white/10 shadow-[0_-8px_0_0_#020617]' : 'bg-white dark:bg-slate-900 text-slate-400 border-b dark:border-slate-800 shadow-sm'}`}>
+    <table className={`w-full border-collapse text-body ${dark ? '' : 'min-w-[860px]'}`} style={dark ? { minWidth: 960 } : undefined}>
+      <thead className={`sticky top-0 z-10 text-label ${dark ? 'bg-slate-950 text-slate-400 border-b border-white/10' : 'bg-card dark:bg-card-dark text-muted dark:text-muted-dark border-b border-hair dark:border-hair-dark'}`}>
         <tr>
-          <th className={th}>Periodo</th>
-          <th className={th}>Inflación</th>
+          <th className={`${th} text-left`}>Periodo</th>
+          <th className={`${th} text-left`}>Inflación</th>
           <th className={th}>Cuota UVA</th>
           <th className={th}>Valor UVA</th>
-          <th className={th}>Cuota Total</th>
+          <th className={th}>Cuota total</th>
           <th className={th}>Interés</th>
           <th className={th}>Capital</th>
           <th className={th}>Saldo</th>
         </tr>
       </thead>
-      <tbody className={`text-center ${dark ? 'divide-y divide-white/5' : 'divide-y dark:divide-slate-800'}`}>
+      <tbody className={dark ? 'divide-y divide-white/5' : 'divide-y divide-hair dark:divide-hair-dark'}>
         {data.map((d, i) => {
-          // El origen de la inflacion solo se muestra cuando cambia: repetirlo en
-          // las 240 filas es ruido.
+          // El origen del dato solo se marca cuando cambia.
           const cambiaOrigen = i === 0 || data[i - 1].source !== d.source;
           return (
-            <tr key={d.mes} className={`transition-colors ${d.isHalfWay ? (dark ? 'bg-indigo-900/20 border-l-4 border-indigo-500' : 'bg-indigo-50 dark:bg-indigo-900/20 border-l-4 border-indigo-500') : (dark ? 'hover:bg-white/5' : 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40')}`}>
-              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-slate-200' : 'text-slate-800 dark:text-slate-200'}`}>
-                <span className="flex items-center justify-center gap-1.5">
+            <tr key={d.mes} className={`${tenue} ${d.isHalfWay ? (dark ? 'bg-white/5' : 'bg-indigo-500/5') : ''}`}>
+              <td className={`px-4 py-2.5 text-left whitespace-nowrap ${tinta}`}>
+                <span className="inline-flex items-center gap-1.5">
                   {d.label}
-                  {d.isHalfWay && <span title="50% del capital saldado" className="flex items-center gap-1 bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded-full tracking-tighter"><Flag className="w-2 h-2"/> 50%</span>}
+                  {d.isHalfWay && <span title="Mitad del capital devuelto" className="inline-flex items-center gap-1 text-micro text-indigo-500"><Flag className="w-3 h-3" /> 50%</span>}
                 </span>
               </td>
-              <td className="p-4">
-                {cambiaOrigen
-                  ? (
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-semibold ${dark ? 'bg-white/5 text-slate-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${d.oficial ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                      {d.source}
-                    </span>
-                  )
-                  : <span className="text-slate-300 dark:text-slate-700">·</span>}
+              <td className="px-4 py-2.5 text-left whitespace-nowrap">
+                {cambiaOrigen && (
+                  <span className={`inline-flex items-center gap-1.5 text-micro px-2 py-0.5 rounded-full ${dark ? 'bg-white/5 text-slate-300' : 'bg-hair dark:bg-hair-dark text-muted dark:text-muted-dark'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${d.oficial ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                    {d.source}
+                  </span>
+                )}
               </td>
-              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}`}>{uvas(d.cuotaUva)}</td>
-              <td className="p-4 text-slate-400 whitespace-nowrap">{money(d.valorUva)}</td>
-              <td className={`p-4 font-semibold whitespace-nowrap ${dark ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{money(d.cuotaTotal)}</td>
-              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(d.interes)}</td>
-              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(d.principal)}</td>
-              <td className={`p-4 font-semibold whitespace-nowrap ${dark ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{money(d.saldo)}</td>
+              <td className={td}>{uvas(d.cuotaUva)}</td>
+              <td className={td}>{money(d.valorUva)}</td>
+              <td className={`${td} font-semibold ${tinta}`}>{money(d.cuotaTotal)}</td>
+              <td className={td}>{money(d.interes)}</td>
+              <td className={td}>{money(d.principal)}</td>
+              <td className={td}>{money(d.saldo)}</td>
             </tr>
           );
         })}
       </tbody>
-      <tfoot className={`sticky bottom-0 font-semibold text-[12px] ${dark ? 'bg-slate-950 text-slate-300 border-t border-white/10' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-200 border-t dark:border-slate-700'}`}>
+      <tfoot className={`sticky bottom-0 text-label ${dark ? 'bg-slate-950 text-slate-300 border-t border-white/10' : 'bg-card dark:bg-card-dark text-ink dark:text-ink-dark border-t border-hair dark:border-hair-dark'}`}>
         <tr>
-          <td className="p-4 text-center whitespace-nowrap">Totales</td>
-          <td className="p-4"></td>
-          <td className="p-4 text-center whitespace-nowrap">{uvas(totalUva)}</td>
-          <td className="p-4"></td>
-          <td className="p-4 text-center whitespace-nowrap">{money(totalCuotas)}</td>
-          <td className={`p-4 text-center whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(totalInteres)}</td>
-          <td className={`p-4 text-center whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(totalCapital)}</td>
-          <td className="p-4"></td>
+          <td className="px-4 py-3 text-left font-medium">Totales</td>
+          <td />
+          <td className="px-4 py-3 text-right whitespace-nowrap">{uvas(totalUva)}</td>
+          <td />
+          <td className="px-4 py-3 text-right whitespace-nowrap font-semibold">{money(totalCuotas)}</td>
+          <td className="px-4 py-3 text-right whitespace-nowrap">{money(totalInteres)}</td>
+          <td className="px-4 py-3 text-right whitespace-nowrap">{money(totalCapital)}</td>
+          <td />
         </tr>
       </tfoot>
     </table>
