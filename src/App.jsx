@@ -454,7 +454,7 @@ const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" title={`Créditos hipotecarios en ${name}`}
       className="flex items-center justify-center h-12 px-3 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-indigo-500 transition-colors">
-      <img src={logoUrl} alt={name} loading="lazy" className="max-h-6 max-w-full object-contain grayscale opacity-60 hover:opacity-100 mix-blend-multiply dark:invert dark:mix-blend-screen transition-opacity" />
+      <img src={logoUrl} alt={name} loading="lazy" className="max-h-7 max-w-full object-contain grayscale opacity-60 hover:opacity-100 mix-blend-multiply dark:invert dark:mix-blend-screen transition-opacity" />
     </a>
   );
 });
