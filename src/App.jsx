@@ -14,7 +14,7 @@ import {
   CalendarDays, AlertTriangle, Activity, Github, Download, Sun, Moon,
   ExternalLink, HelpCircle, X, Coffee, HeartHandshake, FileSpreadsheet, Flag,
   Handshake, RotateCcw, MessageCircle, Check, Maximize2, Mail, Smartphone,
-  Home
+  Home, Wallet, Percent, Coins, Scale, CalendarClock
 } from 'lucide-react';
 
 // --- CONSTANTES GLOBALES ---
@@ -1203,6 +1203,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="p-4">
             <Stat
+              icon={Wallet}
               label={loanType === 'new' ? 'Primera cuota' : 'Próxima cuota'}
               value={sinDatos ? '---' : moneyCompact(totals.cuotaInicial)}
               sub={schedule[0] ? `${uvas(schedule[0].cuotaUva)} UVA por mes` : '\u00a0'}
@@ -1210,6 +1211,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </Card>
           <Card className="p-4">
             <Stat
+              icon={Percent}
               label="Intereses"
               value={sinDatos ? '---' : moneyCompact(totals.totalIntereses)}
               sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : '\u00a0'}
@@ -1217,6 +1219,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </Card>
           <Card className="p-4">
             <Stat
+              icon={Coins}
               label={loanType === 'new' ? 'Total a pagar' : 'Falta pagar'}
               value={sinDatos ? '---' : moneyCompact(totals.totalPagadoFinal)}
               sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : '\u00a0'}
@@ -1224,6 +1227,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </Card>
           <Card className="p-4">
             <Stat
+              icon={Scale}
               label="Costo real"
               value={!sinDatos && totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2).replace('.', ',')}x` : '---'}
               sub={!sinDatos && totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1).replace('.', ',')}x en pesos nominales` : '\u00a0'}
@@ -1888,6 +1892,7 @@ function RentCalculator({ remData, dolarOficial }) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="p-4">
             <Stat
+              icon={Wallet}
               label="Hoy pagás"
               value={sinDatos ? '---' : moneyCompact(totals.cuotaTotalInicial)}
               sub={sinDatos ? NBSP : `alquiler ${moneyCompact(totals.alquilerInicial)} + expensas ${moneyCompact(totals.expensasIniciales)}`}
@@ -1895,6 +1900,7 @@ function RentCalculator({ remData, dolarOficial }) {
           </Card>
           <Card className="p-4">
             <Stat
+              icon={TrendingUp}
               label="Próximo aumento"
               value={proximoAjuste ? `+${pct(proximoAjuste.aumento)}%` : '---'}
               sub={proximoAjuste ? `en ${proximoAjuste.label}` : (sinDatos ? NBSP : 'sin ajustes en el período')}
@@ -1902,6 +1908,7 @@ function RentCalculator({ remData, dolarOficial }) {
           </Card>
           <Card className="p-4">
             <Stat
+              icon={Coins}
               label="Total del contrato"
               value={sinDatos ? '---' : moneyCompact(totals.totalContrato)}
               sub={sinDatos ? NBSP : `${schedule.length} meses`}
@@ -1909,6 +1916,7 @@ function RentCalculator({ remData, dolarOficial }) {
           </Card>
           <Card className="p-4">
             <Stat
+              icon={CalendarClock}
               label="Último mes"
               value={sinDatos ? '---' : moneyCompact(totals.ultimoMes)}
               sub={sinDatos || totals.cuotaTotalInicial === 0 ? NBSP : `+${pct(((totals.ultimoMes / totals.cuotaTotalInicial) - 1) * 100)}% contra hoy`}
