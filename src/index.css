@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Todas las cifras del sitio con el mismo ancho, para que las columnas y los
+     totales alineen sin cambiar de familia tipografica. Los controles de
+     formulario no heredan esta propiedad por defecto, asi que se la pasamos. */
+  html { font-variant-numeric: tabular-nums; }
+  input, select, textarea, button { font-variant-numeric: inherit; }
+}
+
 @layer utilities {
   /* Se usa en las tiras que scrollean de costado (selector de plazo, tabla,
      datos del encabezado en movil). Estaba aplicada en varios lugares pero

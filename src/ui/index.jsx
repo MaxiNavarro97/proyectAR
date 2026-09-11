@@ -92,7 +92,7 @@ export function Stat({ label, value, sub, tone = 'neutral', size = 'stat', aside
         <Label className="truncate">{label}</Label>
         {aside}
       </div>
-      <p className={unir(size === 'display' ? 'text-display' : 'text-stat', 'font-mono truncate', TONO[tone])}>{value}</p>
+      <p className={unir(size === 'display' ? 'text-display' : 'text-stat', ' truncate', TONO[tone])}>{value}</p>
       {sub && <Hint className="mt-1 truncate">{sub}</Hint>}
     </div>
   );
@@ -166,7 +166,7 @@ export function Notice({ tone = 'info', icon: Icon, children, className }) {
 
 /* ---------- Controles de entrada ---------- */
 
-const CAMPO = 'w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 font-mono text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-colors';
+const CAMPO = 'w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-colors';
 
 // Un número con su unidad pegada al borde (%, UVA, lo que sea).
 export function NumberField({ value, onChange, suffix, prefix, placeholder, align = 'left' }) {

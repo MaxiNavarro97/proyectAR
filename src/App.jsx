@@ -428,7 +428,7 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent }) {
           onFocus={(e) => { setEnFoco(true); e.target.select(); }}
           onBlur={() => setEnFoco(false)}
           placeholder="$ 0"
-          className="w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 pr-9 font-mono text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 transition-colors"
+          className="w-full bg-field dark:bg-field-dark border border-hair dark:border-hair-dark rounded-control px-3 py-2.5 pr-9 text-stat text-ink dark:text-ink-dark outline-none focus:border-indigo-500 transition-colors"
         />
         <DollarSign className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-faint dark:text-faint-dark pointer-events-none" />
       </div>
@@ -476,7 +476,7 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
             </Tooltip>
           )}
         </div>
-        <p className={`text-xl md:text-2xl font-medium font-mono tracking-tight leading-none truncate transition-opacity duration-200 ${animating ? 'opacity-30' : 'opacity-100'} ${colorClass === 'rose' && title.includes('Rentabilidad') ? 'text-rose-500' : 'dark:text-white'}`}>{displayValue}</p>
+        <p className={`text-xl md:text-2xl font-medium tracking-tight leading-none truncate transition-opacity duration-200 ${animating ? 'opacity-30' : 'opacity-100'} ${colorClass === 'rose' && title.includes('Rentabilidad') ? 'text-rose-500' : 'dark:text-white'}`}>{displayValue}</p>
         {sub && <p className="text-[11px] font-bold text-slate-400 leading-none truncate mt-1">{sub}</p>}
       </div>
     </div>
@@ -577,7 +577,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
         {[0, 0.25, 0.5, 0.75, 1].map(p => (
           <g key={p}>
             <line x1={padL} y1={h - padB - (h - padB - padT) * p} x2={w - padR} y2={h - padB - (h - padB - padT) * p} stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeDasharray="4"/>
-            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[14px] fill-slate-400 font-mono font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
+            <text x={padL - 15} y={h - padB - (h - padB - padT) * p + 5} textAnchor="end" className="text-[14px] fill-slate-400 font-bold">$ {new Intl.NumberFormat('es-AR').format(Math.round((maxVal * p) / 1000))} mil</text>
           </g>
         ))}
         {sampled.map((d, i) => {
@@ -675,12 +675,12 @@ function AmortizationTable({ data, dark = false }) {
                   )
                   : <span className="text-slate-300 dark:text-slate-700">·</span>}
               </td>
-              <td className={`p-4 font-mono font-bold whitespace-nowrap ${dark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}`}>{uvas(d.cuotaUva)}</td>
-              <td className="p-4 font-mono text-slate-400 whitespace-nowrap">{money(d.valorUva)}</td>
+              <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}`}>{uvas(d.cuotaUva)}</td>
+              <td className="p-4 text-slate-400 whitespace-nowrap">{money(d.valorUva)}</td>
               <td className={`p-4 font-semibold whitespace-nowrap ${dark ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{money(d.cuotaTotal)}</td>
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(d.interes)}</td>
               <td className={`p-4 font-bold whitespace-nowrap ${dark ? 'text-indigo-400' : 'text-indigo-600'}`}>{money(d.principal)}</td>
-              <td className={`p-4 font-semibold font-mono whitespace-nowrap ${dark ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{money(d.saldo)}</td>
+              <td className={`p-4 font-semibold whitespace-nowrap ${dark ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>{money(d.saldo)}</td>
             </tr>
           );
         })}
@@ -689,7 +689,7 @@ function AmortizationTable({ data, dark = false }) {
         <tr>
           <td className="p-4 text-center whitespace-nowrap">Totales</td>
           <td className="p-4"></td>
-          <td className="p-4 text-center font-mono whitespace-nowrap">{uvas(totalUva)}</td>
+          <td className="p-4 text-center whitespace-nowrap">{uvas(totalUva)}</td>
           <td className="p-4"></td>
           <td className="p-4 text-center whitespace-nowrap">{money(totalCuotas)}</td>
           <td className={`p-4 text-center whitespace-nowrap ${dark ? 'text-orange-400' : 'text-orange-600'}`}>{money(totalInteres)}</td>
@@ -732,7 +732,7 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
       {items.map((it, i) => (
         <div key={it.label} title={it.title} className={`flex items-baseline gap-1.5 shrink-0 lg:flex-col lg:items-start lg:gap-1 ${i > 0 ? 'lg:border-l lg:border-hair lg:dark:border-hair-dark lg:pl-5 lg:ml-5' : ''}`}>
           <span className="text-[11px] font-semibold text-slate-400 leading-none">{it.label}</span>
-          <span className={`text-[13px] md:text-[15px] font-semibold font-mono leading-none ${it.color}`}>{it.valor}</span>
+          <span className={`text-[13px] md:text-[15px] font-semibold leading-none ${it.color}`}>{it.valor}</span>
         </div>
       ))}
     </div>
@@ -1158,7 +1158,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                   <Notice tone={Math.abs(gapPct) <= 5 ? 'info' : 'warning'} icon={ArrowRightLeft} className="mt-3">
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <span>Simulada {money(totals.cuotaInicial)}</span>
-                      <span className="font-mono text-stat">{gapPct > 0 ? '+' : ''}{gapPct.toFixed(1)}%</span>
+                      <span className="text-stat">{gapPct > 0 ? '+' : ''}{gapPct.toFixed(1)}%</span>
                     </div>
                     <span className="text-micro opacity-80">
                       {Math.abs(gapPct) <= 5
@@ -1197,7 +1197,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                       {inflacionAnual.map(a => (
                         <div key={a.año}>
                           <Label className="block mb-1">{a.año}{a.parcial && <span className="text-faint"> parcial</span>}</Label>
-                          <p className="text-stat font-mono text-emerald-600 dark:text-emerald-400">{a.valor.toFixed(0)}%</p>
+                          <p className="text-stat text-emerald-600 dark:text-emerald-400">{a.valor.toFixed(0)}%</p>
                         </div>
                       ))}
                     </div>
@@ -1808,7 +1808,7 @@ function RentCalculator({ remData, dolarOficial }) {
             <div className="group text-left">
               <label className="text-[12px] font-semibold text-slate-400 block mb-2">{rentType === 'new' ? (rentRole === 'owner' ? 'Ingreso del alquiler' : 'Monto del alquiler') : 'ALQUILER ACTUAL (MES EN CURSO)'}</label>
               <div className="relative">
-                <input type="text" inputMode="numeric" value={amountFocused && rentAmount === 0 ? '' : money(rentAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setRentAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
+                <input type="text" inputMode="numeric" value={amountFocused && rentAmount === 0 ? '' : money(rentAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setRentAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setAmountFocused(true); e.target.select(); }} onBlur={() => setAmountFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 dark:text-slate-400"><DollarSign className="w-5 h-5" /></div>
               </div>
               {rentAmount > 0 && <p className="text-[12px] text-emerald-600 mt-2 px-1 font-bold">Aprox. USD {new Intl.NumberFormat('es-AR').format(Math.round(rentAmount / dolarOficial))} <span className="text-[10px] opacity-70">(Oficial)</span></p>}
@@ -1817,7 +1817,7 @@ function RentCalculator({ remData, dolarOficial }) {
             <div className="group text-left">
               <label className="text-[12px] font-semibold text-slate-400 block mb-2">{rentRole === 'owner' ? 'EXPENSAS A CARGO INQUILINO' : 'Expensas iniciales'}</label>
               <div className="relative mb-2">
-                <input type="text" inputMode="numeric" value={expFocused && expensesAmount === 0 ? '' : money(expensesAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setExpensesAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setExpFocused(true); e.target.select(); }} onBlur={() => setExpFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
+                <input type="text" inputMode="numeric" value={expFocused && expensesAmount === 0 ? '' : money(expensesAmount)} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setExpensesAmount(v === '' ? 0 : Number(v)); }} onFocus={(e) => { setExpFocused(true); e.target.select(); }} onBlur={() => setExpFocused(false)} placeholder="$ 0" className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white" />
               </div>
               <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border dark:border-slate-700">
                 <span className="text-[12px] font-semibold text-slate-500 leading-tight">¿Ajustar por inflación? (Mensual)</span>
@@ -1828,11 +1828,11 @@ function RentCalculator({ remData, dolarOficial }) {
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
                 <label className="text-[13px] font-semibold text-emerald-600 block mb-2 leading-none">{rentType === 'new' ? 'Duración (meses)' : 'MESES RESTANTES'}</label>
-                <input type="text" inputMode="numeric" value={(durFocused && (durationMonths === 0 || durationMonths === '')) ? '' : durationMonths} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setDurationMonths(num !== '' && num > 240 ? 240 : num); }} onFocus={(e) => { setDurFocused(true); e.target.select(); }} onBlur={() => setDurFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
+                <input type="text" inputMode="numeric" value={(durFocused && (durationMonths === 0 || durationMonths === '')) ? '' : durationMonths} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setDurationMonths(num !== '' && num > 240 ? 240 : num); }} onFocus={(e) => { setDurFocused(true); e.target.select(); }} onBlur={() => setDurFocused(false)} className="w-full bg-transparent text-xl font-semibold outline-none text-center dark:text-white" />
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border dark:border-slate-800 text-center">
                 <label className="text-[13px] font-semibold text-emerald-600 block mb-2 leading-none">Ajusta cada (meses)</label>
-                <input type="text" inputMode="numeric" value={(adjFocused && (adjustPeriod === 0 || adjustPeriod === '')) ? '' : adjustPeriod} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setAdjustPeriod(num !== '' && num > 120 ? 120 : num); }} onFocus={(e) => { setAdjFocused(true); e.target.select(); }} onBlur={() => setAdjFocused(false)} className="w-full bg-transparent font-mono text-xl font-semibold outline-none text-center dark:text-white" />
+                <input type="text" inputMode="numeric" value={(adjFocused && (adjustPeriod === 0 || adjustPeriod === '')) ? '' : adjustPeriod} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); setAdjustPeriod(num !== '' && num > 120 ? 120 : num); }} onFocus={(e) => { setAdjFocused(true); e.target.select(); }} onBlur={() => setAdjFocused(false)} className="w-full bg-transparent text-xl font-semibold outline-none text-center dark:text-white" />
               </div>
             </div>
 
@@ -1844,7 +1844,7 @@ function RentCalculator({ remData, dolarOficial }) {
                       Ej: Si firmaste o tuviste el último aumento hace 2 meses exactos, ingresá"2". Esto permite calcular con precisión el próximo mes de ajuste.
                     </Tooltip>
                 </label>
-                <input type="text" inputMode="numeric" value={(sinceFocused && (monthsSinceLastAdjust === 0 || monthsSinceLastAdjust === '')) ? '' : monthsSinceLastAdjust} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); const maxVal = Number(adjustPeriod) > 0 ? Number(adjustPeriod) - 1 : 11; setMonthsSinceLastAdjust(num !== '' && num > maxVal ? maxVal : num); }} onFocus={(e) => { setSinceFocused(true); e.target.select(); }} onBlur={() => setSinceFocused(false)} className="w-full bg-transparent font-mono text-2xl font-semibold outline-none text-center text-emerald-700 dark:text-emerald-400" />
+                <input type="text" inputMode="numeric" value={(sinceFocused && (monthsSinceLastAdjust === 0 || monthsSinceLastAdjust === '')) ? '' : monthsSinceLastAdjust} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); const num = v === '' ? '' : Number(v); const maxVal = Number(adjustPeriod) > 0 ? Number(adjustPeriod) - 1 : 11; setMonthsSinceLastAdjust(num !== '' && num > maxVal ? maxVal : num); }} onFocus={(e) => { setSinceFocused(true); e.target.select(); }} onBlur={() => setSinceFocused(false)} className="w-full bg-transparent text-2xl font-semibold outline-none text-center text-emerald-700 dark:text-emerald-400" />
               </div>
             )}
           </div>
@@ -1876,7 +1876,7 @@ function RentCalculator({ remData, dolarOficial }) {
             <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border dark:border-slate-800">
               {inflationMode === 'manual' ? (
                 <div className="animate-in fade-in space-y-2">
-                    <div className="flex justify-between items-center"><span className="text-[12px] font-semibold text-emerald-600 leading-none">Tasa fija anual estimada</span><span className="text-[13px] font-mono font-semibold dark:text-white leading-none">{manualInf}%</span></div>
+                    <div className="flex justify-between items-center"><span className="text-[12px] font-semibold text-emerald-600 leading-none">Tasa fija anual estimada</span><span className="text-[13px] font-semibold dark:text-white leading-none">{manualInf}%</span></div>
                     <input type="range" min="0" max="100" step="1" value={Number(String(manualInf).replace(',', '.')) || 0} onChange={(e)=>setManualInf(String(e.target.value).replace('.', ','))} className="w-full accent-emerald-500" />
                 </div>
               ) : (
@@ -1909,7 +1909,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setPropertyValueUsd(v === '' ? 0 : Number(v)); }}
                     onFocus={(e) => { setPropFocused(true); e.target.select(); }} onBlur={() => setPropFocused(false)}
                     placeholder="USD 0"
-                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl font-mono text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white"
+                    className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500/50  dark:text-white"
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 font-semibold text-xs dark:text-slate-400">USD</div>
                 </div>
@@ -2196,11 +2196,6 @@ export default function App() {
   return (
     <HelmetProvider>
       <Router>
-        <Helmet>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-        </Helmet>
         <div className={darkMode ? 'dark' : ''}>
           <div className="min-h-screen bg-page dark:bg-page-dark text-ink dark:text-ink-dark transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative" style={{ fontFamily:"'Inter', system-ui, -apple-system, sans-serif" }}>
             

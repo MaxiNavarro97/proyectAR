@@ -12,6 +12,11 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      // Una sola familia para todo el sitio, numeros incluidos. Las cifras
+      // se alinean con tabular-nums (ver index.css), no con una monoespaciada.
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
       fontSize: {
         // Seis pasos, nombrados por rol y no por tamaño. Cada uno trae su peso
         // y su interlineado, así el rol se elige una sola vez.
