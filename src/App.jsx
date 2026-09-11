@@ -426,7 +426,7 @@ function TooltipContent({ data, isRent }) {
       </div>
       <div className="space-y-2 text-[15px] mb-3 border-b border-white/10 pb-3">
         <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 tracking-wide">Total:</span><span className="font-semibold text-white">{money(data.cuotaTotal)}</span></div>
-        <div className={`flex justify-between items-center gap-4 font-bold tracking-wide ${isRent ? 'text-emerald-400' : 'text-indigo-400'}`}><div className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${isRent ? 'bg-emerald-500' : 'bg-indigo-500'}`} /><span className="">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
+        <div className={`flex justify-between items-center gap-4 font-bold tracking-wide text-indigo-400`}><div className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full bg-indigo-500`} /><span className="">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
         <div className="flex justify-between items-center gap-4 text-orange-400 font-bold tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
       </div>
       <div className="space-y-1.5 text-[14px]">
@@ -516,8 +516,8 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
               onTouchEnd={handleTouchEnd}
               className="group cursor-pointer"
             >
-              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill={isRent ?"#10b981" :"#6366f1"} rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
-              <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill={isRent ?"#f59e0b" :"#fb923c"} rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri} width={barW} height={hPri} fill="#6366f1" rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
+              <rect x={x} y={h - padB - hPri - hInt} width={barW} height={hInt} fill="#fb923c" rx="1.5" fillOpacity="0.85" className="transition-all group-hover:brightness-110"/>
               {(i % Math.ceil(sampled.length/10) === 0) && (
                 <text x={x + barW/2} y={h - padB + 10} textAnchor="end" className="text-[13px] fill-slate-500 md:hidden" transform={`rotate(-90, ${x + barW/2}, ${h - padB + 10})`}>
                   {dateMode === 'calendar' ? d.shortDate : `M${d.mes}`}
