@@ -39,10 +39,10 @@ export const faqsOperativas = [
         <p>ProyectAR combina <b>dos fuentes oficiales</b> de datos de inflación para armar un timeline unificado:</p>
         <div className="space-y-3 mt-3">
           <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-emerald-500 mr-2 align-middle"></span><b>IPC (Índice de Precios al Consumidor)</b> — Dato real, cerrado. Lo publica el INDEC una vez al mes. Usamos los últimos 12 meses como dato histórico confirmado. Siempre tiene prioridad.</p>
+            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-emerald-500 mr-2 align-middle"></span><b>IPC (Índice de Precios al Consumidor)</b>: dato real, cerrado. Lo publica el INDEC una vez al mes. Usamos los últimos 12 meses como dato histórico confirmado. Siempre tiene prioridad.</p>
           </div>
           <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-xl">
-            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-indigo-500 mr-2 align-middle"></span><b>REM (Relevamiento de Expectativas de Mercado)</b> — Proyección. El BCRA encuesta a las principales consultoras y bancos sobre cuánto creen que va a ser la inflación futura. Usamos la mediana de esas estimaciones.</p>
+            <p className="text-sm"><span className="inline-block w-3 h-3 rounded-full bg-indigo-500 mr-2 align-middle"></span><b>REM (Relevamiento de Expectativas de Mercado)</b>: proyección. El BCRA encuesta a las principales consultoras y bancos sobre cuánto creen que va a ser la inflación futura. Usamos la mediana de esas estimaciones.</p>
           </div>
         </div>
         <p className="mt-3">Cuando un mes tiene dato IPC (real) y REM (proyectado), siempre priorizamos el IPC. Para los meses futuros donde solo hay REM, usamos esa proyección. Si se agotan ambas fuentes, aplicamos <b>inercia</b>: repetimos el último valor disponible del REM.</p>
