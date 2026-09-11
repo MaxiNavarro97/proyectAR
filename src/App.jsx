@@ -10,12 +10,11 @@ import { faqsOperativas } from './content/faqs.jsx';
 import { Panel, Card, SectionTitle, Label, Hint, Body, Field, Stat, Segmented, Badge, Notice, NumberField } from './ui/index.jsx';
 
 import { 
-  Calculator, DollarSign, TrendingUp, Globe, Home, ArrowRightLeft, Landmark,
-  FileText, Zap, Settings2, CalendarDays, AlertTriangle, Activity, Github,
-  Clock, Wallet, CheckCircle2, Download, Sun, Moon, ExternalLink,
-  ShieldAlert, HelpCircle, X, Coffee, HeartHandshake, FileSpreadsheet, Flag,
-  Handshake, RotateCcw, MessageCircle, Check, Flame, Maximize2, Mail,
-  Smartphone
+  Calculator, DollarSign, TrendingUp, Globe, Home, ArrowRightLeft, FileText,
+  Zap, Settings2, CalendarDays, AlertTriangle, Activity, Github, Clock,
+  Wallet, CheckCircle2, Download, Sun, Moon, ExternalLink, ShieldAlert,
+  HelpCircle, X, Coffee, HeartHandshake, FileSpreadsheet, Flag, Handshake,
+  RotateCcw, MessageCircle, Check, Flame, Maximize2, Mail, Smartphone
 } from 'lucide-react';
 
 // --- CONSTANTES GLOBALES ---
@@ -449,14 +448,13 @@ const SummaryCard = React.memo(function SummaryCard({ title, value, icon: Icon, 
 });
 
 const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
-  const [imgError, setImgError] = useState(false);
+  // Logos en gris: son links de referencia, no la informacion principal. En
+  // oscuro se invierten y se funden con el fondo, asi el fondo blanco de cada
+  // imagen deja de ser un rectangulo brillante.
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="group relative flex flex-col items-center justify-center p-2 md:p-3 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500/50  transition-all duration-500 overflow-hidden aspect-square">
-      <div className="relative z-10 h-10 md:h-12 w-full flex items-center justify-center bg-white">
-        {!imgError ? (
-          <img src={logoUrl} alt={name} onError={() => setImgError(true)} className="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
-        ) : (<Landmark className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" />)}
-      </div>
+    <a href={url} target="_blank" rel="noopener noreferrer" title={`Créditos hipotecarios en ${name}`}
+      className="flex items-center justify-center h-12 px-3 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-indigo-500 transition-colors">
+      <img src={logoUrl} alt={name} loading="lazy" className="max-h-6 max-w-full object-contain grayscale opacity-60 hover:opacity-100 mix-blend-multiply dark:invert dark:mix-blend-screen transition-opacity" />
     </a>
   );
 });
@@ -1226,25 +1224,6 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           )}
         </Panel>
 
-        <Panel className="p-4 md:p-5">
-          <SectionTitle icon={Globe}>Bancos</SectionTitle>
-          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2">
-            {[
-              { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/bconacion.png" },
-              { n: "Bco. Provincia", u: "https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l: "/logos/provincia.png" },
-              { n: "Galicia", u: "https://www.galicia.ar/personas/prestamos/hipotecarios", l: "/logos/galicia.png" },
-              { n: "Santander", u: "https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
-              { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" },
-              { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l: "/logos/bbva.png" },
-              { n: "Credicoop", u: "https://www.bancocredicoop.coop/personas/asalariados/creditos-para-la-vivienda/compra-uvas", l: "/logos/credicoop.png" },
-              { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
-              { n: "ICBC", u: "https://www.icbc.com.ar/personas/productos-servicios/prestamos/hipotecarios", l: "/logos/icbc.png" },
-              { n: "Supervielle", u: "https://www.supervielle.com.ar/personas/prestamos/hipotecarios", l: "/logos/supervielle.png" },
-              { n: "Patagonia", u: "https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios", l: "/logos/patagonia.png" },
-              { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" }
-            ].map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
-          </div>
-        </Panel>
       </div>
 
       {/* --- COLUMNA DERECHA: LO QUE SALE --- */}
@@ -1370,6 +1349,26 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <div className="inline-block min-w-full align-middle">
               <AmortizationTable data={schedule} />
             </div>
+          </div>
+        </Card>
+
+        <Card className="p-4 md:p-5">
+          <SectionTitle icon={Globe}>Bancos con crédito UVA</SectionTitle>
+          <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-6 gap-2">
+            {[
+              { n: "Bco. Nación", u: "https://www.bna.com.ar/Personas/CreditosHipotecarios", l: "/logos/bconacion.png" },
+              { n: "Bco. Provincia", u: "https://www.bancoprovincia.com.ar/hipotecarioTradicional/Info_Prov_Vivienda", l: "/logos/provincia.png" },
+              { n: "Galicia", u: "https://www.galicia.ar/personas/prestamos/hipotecarios", l: "/logos/galicia.png" },
+              { n: "Santander", u: "https://www.santander.com.ar/personas/prestamos/hipotecarios-uva", l: "/logos/santander.png" },
+              { n: "Macro", u: "https://www.macro.com.ar/personas/prestamos-hipotecarios?d=Any", l: "/logos/macro.png" },
+              { n: "BBVA", u: "https://www.bbva.com.ar/personas/productos/creditos-hipotecarios.html", l: "/logos/bbva.png" },
+              { n: "Credicoop", u: "https://www.bancocredicoop.coop/personas/asalariados/creditos-para-la-vivienda/compra-uvas", l: "/logos/credicoop.png" },
+              { n: "Bco. Ciudad", u: "https://bancociudad.com.ar/institucional/micrositio/PrestamoRemodelacionVivienda", l: "/logos/ciudad.png" },
+              { n: "ICBC", u: "https://www.icbc.com.ar/personas/productos-servicios/prestamos/hipotecarios", l: "/logos/icbc.png" },
+              { n: "Supervielle", u: "https://www.supervielle.com.ar/personas/prestamos/hipotecarios", l: "/logos/supervielle.png" },
+              { n: "Patagonia", u: "https://www.bancopatagonia.com.ar/personas/prestamos/hipotecarios", l: "/logos/patagonia.png" },
+              { n: "Hipotecario", u: "https://www.hipotecario.com.ar/personas/prestamos-a-la-vivienda/tradicional/adquisicion/", l: "/logos/hipotecario.png" }
+            ].map(b => <BankCard key={b.n} name={b.n} url={b.u} logoUrl={b.l} />)}
           </div>
         </Card>
       </div>
@@ -2226,16 +2225,17 @@ export default function App() {
               )}
             </main>
 
-            <div className="max-w-[1800px] mx-auto px-6 md:px-10 mt-10">
-               <div className="bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 dark:from-indigo-500/5 dark:to-emerald-500/5 rounded-2xl p-8 md:p-12 text-center border border-indigo-500/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12"><HeartHandshake className="w-40 h-40 text-indigo-500" /></div>
-                  <h3 className="text-xl md:text-2xl font-semibold tracking-tight mb-2">¿Te sirvió ProyectAR?</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-2xl mx-auto">Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.</p>
-                  <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
-                     <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#00cba9] hover:bg-[#00b899] text-white font-semibold rounded-xl text-xs transition-all"><Coffee className="w-4 h-4"/> Invitar un Cafecito</a>
-                     <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 bg-[#009ee3] hover:bg-[#008ed0] text-white font-semibold rounded-xl text-xs transition-all"><Handshake className="w-4 h-4"/> Aportar por Mercado Pago</a>
-                  </div>
-               </div>
+            <div className="max-w-[1800px] mx-auto w-full px-6 md:px-10 mt-10">
+              <div className="rounded-surface border border-hair dark:border-hair-dark bg-card dark:bg-card-dark p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
+                <div>
+                  <p className="text-title text-ink dark:text-ink-dark">¿Te sirvió ProyectAR?</p>
+                  <p className="text-body text-muted dark:text-muted-dark mt-1 max-w-2xl">Es 100% gratuita y la hacemos a pulmón. Si te aportó algo, una colaboración nos ayuda a pagar los servidores y a seguir mejorándola.</p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                  <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors"><Coffee className="w-4 h-4 text-faint" /> Invitar un cafecito</a>
+                  <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-indigo-500 transition-colors"><Handshake className="w-4 h-4 text-faint" /> Aportar por Mercado Pago</a>
+                </div>
+              </div>
             </div>
 
             <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col gap-8">
