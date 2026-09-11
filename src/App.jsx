@@ -13,9 +13,9 @@ import {
   Calculator, DollarSign, TrendingUp, Globe, Home, ArrowRightLeft, Landmark,
   FileText, Zap, Settings2, CalendarDays, AlertTriangle, Activity, Github,
   Clock, Wallet, CheckCircle2, Download, Sun, Moon, ExternalLink,
-  ShieldAlert, HelpCircle, Rocket, X, Sparkles, Coffee, HeartHandshake,
-  FileSpreadsheet, Flag, Handshake, RotateCcw, MessageCircle, Check, Flame,
-  Maximize2, Mail, Smartphone
+  ShieldAlert, HelpCircle, X, Coffee, HeartHandshake, FileSpreadsheet, Flag,
+  Handshake, RotateCcw, MessageCircle, Check, Flame, Maximize2, Mail,
+  Smartphone
 } from 'lucide-react';
 
 // --- CONSTANTES GLOBALES ---
@@ -343,39 +343,6 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
            <div className="mt-2">{getButtonContent()}</div>
         </div>
         <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 text-slate-500 dark:text-white rounded-full backdrop-blur-md transition-all"><X className="w-4 h-4" /></button>
-      </div>
-    </div>
-  )
-}
-
-function WelcomeModal({ onClose }) {
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm duration-300">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-indigo-500/20 shadow-sm w-full max-w-lg overflow-hidden relative duration-300">
-        <div className="h-32 bg-indigo-600 relative overflow-hidden flex items-center justify-center">
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-indigo-500 rounded-full blur-2xl opacity-50"></div>
-            <div className="absolute top-10 left-10 w-16 h-16 bg-white/10 rounded-full blur-xl"></div>
-            <Rocket className="w-12 h-12 text-white relative z-10 drop-shadow-sm" />
-        </div>
-        <div className="p-8 text-left">
-           <div className="flex items-center gap-2 mb-2">
-             <span className="bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Novedades</span>
-             <h2 className="text-xl font-semibold text-slate-800 dark:text-white">Version {APP_VERSION}</h2>
-           </div>
-           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-6 leading-relaxed">
-             Seguimos mejorando ProyectAR para que tengas la mejor experiencia de análisis financiero:
-           </p>
-           <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-3"><div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 shrink-0"><Smartphone className="w-4 h-4"/></div><div><h4 className="text-xs font-semibold dark:text-white">Experiencia Mobile Mejorada</h4><p className="text-[12px] text-slate-400">Gráficos y tablas optimizados para pantallas chicas. Headers fijos al scrollear y tooltips que siguen tu dedo.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0"><Landmark className="w-4 h-4"/></div><div><h4 className="text-xs font-semibold dark:text-white">Más Bancos</h4><p className="text-[12px] text-slate-400">Sumamos Galicia, Provincia, ICBC, Supervielle, Patagonia y Credicoop a los links directos.</p></div></div>
-              <div className="flex items-start gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400 shrink-0"><Maximize2 className="w-4 h-4"/></div><div><h4 className="text-xs font-semibold dark:text-white">Modo Cine Mejorado</h4><p className="text-[12px] text-slate-400">Pantalla completa más limpia en gráficos. Landscape automático sin distracciones.</p></div></div>
-           </div>
-           <button onClick={onClose} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2 group">
-             <span>¡A simular!</span> <Sparkles className="w-3 h-3 text-indigo-300 group-hover:text-white transition-colors"/>
-           </button>
-        </div>
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-all"><X className="w-4 h-4" /></button>
       </div>
     </div>
   )
@@ -719,20 +686,23 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
   // La fecha del dato va dentro de la etiqueta: en una banda de una linea no
   // hay lugar para un pie, y sin fecha un numero de inflacion no dice nada.
   const items = [
-    { label: 'UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', color: 'text-indigo-500 dark:text-indigo-400', title: 'Unidad de Valor Adquisitivo. Se ajusta a diario por el CER, que sigue a la inflación del INDEC.' },
-    { label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', color: 'text-emerald-600 dark:text-emerald-400', title: 'Cotización oficial del peso contra el dólar.' },
-    { label: datos.ipc ? `IPC ${MESES[datos.ipc.mes - 1].toLowerCase()} ${String(datos.ipc.año).slice(-2)}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', color: 'text-amber-600 dark:text-amber-400', title: 'Último dato de inflación mensual publicado por el INDEC.' },
-    { label: 'REM 12m', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', color: 'text-indigo-600 dark:text-indigo-400', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
+    { label: 'UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', title: 'Unidad de Valor Adquisitivo. Se ajusta a diario por el CER, que sigue a la inflación del INDEC.' },
+    { label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', title: 'Cotización oficial del peso contra el dólar.' },
+    { label: datos.ipc ? `IPC ${MESES[datos.ipc.mes - 1].toLowerCase()} ${String(datos.ipc.año).slice(-2)}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', title: 'Último dato de inflación mensual publicado por el INDEC.' },
+    { label: 'REM 12m', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
   ];
 
   return (
-    <div title={`Datos actualizados el ${formatDateTime(lastUpdate)}`} className="w-full lg:w-auto flex items-center gap-x-4 overflow-x-auto no-scrollbar lg:overflow-visible">
-      {items.map((it, i) => (
-        <div key={it.label} title={it.title} className={`flex items-baseline gap-1.5 shrink-0 lg:flex-col lg:items-start lg:gap-1 ${i > 0 ? 'lg:border-l lg:border-hair lg:dark:border-hair-dark lg:pl-5 lg:ml-5' : ''}`}>
-          <span className="text-[11px] font-semibold text-slate-400 leading-none">{it.label}</span>
-          <span className={`text-[13px] md:text-[15px] font-semibold leading-none ${it.color}`}>{it.valor}</span>
-        </div>
-      ))}
+    <div className="border-b border-hair dark:border-hair-dark px-4 md:px-10">
+      <div className="max-w-[1800px] mx-auto h-8 flex items-center gap-5 overflow-x-auto no-scrollbar text-micro whitespace-nowrap">
+        {items.map(it => (
+          <span key={it.label} title={it.title} className="shrink-0">
+            <span className="text-faint dark:text-faint-dark">{it.label}</span>{' '}
+            <span className="font-medium text-ink dark:text-ink-dark">{it.valor}</span>
+          </span>
+        ))}
+        <span className="ml-auto shrink-0 text-faint dark:text-faint-dark" title="Ultima actualizacion de los datos">{formatDateTime(lastUpdate)}</span>
+      </div>
     </div>
   );
 }
@@ -2137,7 +2107,6 @@ export default function App() {
   const [remData, setRemData] = useState([]);
   const [remStatus, setRemStatus] = useState('loading');
   const [loading, setLoading] = useState(true);
-  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     try { localStorage.setItem('proyectar_dark', JSON.stringify(darkMode)); } catch { /* storage lleno o bloqueado */ }
@@ -2145,16 +2114,7 @@ export default function App() {
 
   useEffect(() => {
     if (GA_MEASUREMENT_ID) { ReactGA.initialize(GA_MEASUREMENT_ID); ReactGA.send({ hitType:"pageview", page: window.location.pathname }); }
-    try {
-      const hasSeenWelcome = localStorage.getItem(`proyectar_welcome_v${APP_VERSION}`);
-      if (!hasSeenWelcome) setShowWelcome(true);
-    } catch { /* si no se puede leer, no mostramos el welcome */ }
   }, []);
-
-  const handleCloseWelcome = () => {
-    try { localStorage.setItem(`proyectar_welcome_v${APP_VERSION}`, 'true'); } catch { /* ignorar */ }
-    setShowWelcome(false);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -2193,20 +2153,18 @@ export default function App() {
       <Router>
         <div className={darkMode ? 'dark' : ''}>
           <div className="min-h-screen bg-page dark:bg-page-dark text-ink dark:text-ink-dark transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative" style={{ fontFamily:"'Inter', system-ui, -apple-system, sans-serif" }}>
-            
-            {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
-            <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b dark:border-slate-800 sticky top-0 z-40 min-h-[80px] h-auto lg:h-24 flex flex-col lg:flex-row items-center justify-between px-4 md:px-10 py-4 lg:py-0 gap-4 lg:gap-0 leading-none">
+            <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
+
+            <nav className="bg-page/90 dark:bg-page-dark/90 backdrop-blur-3xl border-b border-hair dark:border-hair-dark sticky top-0 z-40 h-auto md:h-16 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-3 md:py-0 gap-3 md:gap-0 leading-none">
               <div className="flex items-center gap-3 md:gap-5">
-                <img src="/favicon.png" alt="ProyectAR Logo" className="w-10 h-10 md:w-16 md:h-16 object-contain drop-shadow-sm" />
-                <div className="flex flex-col text-left leading-none"><span className="font-semibold text-lg md:text-3xl tracking-tighter leading-none">Proyect<span className="text-indigo-500">AR</span></span><span className="text-[11px] md:text-[13px] font-semibold tracking-[0.2em] text-slate-500 mt-1 md:mt-3 opacity-60 leading-none">v{APP_VERSION}</span></div>
+                <img src="/favicon.png" alt="ProyectAR Logo" className="w-9 h-9 object-contain rounded-control" />
+                <div className="flex flex-col text-left leading-none"><span className="text-title md:text-xl font-semibold tracking-tight leading-none">Proyect<span className="text-indigo-500">AR</span></span></div>
               </div>
 
-              <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
-
-              <div className="flex items-center gap-2 lg:gap-8 w-full lg:w-auto justify-between lg:justify-end">
+              <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-end">
                 <NavigationMenu />
-                <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" className="p-2.5 md:p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border dark:border-slate-700">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
+                <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" className="p-2.5 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
               </div>
             </nav>
 
@@ -2281,7 +2239,7 @@ export default function App() {
 
             <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col gap-8">
               <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
-                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 tracking-[0.2em] opacity-50">{`República Argentina - ${CURRENT_YEAR}`}</p></div>
+                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 tracking-[0.2em] opacity-50">{`República Argentina · ${CURRENT_YEAR} · v${APP_VERSION}`}</p></div>
                 <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[12px] leading-relaxed tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-semibold text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
                 <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[13px] font-bold text-slate-400 opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
               </div>
