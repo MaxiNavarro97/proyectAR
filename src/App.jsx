@@ -892,6 +892,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   // Cuantos meses de la proyeccion tienen dato oficial (IPC o REM) detras.
   const mesesOficiales = schedule.filter(d => d.oficial).length;
   const mesesSinDato = schedule.length - mesesOficiales;
+  // Meses que cubre el dato oficial desde hoy. No depende del plazo: se sabe
+  // antes de cargar nada, y es el numero que va en "Primeros N meses".
+  const mesesConREM = (remData || []).filter(d => d.año > hoy.getFullYear() || (d.año === hoy.getFullYear() && d.mes >= hoy.getMonth() + 1)).length;
 
   // Cuanto se aparta la simulacion de lo que el banco cobra de verdad.
   const gapAbs = (bankInstallment > 0 && totals.cuotaInicial > 0) ? bankInstallment - totals.cuotaInicial : 0;
@@ -1122,7 +1125,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           <div className="divide-y divide-hair dark:divide-hair-dark">
             <div className="pb-4">
               <div className="flex items-center justify-between gap-2 mb-2">
-                <Label>{mesesOficiales === 0 ? 'Primeros meses' : mesesSinDato === 0 ? `Los ${mesesOficiales} meses` : `Primeros ${mesesOficiales} meses`}</Label>
+                <Label>{!sinDatos && mesesSinDato === 0 ? `Los ${schedule.length} meses` : mesesConREM > 0 ? `Primeros ${mesesConREM} meses` : 'Primeros meses'}</Label>
                 <Segmented size="sm" value={inflFirstMode} onChange={setInflFirstMode}
                   options={[{ value: 'rem', label: 'REM' }, { value: 'custom', label: 'Propia' }]} />
               </div>
@@ -1146,7 +1149,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               )}
             </div>
 
-            {mesesSinDato > 0 && (
+            {(sinDatos || mesesSinDato > 0) && (
               <div className="pt-4">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <Label>Meses restantes</Label>
@@ -1600,6 +1603,9 @@ function RentCalculator({ remData, dolarOficial }) {
   const proximoAjuste = schedule.find(d => d.ajuste) || null;
   const mesesOficiales = schedule.filter(d => d.oficial).length;
   const mesesSinDato = schedule.length - mesesOficiales;
+  // Meses que cubre el dato oficial desde hoy. No depende del plazo: se sabe
+  // antes de cargar nada, y es el numero que va en "Primeros N meses".
+  const mesesConREM = (remData || []).filter(d => d.año > hoy.getFullYear() || (d.año === hoy.getFullYear() && d.mes >= hoy.getMonth() + 1)).length;
   const NBSP = ' ';
   const pct = (v) => v.toFixed(1).replace('.', ',');
 
@@ -1785,7 +1791,7 @@ function RentCalculator({ remData, dolarOficial }) {
           <div className="divide-y divide-hair dark:divide-hair-dark">
             <div className="pb-4">
               <div className="flex items-center justify-between gap-2 mb-2">
-                <Label>{sinDatos || mesesOficiales === 0 ? 'Primeros meses' : mesesSinDato === 0 ? `Los ${mesesOficiales} meses` : `Primeros ${mesesOficiales} meses`}</Label>
+                <Label>{!sinDatos && mesesSinDato === 0 ? `Los ${schedule.length} meses` : mesesConREM > 0 ? `Primeros ${mesesConREM} meses` : 'Primeros meses'}</Label>
                 <Segmented size="sm" value={inflFirstMode} onChange={setInflFirstMode}
                   options={[{ value: 'rem', label: 'REM' }, { value: 'custom', label: 'Propia' }]} />
               </div>
