@@ -28,9 +28,13 @@ const CURRENT_YEAR = new Date().getFullYear();
 // el logo y el menu quedaban lejos del contenido.
 const CONTENEDOR = 'max-w-[1800px] mx-auto w-full px-4 md:px-10';
 
+// Misma tipografia que el sitio. react-pdf acepta TTF y WOFF (no WOFF2).
 Font.register({
-  family: 'Roboto',
-  src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf'
+  family: 'Inter',
+  fonts: [
+    { src: 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.0/files/inter-latin-400-normal.woff', fontWeight: 400 },
+    { src: 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.0/files/inter-latin-600-normal.woff', fontWeight: 600 },
+  ],
 });
 
 // Acumula la inflacion mensual de cada anio calendario. Un anio queda"parcial"
@@ -126,102 +130,166 @@ function Tooltip({ children, iconClass ="w-3.5 h-3.5 text-slate-400", color ="in
 }
 
 // --- ESTILOS PDF ---
-// Borde compartido por columnas de tabla PDF
-const PDF_BORDER = { borderStyle:"solid", borderColor: '#e2e8f0', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0 };
+// Colores del PDF: los mismos roles que el sitio, en valores fijos porque el
+// PDF no conoce las clases de Tailwind.
+const PDF = { tinta: '#0f172a', suave: '#475569', tenue: '#94a3b8', linea: '#e2e8f0', fondo: '#f1f5f9', indigo: '#4f46e5', verde: '#059669' };
 
 const pdfStyles = StyleSheet.create({
-  page: { padding: 30, fontFamily: 'Roboto', backgroundColor: '#f8fafc' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', paddingBottom: 10 },
-  brandTitle: { fontSize: 18, fontWeight: 'bold', color: '#4f46e5', textTransform: '' },
-  brandSub: { fontSize: 8, color: '#64748b', letterSpacing: 1 },
-  reportTitle: { fontSize: 14, fontWeight: 'bold', color: '#1e293b', marginTop: 10, marginBottom: 5, textTransform: '' },
-  disclaimerBox: { backgroundColor: '#f1f5f9', padding: 8, borderRadius: 4, marginBottom: 15 },
-  disclaimerText: { fontSize: 7, color: '#475569', textAlign: 'center' },
-  table: { display:"flex", flexDirection:"column", width:"100%", borderStyle:"solid", borderColor: '#e2e8f0', borderWidth: 1, borderRightWidth: 0, borderBottomWidth: 0 },
-  tableRow: { flexDirection:"row" },
-  tableColHeader: { ...PDF_BORDER, width:"14.28%", borderBottomColor: '#4f46e5', backgroundColor: '#eef2ff' },
-  tableCol: { ...PDF_BORDER, width:"14.28%" },
-  tableCellHeader: { margin: 5, fontSize: 8, fontWeight: 'bold', color: '#4f46e5', textTransform: '', textAlign: 'center' },
-  tableCell: { margin: 5, fontSize: 8, color: '#334155', textAlign: 'center' },
-  footer: { position: 'absolute', bottom: 20, left: 30, right: 30, textAlign: 'center', fontSize: 7, color: '#94a3b8', borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 10 }
+  page: { paddingTop: 32, paddingBottom: 60, paddingHorizontal: 32, fontFamily: 'Inter', fontSize: 8, color: PDF.tinta, backgroundColor: '#ffffff' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: PDF.linea },
+  marca: { fontSize: 16, fontWeight: 600, color: PDF.tinta },
+  subtitulo: { fontSize: 9, color: PDF.suave, marginTop: 2 },
+  meta: { fontSize: 7, color: PDF.tenue, textAlign: 'right' },
+  tarjetas: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  tarjeta: { flex: 1, borderWidth: 1, borderColor: PDF.linea, borderRadius: 6, padding: 8 },
+  tarjetaEtiqueta: { fontSize: 7, color: PDF.suave, marginBottom: 3 },
+  tarjetaValor: { fontSize: 12, fontWeight: 600, color: PDF.tinta },
+  tarjetaSub: { fontSize: 6.5, color: PDF.tenue, marginTop: 2 },
+  fila: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: PDF.linea },
+  filaCabecera: { flexDirection: 'row', backgroundColor: PDF.fondo, borderBottomWidth: 1, borderBottomColor: PDF.linea },
+  celda: { paddingVertical: 4, paddingHorizontal: 5, fontSize: 7.5, color: PDF.suave },
+  celdaCabecera: { paddingVertical: 5, paddingHorizontal: 5, fontSize: 7, fontWeight: 600, color: PDF.suave },
+  pie: { position: 'absolute', bottom: 24, left: 32, right: 32, flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: PDF.linea, paddingTop: 8 },
+  pieTexto: { fontSize: 6.5, color: PDF.tenue },
 });
 
-// --- COMPONENTE DOCUMENTO PDF (CRÉDITOS) ---
-const MortgagePDFDocument = ({ data, summary }) => (
-  <Document>
-    <Page size="A4" style={pdfStyles.page}>
-      <View style={pdfStyles.header}>
-        <View><Text style={pdfStyles.brandTitle}>ProyectAR</Text><Text style={pdfStyles.brandSub}>Soberanía Financiera</Text></View>
-        <View><Text style={{ fontSize: 8, color: '#64748b' }}>Reporte Generado: {new Date().toLocaleDateString('es-AR')}</Text></View>
+const AVISO_PDF = 'Simulación con fines informativos. No es asesoramiento financiero ni garantiza resultados: las proyecciones usan datos del INDEC y del REM-BCRA y pueden variar.';
+
+// Piezas comunes a los dos reportes. El encabezado, la cabecera de la tabla y
+// el pie se repiten en cada pagina.
+function PdfEncabezado({ titulo, acento }) {
+  return (
+    <View style={pdfStyles.header} fixed>
+      <View>
+        <Text style={pdfStyles.marca}>Proyect<Text style={{ color: acento }}>AR</Text></Text>
+        <Text style={pdfStyles.subtitulo}>{titulo}</Text>
       </View>
-      <Text style={pdfStyles.reportTitle}>Proyección de Crédito Hipotecario UVA</Text>
-      <View style={pdfStyles.disclaimerBox}>
-         <Text style={pdfStyles.disclaimerText}>AVISO LEGAL: ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos.</Text>
+      <View>
+        <Text style={pdfStyles.meta}>Generado el {new Date().toLocaleDateString('es-AR')}</Text>
+        <Text style={pdfStyles.meta}>proyectar.io</Text>
       </View>
-      <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
-          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>Cuota inicial</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.cuotaInicial)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#fff7ed', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#ea580c', fontWeight: 'bold' }}>Total intereses</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalIntereses)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>Pago total est.</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalPagadoFinal)}</Text></View>
+    </View>
+  );
+}
+
+function PdfTarjetas({ items }) {
+  return (
+    <View style={pdfStyles.tarjetas}>
+      {items.map(it => (
+        <View key={it.etiqueta} style={pdfStyles.tarjeta}>
+          <Text style={pdfStyles.tarjetaEtiqueta}>{it.etiqueta}</Text>
+          <Text style={pdfStyles.tarjetaValor}>{it.valor}</Text>
+          {it.sub ? <Text style={pdfStyles.tarjetaSub}>{it.sub}</Text> : null}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function PdfTabla({ columnas, filas }) {
+  const alineada = (col, base) => ({ ...base, width: col.ancho, textAlign: col.izquierda ? 'left' : 'right' });
+  return (
+    <View>
+      <View style={pdfStyles.filaCabecera} fixed>
+        {columnas.map(c => <Text key={c.titulo} style={alineada(c, pdfStyles.celdaCabecera)}>{c.titulo}</Text>)}
       </View>
-      <View style={pdfStyles.table}>
-        <View style={pdfStyles.tableRow}>
-          {["Periodo","Origen Tasa","Cuota Total","Interés","Capital","Saldo"].map(h => (
-            <View style={{...pdfStyles.tableColHeader, width:"16.66%"}} key={h}><Text style={pdfStyles.tableCellHeader}>{h}</Text></View>
+      {filas.map((f, i) => (
+        <View key={i} style={pdfStyles.fila} wrap={false}>
+          {f.map((c, k) => (
+            <Text key={k} style={{
+              ...alineada(columnas[k], pdfStyles.celda),
+              ...(c.tinta ? { color: PDF.tinta } : {}),
+              ...(c.fuerte ? { color: PDF.tinta, fontWeight: 600 } : {}),
+              ...(c.color ? { color: c.color } : {}),
+            }}>{c.texto}</Text>
           ))}
         </View>
-        {data.map((row, i) => (
-          <View style={pdfStyles.tableRow} key={i} backgroundColor={i % 2 === 0 ? '#ffffff' : '#f8fafc'}>
-            <View style={{...pdfStyles.tableCol, width: '16.66%'}}><Text style={pdfStyles.tableCell}>{row.shortDate}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '16.66%'}}><Text style={{...pdfStyles.tableCell, fontSize: 7}}>{row.source}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '16.66%'}}><Text style={{...pdfStyles.tableCell, fontWeight: 'bold'}}>{money(row.cuotaTotal)}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '16.66%'}}><Text style={{...pdfStyles.tableCell, color: '#ea580c'}}>{money(row.interes)}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '16.66%'}}><Text style={{...pdfStyles.tableCell, color: '#4f46e5'}}>{money(row.principal)}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '16.66%'}}><Text style={pdfStyles.tableCell}>{money(row.saldo)}</Text></View>
-          </View>
-        ))}
-      </View>
-      <Text style={pdfStyles.footer}>ProyectAR - Desarrollado por @MaxiNavarro97 - Mar del Plata, Argentina.</Text>
-    </Page>
-  </Document>
-);
+      ))}
+    </View>
+  );
+}
+
+function PdfPie() {
+  return (
+    <View style={pdfStyles.pie} fixed>
+      <Text style={{ ...pdfStyles.pieTexto, flex: 1, marginRight: 12 }}>{AVISO_PDF}</Text>
+      <Text style={pdfStyles.pieTexto} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+    </View>
+  );
+}
+
+// --- COMPONENTE DOCUMENTO PDF (CRÉDITOS) ---
+const MortgagePDFDocument = ({ data, summary }) => {
+  const primera = data[0];
+  const columnas = [
+    { titulo: 'Periodo', ancho: '12%', izquierda: true },
+    { titulo: 'Inflación', ancho: '10%', izquierda: true },
+    { titulo: 'Cuota UVA', ancho: '11%' },
+    { titulo: 'Valor UVA', ancho: '11%' },
+    { titulo: 'Cuota total', ancho: '14%' },
+    { titulo: 'Interés', ancho: '14%' },
+    { titulo: 'Capital', ancho: '14%' },
+    { titulo: 'Saldo', ancho: '14%' },
+  ];
+  return (
+    <Document title="Proyección de crédito UVA - ProyectAR">
+      <Page size="A4" style={pdfStyles.page}>
+        <PdfEncabezado titulo="Proyección de crédito hipotecario UVA" acento={PDF.indigo} />
+        <PdfTarjetas items={[
+          { etiqueta: 'Primera cuota', valor: money(summary.cuotaInicial), sub: primera ? `${uvas(primera.cuotaUva)} UVA por mes` : '' },
+          { etiqueta: 'Intereses', valor: money(summary.totalIntereses), sub: `${uvas(Math.round(summary.totalInteresesUva))} UVA` },
+          { etiqueta: 'Total a pagar', valor: money(summary.totalPagadoFinal), sub: `${uvas(Math.round(summary.totalPagadoUva))} UVA` },
+          { etiqueta: 'Costo real', valor: summary.capitalUva > 0 ? `${(summary.totalPagadoUva / summary.capitalUva).toFixed(2).replace('.', ',')}x` : '---', sub: 'medido en UVA' },
+        ]} />
+        <PdfTabla columnas={columnas} filas={data.map(d => [
+          { texto: d.label, tinta: true },
+          { texto: d.source },
+          { texto: uvas(d.cuotaUva) },
+          { texto: money(d.valorUva) },
+          { texto: money(d.cuotaTotal), fuerte: true },
+          { texto: money(d.interes) },
+          { texto: money(d.principal) },
+          { texto: money(d.saldo) },
+        ])} />
+        <PdfPie />
+      </Page>
+    </Document>
+  );
+};
 
 // --- COMPONENTE DOCUMENTO PDF (ALQUILERES) ---
-const RentPDFDocument = ({ data, summary }) => (
-  <Document>
-    <Page size="A4" style={pdfStyles.page}>
-      <View style={pdfStyles.header}>
-        <View><Text style={pdfStyles.brandTitle}>ProyectAR</Text><Text style={pdfStyles.brandSub}>Soberanía Financiera</Text></View>
-        <View><Text style={{ fontSize: 8, color: '#64748b' }}>Reporte Generado: {new Date().toLocaleDateString('es-AR')}</Text></View>
-      </View>
-      <Text style={pdfStyles.reportTitle}>Proyección Contrato de Alquiler</Text>
-      <View style={pdfStyles.disclaimerBox}>
-         <Text style={pdfStyles.disclaimerText}>AVISO LEGAL: ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos.</Text>
-      </View>
-      <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
-          <View style={{ flex: 1, backgroundColor: '#eef2ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#4f46e5', fontWeight: 'bold' }}>Alquiler inicial</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.alquilerInicial)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#fff7ed', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#ea580c', fontWeight: 'bold' }}>Total expensas est.</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalExpensas)}</Text></View>
-          <View style={{ flex: 1, backgroundColor: '#f0f9ff', padding: 8, borderRadius: 4 }}><Text style={{ fontSize: 8, color: '#0284c7', fontWeight: 'bold' }}>Costo total contrato</Text><Text style={{ fontSize: 12, fontWeight: 'bold' }}>{money(summary.totalContrato)}</Text></View>
-      </View>
-      <View style={pdfStyles.table}>
-        <View style={pdfStyles.tableRow}>
-          {["Periodo","Inflación","Total Mes","Alquiler","Expensas"].map(h => (
-            <View style={{...pdfStyles.tableColHeader, width:"20%"}} key={h}><Text style={pdfStyles.tableCellHeader}>{h}</Text></View>
-          ))}
-        </View>
-        {data.map((row, i) => (
-          <View style={pdfStyles.tableRow} key={i} backgroundColor={i % 2 === 0 ? '#ffffff' : '#f8fafc'}>
-            <View style={{...pdfStyles.tableCol, width: '20%'}}><Text style={pdfStyles.tableCell}>{row.shortDate}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '20%'}}><Text style={{...pdfStyles.tableCell, fontSize: 7}}>{row.source}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '20%'}}><Text style={{...pdfStyles.tableCell, fontWeight: 'bold'}}>{money(row.cuotaTotal)}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '20%'}}><Text style={{...pdfStyles.tableCell, color: '#4f46e5'}}>{money(row.principal)}</Text></View>
-            <View style={{...pdfStyles.tableCol, width: '20%'}}><Text style={{...pdfStyles.tableCell, color: '#ea580c'}}>{money(row.interes)}</Text></View>
-          </View>
-        ))}
-      </View>
-      <Text style={pdfStyles.footer}>ProyectAR - Desarrollado por @MaxiNavarro97 - Mar del Plata, Argentina.</Text>
-    </Page>
-  </Document>
-);
+const RentPDFDocument = ({ data, summary }) => {
+  const pct = (v) => v.toFixed(1).replace('.', ',');
+  const proximo = data.find(d => d.ajuste);
+  const columnas = [
+    { titulo: 'Periodo', ancho: '22%', izquierda: true },
+    { titulo: 'Inflación', ancho: '14%', izquierda: true },
+    { titulo: 'Alquiler', ancho: '20%' },
+    { titulo: 'Expensas', ancho: '20%' },
+    { titulo: 'Total del mes', ancho: '24%' },
+  ];
+  return (
+    <Document title="Proyección de alquiler - ProyectAR">
+      <Page size="A4" style={pdfStyles.page}>
+        <PdfEncabezado titulo="Proyección de contrato de alquiler" acento={PDF.verde} />
+        <PdfTarjetas items={[
+          { etiqueta: 'Hoy pagás', valor: money(summary.cuotaTotalInicial), sub: `alquiler ${money(summary.alquilerInicial)} + expensas ${money(summary.expensasIniciales)}` },
+          { etiqueta: 'Próximo aumento', valor: proximo ? `+${pct(proximo.aumento)}%` : '---', sub: proximo ? `en ${proximo.label}` : 'sin ajustes en el período' },
+          { etiqueta: 'Total del contrato', valor: money(summary.totalContrato), sub: '' },
+          { etiqueta: 'Último mes', valor: money(summary.ultimoMes), sub: '' },
+        ]} />
+        <PdfTabla columnas={columnas} filas={data.map(d => [
+          { texto: d.ajuste ? `${d.label}  +${pct(d.aumento)}%` : d.label, tinta: true, ...(d.ajuste ? { color: PDF.verde } : {}) },
+          { texto: d.source },
+          { texto: money(d.principal) },
+          { texto: money(d.interes) },
+          { texto: money(d.cuotaTotal), fuerte: true },
+        ])} />
+        <PdfPie />
+      </Page>
+    </Document>
+  );
+};
 
 // --- COMPONENTES AUXILIARES ---
 
