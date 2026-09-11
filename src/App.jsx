@@ -10,17 +10,23 @@ import { faqsOperativas } from './content/faqs.jsx';
 import { Panel, Card, SectionTitle, Label, Hint, Body, Field, Stat, Segmented, Badge, Notice, NumberField } from './ui/index.jsx';
 
 import { 
-  Calculator, DollarSign, TrendingUp, Globe, Home, ArrowRightLeft, FileText,
-  Zap, Settings2, CalendarDays, AlertTriangle, Activity, Github, Clock,
-  Wallet, CheckCircle2, Download, Sun, Moon, ExternalLink, ShieldAlert,
-  HelpCircle, X, Coffee, HeartHandshake, FileSpreadsheet, Flag, Handshake,
-  RotateCcw, MessageCircle, Check, Flame, Maximize2, Mail, Smartphone
+  Calculator, DollarSign, TrendingUp, Globe, ArrowRightLeft, FileText, Zap,
+  Settings2, CalendarDays, AlertTriangle, Activity, Github, Clock, Wallet,
+  CheckCircle2, Download, Sun, Moon, ExternalLink, ShieldAlert, HelpCircle,
+  X, Coffee, HeartHandshake, FileSpreadsheet, Flag, Handshake, RotateCcw,
+  MessageCircle, Check, Flame, Maximize2, Mail, Smartphone
 } from 'lucide-react';
 
 // --- CONSTANTES GLOBALES ---
 const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 const APP_VERSION ="1.1.0";
 const CURRENT_YEAR = new Date().getFullYear();
+
+// Un solo contenedor para todas las franjas del sitio (tira de datos, nav,
+// contenido y pie): mismo ancho maximo y mismo margen, asi sus bordes coinciden
+// en cualquier pantalla. Antes cada franja tenia el suyo y en monitores anchos
+// el logo y el menu quedaban lejos del contenido.
+const CONTENEDOR = 'max-w-[1800px] mx-auto w-full px-4 md:px-10';
 
 Font.register({
   family: 'Roboto',
@@ -345,29 +351,26 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
 }
 
 // --- COMPONENTE DE BOTON DE NAVEGACIÓN ---
-const NAV_THEMES = {
-  indigo: 'text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 shadow-sm border-indigo-100 dark:border-indigo-500/30 scale-105',
-  emerald: 'text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-800 shadow-sm border-emerald-100 dark:border-emerald-500/30 scale-105',
-  amber: 'text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800 shadow-sm border-amber-100 dark:border-amber-500/30 scale-105',
-};
-
-const NavBtn = React.memo(function NavBtn({ to, currentPath, icon, label, color }) {
-  const active = currentPath === to || (to === '/' && currentPath === '');
-  return (
-    <Link to={to} className={`px-2.5 sm:px-4 md:px-5 py-2.5 rounded-xl text-[11px] sm:text-[12px] md:text-xs font-semibold flex items-center gap-1.5 md:gap-2 transition-all border border-transparent ${active ? NAV_THEMES[color] : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-      {React.cloneElement(icon, { className:"w-3.5 h-3.5 md:w-5 md:h-5" })} {label}
-    </Link>
-  );
-});
-
-// --- MENU DE NAVEGACIÓN ---
+// Pestanas del sitio. Mismo aspecto que los toggles de la pagina (Segmented):
+// riel gris y la activa en indigo. Son links y no botones porque cambian de ruta.
 function NavigationMenu() {
-  const location = useLocation();
+  const { pathname } = useLocation();
+  const pestanas = [
+    { to: '/calculadora-creditos-uva', label: 'Créditos' },
+    { to: '/calculadora-alquileres', label: 'Alquileres' },
+    { to: '/faq', label: 'FAQ' },
+  ];
   return (
-    <div className="flex gap-1.5 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl border dark:border-slate-700  overflow-x-auto no-scrollbar max-w-full">
-      <NavBtn currentPath={location.pathname} to="/calculadora-creditos-uva" icon={<Home />} label="Créditos" color="indigo"/>
-      <NavBtn currentPath={location.pathname} to="/calculadora-alquileres" icon={<ArrowRightLeft />} label="Alquileres" color="emerald"/>
-      <NavBtn currentPath={location.pathname} to="/faq" icon={<HelpCircle />} label="FAQ" color="amber"/>
+    <div className="flex md:inline-flex w-full md:w-auto p-0.5 bg-hair dark:bg-hair-dark rounded-control">
+      {pestanas.map(p => {
+        const activa = pathname === p.to;
+        return (
+          <Link key={p.to} to={p.to} aria-current={activa ? 'page' : undefined}
+            className={`flex-1 md:flex-none text-center py-2 px-4 text-label rounded-control transition-colors whitespace-nowrap ${activa ? 'bg-indigo-600 text-white' : 'text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark'}`}>
+            {p.label}
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -691,8 +694,8 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
   ];
 
   return (
-    <div className="border-b border-hair dark:border-hair-dark px-4 md:px-10">
-      <div className="max-w-[1800px] mx-auto h-8 flex items-center gap-5 overflow-x-auto no-scrollbar text-micro whitespace-nowrap">
+    <div className="border-b border-hair dark:border-hair-dark">
+      <div className={`${CONTENEDOR} h-8 flex items-center gap-5 overflow-x-auto no-scrollbar text-micro whitespace-nowrap`}>
         {items.map(it => (
           <span key={it.label} title={it.title} className="shrink-0">
             <span className="text-faint dark:text-faint-dark">{it.label}</span>{' '}
@@ -2164,19 +2167,23 @@ export default function App() {
 
             <MacroBar uvaValue={uvaValue} dolarOficial={dolarOficial} remData={remData} lastUpdate={lastUpdate} />
 
-            <nav className="bg-page/90 dark:bg-page-dark/90 backdrop-blur-3xl border-b border-hair dark:border-hair-dark sticky top-0 z-40 h-auto md:h-16 flex flex-col md:flex-row items-center justify-between px-4 md:px-10 py-3 md:py-0 gap-3 md:gap-0 leading-none">
-              <div className="flex items-center gap-3 md:gap-5">
-                <img src="/favicon.png" alt="ProyectAR Logo" className="w-9 h-9 object-contain rounded-control" />
-                <div className="flex flex-col text-left leading-none"><span className="text-title md:text-xl font-semibold tracking-tight leading-none">Proyect<span className="text-indigo-500">AR</span></span></div>
-              </div>
-
-              <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-end">
-                <NavigationMenu />
-                <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" className="p-2.5 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark">{darkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-slate-600" />}</button>
+            <nav className="bg-page/90 dark:bg-page-dark/90 backdrop-blur-xl border-b border-hair dark:border-hair-dark sticky top-0 z-40">
+              <div className={`${CONTENEDOR} grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center gap-3 py-3 md:py-0 md:h-16`}>
+                <div className="flex items-center gap-2.5 justify-self-start">
+                  <img src="/favicon.png" alt="" className="w-8 h-8 object-contain rounded-control" />
+                  <span className="text-title md:text-lg font-semibold tracking-tight text-ink dark:text-ink-dark">Proyect<span className="text-indigo-500">AR</span></span>
+                </div>
+                <div className="order-3 col-span-2 md:order-none md:col-span-1 md:justify-self-center">
+                  <NavigationMenu />
+                </div>
+                <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" title="Cambiar tema"
+                  className="order-2 md:order-none justify-self-end p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
+                  {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
               </div>
             </nav>
 
-            <main className="max-w-[1800px] mx-auto p-6 md:p-10 flex-grow w-full">
+            <main className={`${CONTENEDOR} py-6 md:py-8 flex-grow`}>
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[14px] font-semibold tracking-[0.4em] text-slate-400 text-center">Sincronizando Mercados...</p></div>
               ) : (
@@ -2233,7 +2240,7 @@ export default function App() {
               )}
             </main>
 
-            <div className="max-w-[1800px] mx-auto w-full px-6 md:px-10 mt-10">
+            <div className={`${CONTENEDOR} mt-10`}>
               <div className="rounded-surface border border-hair dark:border-hair-dark bg-card dark:bg-card-dark p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
                 <div>
                   <p className="text-title text-ink dark:text-ink-dark">¿Te sirvió ProyectAR?</p>
@@ -2246,7 +2253,7 @@ export default function App() {
               </div>
             </div>
 
-            <footer className="max-w-[1800px] mx-auto w-full border-t dark:border-slate-800 mt-10 md:mt-20 py-10 md:py-16 px-6 md:px-10 flex flex-col gap-8">
+            <footer className={`${CONTENEDOR} border-t border-hair dark:border-hair-dark mt-10 md:mt-16 py-10 flex flex-col gap-8`}>
               <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
                 <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 tracking-[0.2em] opacity-50">{`República Argentina · ${CURRENT_YEAR} · v${APP_VERSION}`}</p></div>
                 <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[12px] leading-relaxed tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-semibold text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
