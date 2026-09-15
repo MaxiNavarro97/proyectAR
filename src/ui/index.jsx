@@ -87,11 +87,11 @@ const TONO = {
   interest: 'text-orange-600 dark:text-orange-400',
 };
 
-export function Stat({ label, value, sub, tone = 'neutral', size = 'stat', aside, icon: Icon, className }) {
+export function Stat({ label, value, sub, tone = 'neutral', size = 'stat', aside, icon: Icon, iconClass = 'text-acento', className }) {
   return (
     <div className={unir('min-w-0 text-left', className)}>
       <div className="flex items-center justify-between gap-1 mb-1.5">
-        <Label className="truncate flex items-center gap-1.5">{Icon && <Icon className="w-3.5 h-3.5 text-acento shrink-0" />}{label}</Label>
+        <Label className="truncate flex items-center gap-1.5">{Icon && <Icon className={unir('w-3.5 h-3.5 shrink-0', iconClass)} />}{label}</Label>
         {aside}
       </div>
       <p className={unir(size === 'display' ? 'text-display' : 'text-stat', ' truncate', TONO[tone])}>{value}</p>

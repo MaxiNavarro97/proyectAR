@@ -377,7 +377,7 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
       if (exportType === 'pdf') { return downloadLink; }
       let icon = <Download className="w-4 h-4"/>;
       let label = `Descargar ${exportType.toUpperCase()}`;
-      let bg ="bg-indigo-600 hover:bg-indigo-700";
+      let bg ="bg-acento hover:opacity-90";
       if (exportType === 'excel') { icon = <FileSpreadsheet className="w-4 h-4"/>; bg ="bg-emerald-600 hover:bg-emerald-700"; }
       return (
         <button onClick={handleStandardDownload} disabled={downloading} className={`w-full py-3.5 ${bg} text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2`}>
@@ -417,6 +417,13 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
       </div>
     </div>
   )
+}
+
+// El "AR" del logo toma el color de la seccion en la que estas.
+function Marca() {
+  const { pathname } = useLocation();
+  const color = pathname === '/calculadora-alquileres' ? 'text-emerald-500' : 'text-indigo-500';
+  return <span className="text-title md:text-lg font-semibold tracking-tight text-ink dark:text-ink-dark">Proyect<span className={`${color} transition-colors`}>AR</span></span>;
 }
 
 // --- COMPONENTE DE BOTON DE NAVEGACIÓN ---
@@ -706,8 +713,10 @@ function AmortizationTable({ data, dark = false }) {
 // datos que ya se descargan: market_status.json y el CSV unificado.
 function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
   const datos = useMemo(() => {
-    if (!remData || remData.length === 0) return { ipc: null, rem12: null };
-    const ipc = [...remData].reverse().find(d => d.origen === 'IPC') || null;
+    if (!remData || remData.length === 0) return { ipc: null, ipcAnterior: null, rem12: null };
+    const ipcs = remData.filter(d => d.origen === 'IPC');
+    const ipc = ipcs[ipcs.length - 1] || null;
+    const ipcAnterior = ipcs[ipcs.length - 2] || null;
     const hoy = new Date();
     const futuros = remData
       .filter(d => d.año > hoy.getFullYear() || (d.año === hoy.getFullYear() && d.mes > hoy.getMonth() + 1))
@@ -715,15 +724,24 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
     const rem12 = futuros.length === 12
       ? (futuros.reduce((f, d) => f * (1 + d.valor / 100), 1) - 1) * 100
       : null;
-    return { ipc, rem12 };
+    return { ipc, ipcAnterior, rem12 };
   }, [remData]);
+
+  // El IPC se tine segun contra el mes anterior: ambar si la inflacion subio, verde si bajo.
+  const { ipc, ipcAnterior } = datos;
+  const ipcTono = ipc && ipcAnterior
+    ? (ipc.valor > ipcAnterior.valor ? 'text-amber-600 dark:text-amber-400' : ipc.valor < ipcAnterior.valor ? 'text-emerald-600 dark:text-emerald-400' : '')
+    : '';
+  const ipcComparacion = ipc && ipcAnterior
+    ? ` ${ipc.valor > ipcAnterior.valor ? 'Subió' : ipc.valor < ipcAnterior.valor ? 'Bajó' : 'Igual'} contra el mes anterior (${String(ipcAnterior.valor).replace('.', ',')}%).`
+    : '';
 
   // La fecha del dato va dentro de la etiqueta: en una banda de una linea no
   // hay lugar para un pie, y sin fecha un numero de inflacion no dice nada.
   const items = [
     { label: 'UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', title: 'Unidad de Valor Adquisitivo. Se ajusta a diario por el CER, que sigue a la inflación del INDEC.' },
     { label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', title: 'Cotización oficial del peso contra el dólar.' },
-    { label: datos.ipc ? `IPC ${new Date(datos.ipc.año, datos.ipc.mes - 1, 1).toLocaleString('es-AR', { month: 'long' })}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', title: 'Último dato de inflación mensual publicado por el INDEC.' },
+    { label: datos.ipc ? `IPC ${new Date(datos.ipc.año, datos.ipc.mes - 1, 1).toLocaleString('es-AR', { month: 'long' })}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', tono: ipcTono, title: `Último dato de inflación mensual publicado por el INDEC.${ipcComparacion}` },
     { label: 'REM 12 meses', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
   ];
 
@@ -733,7 +751,7 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
         {items.map(it => (
           <span key={it.label} title={it.title} className="shrink-0 pl-4 border-l border-hair dark:border-hair-dark first:pl-0 first:border-l-0">
             <span className="text-faint dark:text-faint-dark">{it.label}</span>{' '}
-            <span className="font-medium text-ink dark:text-ink-dark">{it.valor}</span>
+            <span className={`font-medium ${it.tono || 'text-ink dark:text-ink-dark'}`}>{it.valor}</span>
           </span>
         ))}
         <span className="ml-auto shrink-0 text-faint dark:text-faint-dark" title="Ultima actualizacion de los datos">{formatDateTime(lastUpdate)}</span>
@@ -1042,7 +1060,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           downloadLink={
             <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} sistema={sistema} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
               {({ loading }) => (
-                <button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2">
+                <button disabled={loading} className="w-full py-3.5 bg-acento hover:opacity-90 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2">
                    <FileText className="w-4 h-4"/> {loading ? 'Generando Archivo...' : 'Descargar PDF Ahora'}
                 </button>
               )}
@@ -1277,7 +1295,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               <Stat
                 label="Afectación de la primera cuota"
                 value={`${((totals.cuotaInicial / salary) * 100).toFixed(1)}%`}
-                tone={(totals.cuotaInicial / salary) > 0.3 ? 'negative' : 'neutral'}
+                tone={(totals.cuotaInicial / salary) > 0.3 ? 'negative' : (totals.cuotaInicial / salary) > 0.25 ? 'warning' : 'positive'}
               />
               <Body>Los bancos suelen pedir que no supere el <b>25-30%</b> de tus ingresos netos. Por encima de eso normalmente piden codeudor o bajar el monto.</Body>
               <Hint>Es solo la primera cuota. Si tu sueldo sube menos que la inflación, con el tiempo va a pesar más.</Hint>
@@ -1306,6 +1324,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           <Card className="p-4">
             <Stat
               icon={Percent}
+              iconClass="text-orange-500"
               label="Intereses"
               value={sinDatos ? '---' : moneyCompact(totals.totalIntereses)}
               sub={totals.totalInteresesUva > 0 ? `${uvas(Math.round(totals.totalInteresesUva))} UVA` : '\u00a0'}
@@ -1314,6 +1333,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           <Card className="p-4">
             <Stat
               icon={Coins}
+              iconClass="text-sky-500"
               label={loanType === 'new' ? 'Total a pagar' : 'Falta pagar'}
               value={sinDatos ? '---' : moneyCompact(totals.totalPagadoFinal)}
               sub={totals.totalPagadoUva > 0 ? `${uvas(Math.round(totals.totalPagadoUva))} UVA` : '\u00a0'}
@@ -1322,6 +1342,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           <Card className="p-4">
             <Stat
               icon={Scale}
+              iconClass="text-violet-500"
               label="Costo real"
               value={!sinDatos && totals.capitalUva > 0 ? `${(totals.totalPagadoUva / totals.capitalUva).toFixed(2).replace('.', ',')}x` : '---'}
               sub={!sinDatos && totals.montoOriginalPesos > 0 ? `${(totals.totalPagadoFinal / totals.montoOriginalPesos).toFixed(1).replace('.', ',')}x en pesos nominales` : '\u00a0'}
@@ -1405,12 +1426,12 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               ))}
 
               <button onClick={copyToWhatsApp} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-[#25D366] transition-colors">
-                {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
+                className="flex items-center gap-1.5 p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-[#25D366] transition-colors">
+                {copiedWP ? <><Check className="w-4 h-4 text-emerald-500" /><span className="text-micro text-emerald-600 dark:text-emerald-400 pr-0.5">Copiado</span></> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
               </button>
               <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-acento transition-colors">
-                {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
+                className="flex items-center gap-1.5 p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-acento transition-colors">
+                {copiedShare ? <><Check className="w-4 h-4 text-emerald-500" /><span className="text-micro text-emerald-600 dark:text-emerald-400 pr-0.5">Link copiado</span></> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -1788,7 +1809,7 @@ function RentCalculator({ remData, dolarOficial }) {
           }}
           downloadLink={
             <PDFDownloadLink document={<RentPDFDocument data={datosExport} summary={totals} />} fileName={`ProyectAR_Alquiler_${new Date().getTime()}.pdf`}>
-              {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
+              {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-acento hover:opacity-90 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
             </PDFDownloadLink>
           }
         />
@@ -1951,7 +1972,7 @@ function RentCalculator({ remData, dolarOficial }) {
               <Stat
                 label="Primer mes sobre tu sueldo"
                 value={`${pct((totals.cuotaTotalInicial / salary) * 100)}%`}
-                tone={rentAmount * 3 > salary ? 'negative' : 'neutral'}
+                tone={rentAmount * 3 > salary ? 'negative' : 'positive'}
               />
               <Body>Las inmobiliarias suelen pedir ingresos de <b>al menos 3 veces el alquiler</b>. Con este sueldo, eso es un alquiler de hasta {money(salary / 3)}.</Body>
             </div>
@@ -1995,6 +2016,7 @@ function RentCalculator({ remData, dolarOficial }) {
           <Card className="p-4">
             <Stat
               icon={TrendingUp}
+              iconClass="text-orange-500"
               label="Próximo aumento"
               value={proximoAjuste ? `+${pct(proximoAjuste.aumento)}%` : '---'}
               sub={proximoAjuste ? `en ${proximoAjuste.label}` : (sinDatos ? NBSP : 'sin ajustes en el período')}
@@ -2003,6 +2025,7 @@ function RentCalculator({ remData, dolarOficial }) {
           <Card className="p-4">
             <Stat
               icon={Coins}
+              iconClass="text-sky-500"
               label="Total del contrato"
               value={sinDatos ? '---' : moneyCompact(totals.totalContrato)}
               sub={sinDatos ? NBSP : `${schedule.length} meses`}
@@ -2011,6 +2034,7 @@ function RentCalculator({ remData, dolarOficial }) {
           <Card className="p-4">
             <Stat
               icon={CalendarClock}
+              iconClass="text-violet-500"
               label="Último mes"
               value={sinDatos ? '---' : moneyCompact(totals.ultimoMes)}
               sub={sinDatos || totals.cuotaTotalInicial === 0 ? NBSP : `+${pct(((totals.ultimoMes / totals.cuotaTotalInicial) - 1) * 100)}% contra hoy`}
@@ -2095,12 +2119,12 @@ function RentCalculator({ remData, dolarOficial }) {
               ))}
 
               <button onClick={copyToWhatsApp} title="Copiar resumen para WhatsApp" aria-label="Copiar resumen para WhatsApp"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-[#25D366] transition-colors">
-                {copiedWP ? <Check className="w-4 h-4 text-emerald-500" /> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
+                className="flex items-center gap-1.5 p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-[#25D366] transition-colors">
+                {copiedWP ? <><Check className="w-4 h-4 text-emerald-500" /><span className="text-micro text-emerald-600 dark:text-emerald-400 pr-0.5">Copiado</span></> : <MessageCircle className="w-4 h-4 text-[#25D366]" />}
               </button>
               <button onClick={() => copyShareUrl(getShareParams(), setCopiedShare)} title="Copiar link de la simulación" aria-label="Copiar link para compartir"
-                className="p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-acento transition-colors">
-                {copiedShare ? <Check className="w-4 h-4 text-emerald-500" /> : <ExternalLink className="w-4 h-4" />}
+                className="flex items-center gap-1.5 p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:border-acento transition-colors">
+                {copiedShare ? <><Check className="w-4 h-4 text-emerald-500" /><span className="text-micro text-emerald-600 dark:text-emerald-400 pr-0.5">Link copiado</span></> : <ExternalLink className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -2235,7 +2259,7 @@ export default function App() {
               <div className={`${CONTENEDOR} grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center gap-3 py-3 md:py-0 md:h-16`}>
                 <div className="flex items-center gap-2.5 justify-self-start">
                   <img src="/favicon.png" alt="" className="w-8 h-8 object-contain rounded-control" />
-                  <span className="text-title md:text-lg font-semibold tracking-tight text-ink dark:text-ink-dark">Proyect<span className="text-indigo-500">AR</span></span>
+                  <Marca />
                 </div>
                 <div className="order-3 col-span-2 md:order-none md:col-span-1 md:justify-self-center">
                   <NavigationMenu />
@@ -2311,7 +2335,7 @@ export default function App() {
               <div className="rounded-surface border border-hair dark:border-hair-dark bg-card dark:bg-card-dark p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
                 <div>
                   <p className="text-title text-ink dark:text-ink-dark">¿Te sirvió ProyectAR?</p>
-                  <p className="text-body text-muted dark:text-muted-dark mt-1 max-w-2xl">Es 100% gratuita y la hacemos a pulmón. Si te aportó algo, una colaboración nos ayuda a pagar los servidores y a seguir mejorándola.</p>
+                  <p className="text-body text-muted dark:text-muted-dark mt-1">Es 100% gratuita y la hacemos a pulmón. Si te aportó algo, una colaboración nos ayuda a pagar los servidores y a seguir mejorándola.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 shrink-0">
                   <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-acento transition-colors"><Coffee className="w-4 h-4 text-faint" /> Invitar un cafecito</a>
