@@ -26,9 +26,9 @@ export const faqsOperativas = [
     },
     {
       q: "¿Por qué mi cuota no coincide exactamente con la del banco?",
-      resumen: "La simulacion usa sistema frances puro en UVA. Cada banco aplica su propio criterio de recalculo, mas seguros y gastos administrativos que varian segun la entidad. El resultado es una aproximacion cercana, no el numero exacto del resumen.",
+      resumen: "La simulacion usa sistema frances o aleman puro en UVA, segun elijas. Cada banco aplica su propio criterio de recalculo, mas seguros y gastos administrativos que varian segun la entidad. El resultado es una aproximacion cercana, no el numero exacto del resumen.",
       a: <>
-        <p>La simulación usa <b>sistema francés puro en UVA</b>. Cada banco aplica su propio criterio de recálculo, más seguros y gastos administrativos que varían según la entidad. Tomá el resultado como una aproximación cercana, no como el número exacto de tu resumen.</p>
+        <p>La simulación usa <b>sistema francés o alemán puro en UVA</b>, según elijas. Cada banco aplica su propio criterio de recálculo, más seguros y gastos administrativos que varían según la entidad. Tomá el resultado como una aproximación cercana, no como el número exacto de tu resumen.</p>
         <p>Si querés medir esa diferencia, en el modo <b>Crédito en curso</b> podés cargar la cuota que te cobra el banco y la calculadora te muestra cuánto se aparta de la simulación.</p>
       </>
     },
