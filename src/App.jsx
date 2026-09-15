@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
-import { cuadroFrances } from './lib/amortizacion.js';
+import { cuadroFrances, cuadroAleman } from './lib/amortizacion.js';
 import { faqsOperativas } from './content/faqs.jsx';
 import { Panel, Card, SectionTitle, Label, Hint, Body, Field, Stat, Segmented, Badge, Notice, NumberField } from './ui/index.jsx';
 
@@ -219,8 +219,9 @@ function PdfPie() {
 }
 
 // --- COMPONENTE DOCUMENTO PDF (CRÉDITOS) ---
-const MortgagePDFDocument = ({ data, summary }) => {
+const MortgagePDFDocument = ({ data, summary, sistema }) => {
   const primera = data[0];
+  const aleman = sistema === 'aleman';
   const columnas = [
     { titulo: 'Periodo', ancho: '12%', izquierda: true },
     { titulo: 'Inflación', ancho: '10%', izquierda: true },
@@ -234,9 +235,9 @@ const MortgagePDFDocument = ({ data, summary }) => {
   return (
     <Document title="Proyección de crédito UVA - ProyectAR">
       <Page size="A4" style={pdfStyles.page}>
-        <PdfEncabezado titulo="Proyección de crédito hipotecario UVA" acento={PDF.indigo} />
+        <PdfEncabezado titulo={`Proyección de crédito hipotecario UVA · Sistema ${aleman ? 'alemán' : 'francés'}`} acento={PDF.indigo} />
         <PdfTarjetas items={[
-          { etiqueta: 'Primera cuota', valor: money(summary.cuotaInicial), sub: primera ? `${uvas(primera.cuotaUva)} UVA por mes` : '' },
+          { etiqueta: 'Primera cuota', valor: money(summary.cuotaInicial), sub: primera ? (aleman ? `${uvas(primera.cuotaUva)} UVA, baja cada mes` : `${uvas(primera.cuotaUva)} UVA por mes`) : '' },
           { etiqueta: 'Intereses', valor: money(summary.totalIntereses), sub: `${uvas(Math.round(summary.totalInteresesUva))} UVA` },
           { etiqueta: 'Total a pagar', valor: money(summary.totalPagadoFinal), sub: `${uvas(Math.round(summary.totalPagadoUva))} UVA` },
           { etiqueta: 'Costo real', valor: summary.capitalUva > 0 ? `${(summary.totalPagadoUva / summary.capitalUva).toFixed(2).replace('.', ',')}x` : '---', sub: 'medido en UVA' },
@@ -764,7 +765,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   const hoyRef = useRef(new Date());
   const hoy = hoyRef.current;
    
-  const [loanType, setLoanType] = useState('new'); 
+  const [loanType, setLoanType] = useState('new');
+  // Frances por defecto: es el que ofrecen casi todos los bancos para UVA.
+  const [sistema, setSistema] = useState('frances');
   const [balanceCurrency, setBalanceCurrency] = useState('ars'); 
   const [remInstallments, setRemInstallments] = useState(0);
   const [bankInstallment, setBankInstallment] = useState(0);
@@ -807,6 +810,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         if (decoded.y) setYears(decoded.y);
         if (decoded.r) setRate(String(decoded.r));
         if (decoded.lt) setLoanType(decoded.lt);
+        if (decoded.am === 'aleman') setSistema('aleman');
         // Limpiar la URL después de cargar
         window.history.replaceState({}, '', window.location.pathname);
       }
@@ -814,7 +818,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   }, []);
 
   const getShareParams = () => ({
-    t: 'mortgage', a: amount, y: years, r: rate, lt: loanType
+    t: 'mortgage', a: amount, y: years, r: rate, lt: loanType, am: sistema
   });
 
   const handleReset = () => {
@@ -864,7 +868,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
     // El cuadro de marcha se calcula entero en UVA (sin inflación) y recién después
     // se recorre aplicando el valor proyectado de la UVA mes a mes.
-    const cuadro = cuadroFrances(capitalUvaInicial, rateNum, totalMonths);
+    const cuadro = (sistema === 'aleman' ? cuadroAleman : cuadroFrances)(capitalUvaInicial, rateNum, totalMonths);
 
     const data = [];
     let projUva = currentUva;
@@ -912,7 +916,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         principal: principalUva * projUva, 
         cuotaTotal: cuotaTotal, 
         saldo: balanceUva * projUva, 
-        // En sistema frances la cuota en UVA es constante: lo que sube es el valor de la UVA.
+        // En frances la cuota en UVA es constante y en aleman baja; en los dos lo que sube es el valor de la UVA.
         cuotaUva: principalUva + interestUva,
         interesUva: interestUva,
         valorUva: projUva,
@@ -934,7 +938,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
     return data;
-  }, [amount, years, rate, inflFirstMode, inflFirstAnnual, inflLongMode, inflLongAnnual, ultimoRemMensual, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
+  }, [amount, years, rate, sistema, inflFirstMode, inflFirstAnnual, inflLongMode, inflLongAnnual, ultimoRemMensual, uvaValue, startMonth, startYear, remData, loanType, balanceCurrency, remInstallments]);
 
   const totals = useMemo(() => {
       const montoOriginalPesos = loanType === 'new' ? amount : (balanceCurrency === 'ars' ? amount : amount * uvaValue);
@@ -1017,7 +1021,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const copyToWhatsApp = () => {
       if (schedule.length === 0) return;
-      const text = `Proyección de crédito UVA - ProyectAR\n\nPrimera cuota: ${money(totals.cuotaInicial)}\nIntereses totales: ${money(totals.totalIntereses)}\nTotal a pagar: ${money(totals.totalPagadoFinal)}\n\nSimulá tu crédito gratis en proyectar.io`;
+      const text = `Proyección de crédito UVA - ProyectAR\nSistema ${sistema === 'aleman' ? 'alemán' : 'francés'}\n\nPrimera cuota: ${money(totals.cuotaInicial)}\nIntereses totales: ${money(totals.totalIntereses)}\nTotal a pagar: ${money(totals.totalPagadoFinal)}\n\nSimulá tu crédito gratis en proyectar.io`;
       navigator.clipboard.writeText(text);
       setCopiedWP(true);
       setTimeout(() => setCopiedWP(false), 2000);
@@ -1035,7 +1039,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               if(exportType === 'csv') exportToCSV();
           }}
           downloadLink={
-            <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
+            <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} sistema={sistema} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
               {({ loading }) => (
                 <button disabled={loading} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2">
                    <FileText className="w-4 h-4"/> {loading ? 'Generando Archivo...' : 'Descargar PDF Ahora'}
@@ -1079,6 +1083,21 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             onChange={setLoanType}
             options={[{ value: 'new', label: 'Nuevo' }, { value: 'ongoing', label: 'En curso' }]}
           />
+
+          <div className="flex items-center justify-between gap-2 mt-4">
+            <Label className="flex items-center gap-1.5">
+              Sistema de amortización
+              <Tooltip iconClass="w-3 h-3 text-faint">
+                <p className="mb-3"><b className="text-white">Francés:</b> la cuota en UVA es la misma todo el crédito. Es el que ofrecen casi todos los bancos.</p>
+                <p><b className="text-white">Alemán:</b> devolvés el mismo capital cada mes, así que la cuota arranca más alta y baja todos los meses. En total pagás menos intereses.</p>
+              </Tooltip>
+            </Label>
+            <Segmented size="sm" value={sistema} onChange={setSistema}
+              options={[{ value: 'frances', label: 'Francés' }, { value: 'aleman', label: 'Alemán' }]} />
+          </div>
+          {sistema === 'aleman' && (
+            <Hint className="mt-1.5">La cuota arranca más alta y baja todos los meses. Pagás menos intereses en total.</Hint>
+          )}
 
           <Hint className="mt-3 flex items-center gap-1.5">
             <CalendarDays className="w-3 h-3 shrink-0" /> Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}
@@ -1274,7 +1293,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               icon={Wallet}
               label={loanType === 'new' ? 'Primera cuota' : 'Próxima cuota'}
               value={sinDatos ? '---' : moneyCompact(totals.cuotaInicial)}
-              sub={schedule[0] ? `${uvas(schedule[0].cuotaUva)} UVA por mes` : '\u00a0'}
+              sub={schedule[0]
+                ? (sistema === 'aleman'
+                    ? `${uvas(schedule[0].cuotaUva)} UVA, baja hasta ${uvas(schedule[schedule.length - 1].cuotaUva)}`
+                    : `${uvas(schedule[0].cuotaUva)} UVA por mes`)
+                : '\u00a0'}
             />
           </Card>
           <Card className="p-4">

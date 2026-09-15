@@ -40,8 +40,7 @@ export function cuadroFrances(capital, tasaAnual, meses) {
 }
 
 // Sistema alemán: amortización de capital constante, cuota decreciente.
-// No se usa en el simulador UVA (los bancos argentinos ofrecen francés) pero sí
-// aplica a créditos personales y prendarios.
+// En el simulador UVA es una opción: casi todos los bancos ofrecen francés.
 export function cuadroAleman(capital, tasaAnual, meses) {
   if (!(capital > 0) || !(meses > 0)) return [];
 
