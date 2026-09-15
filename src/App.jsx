@@ -476,11 +476,12 @@ function CurrencyInput({ value, onChange, label, sublabel, usdEquivalent }) {
 const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
   // Logos en gris: son links de referencia, no la informacion principal. En
   // oscuro se invierten y se funden con el fondo, asi el fondo blanco de cada
-  // imagen deja de ser un rectangulo brillante.
+  // imagen deja de ser un rectangulo brillante. Al pasar el mouse recuperan su
+  // color; en oscuro la tarjeta se vuelve blanca para que el logo se vea tal cual.
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" title={`Créditos hipotecarios en ${name}`}
-      className="flex items-center justify-center h-12 px-3 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark hover:border-acento transition-colors">
-      <img src={logoUrl} alt={name} loading="lazy" className="max-h-7 max-w-full object-contain grayscale opacity-60 hover:opacity-100 mix-blend-multiply dark:invert dark:mix-blend-screen transition-opacity" />
+      className="group flex items-center justify-center h-12 px-3 rounded-control bg-field dark:bg-field-dark dark:hover:bg-white border border-hair dark:border-hair-dark hover:border-acento transition-colors">
+      <img src={logoUrl} alt={name} loading="lazy" className="max-h-7 max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 mix-blend-multiply dark:invert dark:mix-blend-screen dark:group-hover:invert-0 dark:group-hover:mix-blend-multiply transition" />
     </a>
   );
 });
@@ -722,15 +723,15 @@ function MacroBar({ uvaValue, dolarOficial, remData, lastUpdate }) {
   const items = [
     { label: 'UVA', valor: uvaValue > 0 ? moneyDec(uvaValue) : '---', title: 'Unidad de Valor Adquisitivo. Se ajusta a diario por el CER, que sigue a la inflación del INDEC.' },
     { label: 'Dólar oficial', valor: dolarOficial > 0 ? money(dolarOficial) : '---', title: 'Cotización oficial del peso contra el dólar.' },
-    { label: datos.ipc ? `IPC ${MESES[datos.ipc.mes - 1].toLowerCase()} ${String(datos.ipc.año).slice(-2)}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', title: 'Último dato de inflación mensual publicado por el INDEC.' },
-    { label: 'REM 12m', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
+    { label: datos.ipc ? `IPC ${new Date(datos.ipc.año, datos.ipc.mes - 1, 1).toLocaleString('es-AR', { month: 'long' })}` : 'IPC', valor: datos.ipc ? `${String(datos.ipc.valor).replace('.', ',')}%` : '---', title: 'Último dato de inflación mensual publicado por el INDEC.' },
+    { label: 'REM 12 meses', valor: datos.rem12 !== null ? `${datos.rem12.toFixed(1).replace('.', ',')}%` : '---', title: 'Inflación acumulada esperada para los próximos doce meses, según el Relevamiento de Expectativas de Mercado del BCRA.' },
   ];
 
   return (
     <div className="border-b border-hair dark:border-hair-dark">
-      <div className={`${CONTENEDOR} h-8 flex items-center gap-5 overflow-x-auto no-scrollbar text-micro whitespace-nowrap`}>
+      <div className={`${CONTENEDOR} h-8 flex items-center gap-4 overflow-x-auto no-scrollbar text-micro whitespace-nowrap`}>
         {items.map(it => (
-          <span key={it.label} title={it.title} className="shrink-0">
+          <span key={it.label} title={it.title} className="shrink-0 pl-4 border-l border-hair dark:border-hair-dark first:pl-0 first:border-l-0">
             <span className="text-faint dark:text-faint-dark">{it.label}</span>{' '}
             <span className="font-medium text-ink dark:text-ink-dark">{it.valor}</span>
           </span>
@@ -1095,9 +1096,11 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
             <Segmented size="sm" value={sistema} onChange={setSistema}
               options={[{ value: 'frances', label: 'Francés' }, { value: 'aleman', label: 'Alemán' }]} />
           </div>
-          {sistema === 'aleman' && (
-            <Hint className="mt-1.5">La cuota arranca más alta y baja todos los meses. Pagás menos intereses en total.</Hint>
-          )}
+          <Hint className="mt-1.5">
+            {sistema === 'aleman'
+              ? 'La cuota arranca más alta y baja todos los meses. Pagás menos intereses en total.'
+              : 'La cuota en UVA es la misma todo el crédito. Es el que ofrecen casi todos los bancos.'}
+          </Hint>
 
           <Hint className="mt-3 flex items-center gap-1.5">
             <CalendarDays className="w-3 h-3 shrink-0" /> Proyectando desde {MESES[hoy.getMonth()]} {hoy.getFullYear()}
@@ -2239,7 +2242,7 @@ export default function App() {
                 </div>
                 <button onClick={() => setDarkMode(!darkMode)} aria-label="Cambiar tema claro/oscuro" title="Cambiar tema"
                   className="order-2 md:order-none justify-self-end p-2 rounded-control bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark transition-colors">
-                  {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
                 </button>
               </div>
             </nav>
