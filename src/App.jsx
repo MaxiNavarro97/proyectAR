@@ -3,7 +3,6 @@ import ReactGA from"react-ga4";
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
 import * as XLSX from 'xlsx';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import { cuadroFrances, cuadroAleman } from './lib/amortizacion.js';
 import { faqsOperativas } from './content/faqs.jsx';
@@ -80,7 +79,7 @@ const formatDateTime = (dateStr) => {
 };
 
 // --- TOOLTIP COMPONENT (mobile-friendly, click to toggle, viewport-safe) ---
-function Tooltip({ children, iconClass ="w-3.5 h-3.5 text-slate-400", color ="indigo" }) {
+function Tooltip({ children, iconClass ="w-3.5 h-3.5 text-slate-400" }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
   const tipRef = useRef(null);
@@ -106,12 +105,10 @@ function Tooltip({ children, iconClass ="w-3.5 h-3.5 text-slate-400", color ="in
 
   useEffect(() => { if (open) reposition(); }, [open]);
 
-  const hc = color === 'emerald' ? 'hover:text-emerald-500' : 'hover:text-indigo-500';
-
   return (
     <div ref={wrapRef} className="relative inline-flex items-center">
       <div
-        className={`p-1 -m-1 cursor-help ${hc}`}
+        className="p-1 -m-1 cursor-help hover:text-acento"
         onTouchStart={(e) => { e.preventDefault(); e.stopPropagation(); touchedRef.current = true; setOpen(v => !v); }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
       >
@@ -121,7 +118,7 @@ function Tooltip({ children, iconClass ="w-3.5 h-3.5 text-slate-400", color ="in
           onMouseLeave={() => { if (!touchedRef.current) setOpen(false); }}
         />
       </div>
-      <div ref={tipRef} className={`absolute left-0 bottom-full mb-2 w-[min(22rem,calc(100vw-2rem))] p-4 bg-slate-900/95 backdrop-blur-md text-[14px] text-slate-300 font-medium rounded-2xl shadow-2xl z-[200] leading-relaxed border border-white/10 normal-case tracking-normal text-left whitespace-normal break-words transition-opacity duration-100 pointer-events-none opacity-0 ${open ? '!opacity-100 !pointer-events-auto' : ''}`} style={{left: 0}}>
+      <div ref={tipRef} className={`absolute left-0 bottom-full mb-2 w-[min(20rem,calc(100vw-2rem))] p-3.5 bg-slate-900/95 backdrop-blur-md text-micro text-slate-300 rounded-control shadow-lg z-[200] leading-relaxed border border-white/10 normal-case tracking-normal text-left whitespace-normal break-words transition-opacity duration-100 pointer-events-none opacity-0 ${open ? '!opacity-100 !pointer-events-auto' : ''}`} style={{left: 0}}>
         <button onClick={() => { setOpen(false); touchedRef.current = false; }} className="absolute top-2 right-2 text-slate-500 hover:text-white transition-colors p-1 md:hidden" aria-label="Cerrar"><X className="w-3.5 h-3.5" /></button>
         {children}
       </div>
@@ -219,9 +216,10 @@ function PdfPie() {
 }
 
 // --- COMPONENTE DOCUMENTO PDF (CRÉDITOS) ---
-const MortgagePDFDocument = ({ data, summary, sistema }) => {
+const MortgagePDFDocument = ({ data, summary, sistema, loanType }) => {
   const primera = data[0];
   const aleman = sistema === 'aleman';
+  const enCurso = loanType === 'ongoing';
   const columnas = [
     { titulo: 'Periodo', ancho: '12%', izquierda: true },
     { titulo: 'Inflación', ancho: '10%', izquierda: true },
@@ -235,11 +233,11 @@ const MortgagePDFDocument = ({ data, summary, sistema }) => {
   return (
     <Document title="Proyección de crédito UVA - ProyectAR">
       <Page size="A4" style={pdfStyles.page}>
-        <PdfEncabezado titulo={`Proyección de crédito hipotecario UVA · Sistema ${aleman ? 'alemán' : 'francés'}`} acento={PDF.indigo} />
+        <PdfEncabezado titulo={`Proyección de crédito hipotecario UVA${enCurso ? ' en curso' : ''} · Sistema ${aleman ? 'alemán' : 'francés'}`} acento={PDF.indigo} />
         <PdfTarjetas items={[
-          { etiqueta: 'Primera cuota', valor: money(summary.cuotaInicial), sub: primera ? (aleman ? `${uvas(primera.cuotaUva)} UVA, baja cada mes` : `${uvas(primera.cuotaUva)} UVA por mes`) : '' },
+          { etiqueta: enCurso ? 'Próxima cuota' : 'Primera cuota', valor: money(summary.cuotaInicial), sub: primera ? (aleman ? `${uvas(primera.cuotaUva)} UVA, baja cada mes` : `${uvas(primera.cuotaUva)} UVA por mes`) : '' },
           { etiqueta: 'Intereses', valor: money(summary.totalIntereses), sub: `${uvas(Math.round(summary.totalInteresesUva))} UVA` },
-          { etiqueta: 'Total a pagar', valor: money(summary.totalPagadoFinal), sub: `${uvas(Math.round(summary.totalPagadoUva))} UVA` },
+          { etiqueta: enCurso ? 'Falta pagar' : 'Total a pagar', valor: money(summary.totalPagadoFinal), sub: `${uvas(Math.round(summary.totalPagadoUva))} UVA` },
           { etiqueta: 'Costo real', valor: summary.capitalUva > 0 ? `${(summary.totalPagadoUva / summary.capitalUva).toFixed(2).replace('.', ',')}x` : '---', sub: 'medido en UVA' },
         ]} />
         <PdfTabla columnas={columnas} filas={data.map(d => [
@@ -324,8 +322,8 @@ function ChartModal({ isOpen, onClose, children, title }) {
     <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden duration-300">
       <div style={contentStyle} className="flex flex-col">
         <div className="flex justify-between items-center px-5 py-3 shrink-0">
-          <h3 className="text-white font-semibold text-base md:text-2xl tracking-tighter truncate mr-3">{title}</h3>
-          <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all shrink-0"><X className="w-5 h-5" /></button>
+          <h3 className="text-white text-title md:text-lg font-semibold tracking-tight truncate mr-3">{title}</h3>
+          <button onClick={onClose} aria-label="Cerrar" className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-control transition-colors shrink-0"><X className="w-5 h-5" /></button>
         </div>
         <div className="flex-1 min-h-0 px-5 pb-3 flex items-center justify-center relative">
           <div style={{ width: '100%', height: '100%', maxHeight: '100%', position: 'relative' }}>
@@ -344,14 +342,14 @@ function TableModal({ isOpen, onClose, children, title }) {
     <div className="fixed inset-0 z-[150] bg-slate-950 overflow-hidden duration-300">
       <div style={contentStyle} className="flex flex-col h-full">
         <div className="flex justify-between items-center px-5 py-4 shrink-0 border-b border-white/10">
-          <h3 className="text-white font-semibold text-base md:text-xl tracking-tighter truncate mr-3">{title}</h3>
+          <h3 className="text-white text-title md:text-lg font-semibold tracking-tight truncate mr-3">{title}</h3>
           <div className="flex items-center gap-2 shrink-0">
             {isMobilePortrait && (
-              <button onClick={() => setLandscape(l => !l)} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all" title={landscape ?"Cambiar a vertical" :"Cambiar a horizontal"}>
+              <button onClick={() => setLandscape(l => !l)} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-control transition-colors" title={landscape ?"Cambiar a vertical" :"Cambiar a horizontal"}>
                 <Smartphone className="w-4 h-4" style={{ transition: `transform 0.4s ${EASE}`, transform: landscape ? 'rotate(-90deg)' : 'rotate(0deg)' }} />
               </button>
             )}
-            <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} aria-label="Cerrar" className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-control transition-colors"><X className="w-5 h-5" /></button>
           </div>
         </div>
         <div className="flex-1 min-h-0 overflow-auto no-scrollbar">
@@ -361,6 +359,10 @@ function TableModal({ isOpen, onClose, children, title }) {
     </div>
   );
 }
+
+// Boton de descarga de la ventana de colaboracion: lo usan el CSV y el Excel
+// de adentro y los PDF que arma cada calculadora.
+const BOTON_DESCARGA = 'w-full py-2.5 bg-acento hover:opacity-90 disabled:opacity-60 text-white text-label rounded-control transition-opacity flex items-center justify-center gap-2';
 
 function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
   const [downloading, setDownloading] = useState(false);
@@ -375,45 +377,41 @@ function DonationModal({ onClose, downloadLink, exportType, onDownload }) {
 
   const getButtonContent = () => {
       if (exportType === 'pdf') { return downloadLink; }
-      let icon = <Download className="w-4 h-4"/>;
-      let label = `Descargar ${exportType.toUpperCase()}`;
-      let bg ="bg-acento hover:opacity-90";
-      if (exportType === 'excel') { icon = <FileSpreadsheet className="w-4 h-4"/>; bg ="bg-emerald-600 hover:bg-emerald-700"; }
+      const icon = exportType === 'excel' ? <FileSpreadsheet className="w-4 h-4"/> : <Download className="w-4 h-4"/>;
       return (
-        <button onClick={handleStandardDownload} disabled={downloading} className={`w-full py-3.5 ${bg} text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2`}>
-            {icon} {downloading ? 'Generando...' : label}
+        <button onClick={handleStandardDownload} disabled={downloading} className={BOTON_DESCARGA}>
+            {icon} {downloading ? 'Generando...' : `Descargar ${exportType === 'excel' ? 'Excel' : 'CSV'}`}
         </button>
       );
   };
 
+  // Misma forma que el resto de la pagina: tarjeta, un titulo, un parrafo y
+  // botones con borde. El unico boton lleno es la descarga, en el color de la seccion.
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-4 pb-6 sm:pb-0 bg-slate-900/80 backdrop-blur-sm duration-300">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-indigo-500/20 shadow-sm w-full max-w-md overflow-hidden relative sm:zoom-in-95 duration-300">
-        <div className="p-6 sm:p-8 text-center relative overflow-hidden">
-           <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 dark:from-indigo-950/30 to-transparent -z-10"></div>
-           <HeartHandshake className="w-12 h-12 text-indigo-500 mx-auto mb-4 drop-shadow-sm animate-bounce-slow" />
-           <h2 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-white mb-2 tracking-tight leading-none">¡Tu reporte está listo!</h2>
-           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mb-6 leading-relaxed px-4">
-             Esta herramienta es 100% gratuita y la desarrollamos a pulmón para ayudarte a tomar mejores decisiones financieras. Si te aportó algún valor, considerá hacer una colaboración que nos ayuda enormemente a pagar los servidores y seguir mejorando la aplicación.
-           </p>
-           
-           <div className="flex flex-col gap-3 mb-6">
-              <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#00cba9] hover:bg-[#00b899] text-white font-semibold rounded-xl text-xs transition-all">
-                  <Coffee className="w-4 h-4"/> Invitar un Cafecito
-              </a>
-              <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#009ee3] hover:bg-[#008ed0] text-white font-semibold rounded-xl text-xs transition-all">
-                  <Handshake className="w-4 h-4"/> Aportar por Mercado Pago
-              </a>
-           </div>
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-4 pb-6 sm:pb-0 bg-slate-950/70 backdrop-blur-sm">
+      <div className="bg-card dark:bg-card-dark rounded-surface border border-hair dark:border-hair-dark shadow-lg w-full max-w-md relative text-left">
+        <div className="p-6">
+          <HeartHandshake className="w-6 h-6 text-acento mb-3" />
+          <h2 className="text-lg font-semibold tracking-tight text-ink dark:text-ink-dark mb-1.5">Tu archivo está listo</h2>
+          <p className="text-body text-muted dark:text-muted-dark mb-5">
+            ProyectAR es 100% gratuita y la hacemos a pulmón. Si te aportó algo, una colaboración nos ayuda a pagar los servidores y a seguir mejorándola.
+          </p>
 
-           <div className="relative py-3">
-             <div className="absolute inset-0 flex items-center" aria-hidden="true"><div className="w-full border-t border-slate-200 dark:border-slate-700"></div></div>
-             <div className="relative flex justify-center"><span className="bg-white dark:bg-slate-900 px-2 text-[12px] font-bold text-slate-400">O continuar a la descarga</span></div>
-           </div>
-           
-           <div className="mt-2">{getButtonContent()}</div>
+          <div className="flex flex-col sm:flex-row gap-2 mb-5">
+            <a href="https://cafecito.app/proyectar" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-acento transition-colors">
+              <Coffee className="w-4 h-4 text-faint" /> Invitar un cafecito
+            </a>
+            <a href="https://link.mercadopago.com.ar/proyectarapp" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-control text-label bg-field dark:bg-field-dark border border-hair dark:border-hair-dark text-ink dark:text-ink-dark hover:border-acento transition-colors">
+              <Handshake className="w-4 h-4 text-faint" /> Mercado Pago
+            </a>
+          </div>
+
+          <div className="pt-4 border-t border-hair dark:border-hair-dark">
+            <p className="text-micro text-faint dark:text-faint-dark mb-2">O seguí directo a la descarga:</p>
+            {getButtonContent()}
+          </div>
         </div>
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 text-slate-500 dark:text-white rounded-full backdrop-blur-md transition-all"><X className="w-4 h-4" /></button>
+        <button onClick={onClose} aria-label="Cerrar" className="absolute top-3 right-3 p-2 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors"><X className="w-4 h-4" /></button>
       </div>
     </div>
   )
@@ -494,28 +492,43 @@ const BankCard = React.memo(function BankCard({ name, url, logoUrl }) {
 });
 
 // --- VISUALIZACIÓN DE DATOS ---
+// Detalle de un mes del grafico. Va siempre sobre fondo oscuro, en los dos
+// temas, con las mismas piezas que el resto: una cifra destacada y el resto tenue.
 function TooltipContent({ data, isRent }) {
+  const fila = 'flex justify-between items-center gap-4';
+  const variacion = (v) => (
+    <span className={v > 0 ? 'text-rose-300' : 'text-slate-300'}>{v > 0 ? '+' : ''}{v.toFixed(1).replace('.', ',')}%</span>
+  );
   return (
     <>
-      <div className="flex items-center justify-between mb-2.5 border-b border-white/10 pb-2.5">
-        <p className="text-[14px] font-semibold text-indigo-400">{data.label}</p>
-        <span className={`text-[11px] px-2 py-0.5 rounded font-semibold ${data.source === 'IPC' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : data.source === 'REM' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/10 text-slate-300 border border-white/10'}`}>{data.source}</span>
+      <div className="flex items-center justify-between gap-3 mb-2 pb-2 border-b border-white/10">
+        <p className="text-title text-white">{data.label}</p>
+        <span className="inline-flex items-center gap-1.5 text-micro text-slate-300">
+          <span className={`w-1.5 h-1.5 rounded-full ${data.oficial ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+          {data.source}
+        </span>
       </div>
-      <div className="space-y-2 text-[15px] mb-3 border-b border-white/10 pb-3">
-        <div className="flex justify-between items-center gap-4"><span className="font-bold text-slate-400 tracking-wide">Total:</span><span className="font-semibold text-white">{money(data.cuotaTotal)}</span></div>
-        <div className={`flex justify-between items-center gap-4 font-bold tracking-wide text-indigo-400`}><div className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full bg-indigo-500`} /><span className="">{isRent ? 'Alquiler' : 'Capital'}:</span></div><span>{money(data.principal)}</span></div>
-        <div className="flex justify-between items-center gap-4 text-orange-400 font-bold tracking-wide"><div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-400" /><span className="">{isRent ? 'Expensas' : 'Interés'}:</span></div><span>{money(data.interes)}</span></div>
+      <div className="space-y-1.5 text-body mb-2 pb-2 border-b border-white/10">
+        <div className={fila}><span className="text-slate-400">Total</span><span className="font-medium text-white">{money(data.cuotaTotal)}</span></div>
+        <div className={fila}>
+          <span className="flex items-center gap-1.5 text-slate-400"><span className="w-2 h-2 rounded-sm bg-acento" />{isRent ? 'Alquiler' : 'Capital'}</span>
+          <span className="text-slate-200">{money(data.principal)}</span>
+        </div>
+        <div className={fila}>
+          <span className="flex items-center gap-1.5 text-slate-400"><span className="w-2 h-2 rounded-sm bg-orange-400" />{isRent ? 'Expensas' : 'Interés'}</span>
+          <span className="text-slate-200">{money(data.interes)}</span>
+        </div>
       </div>
-      <div className="space-y-1.5 text-[14px]">
-        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold tracking-wide">Var. Mensual:</span><span className={`font-semibold ${data.varMensual > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varMensual > 0 ? '+' : ''}{data.varMensual.toFixed(1)}%</span></div>
-        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold tracking-wide">Acumulado YTD:</span><span className={`font-semibold ${data.varYTD > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varYTD > 0 ? '+' : ''}{data.varYTD.toFixed(1)}%</span></div>
-        <div className="flex justify-between items-center"><span className="text-slate-400 font-bold tracking-wide">Var. Total:</span><span className={`font-semibold ${data.varTotal > 0 ? 'text-rose-400' : 'text-slate-300'}`}>{data.varTotal > 0 ? '+' : ''}{data.varTotal.toFixed(1)}%</span></div>
+      <div className="space-y-1 text-micro">
+        <div className={fila}><span className="text-slate-400">Contra el mes anterior</span>{variacion(data.varMensual)}</div>
+        <div className={fila}><span className="text-slate-400">En lo que va del año</span>{variacion(data.varYTD)}</div>
+        <div className={fila}><span className="text-slate-400">Desde el primer mes</span>{variacion(data.varTotal)}</div>
       </div>
     </>
   );
 }
 
-function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fullscreen = false }) {
+function CompositionChart({ data, dateMode, isRent = false, fullscreen = false, vacio = 'Completá los datos para ver la proyección.' }) {
   const [hovered, setHovered] = useState(null);
   const touchTimer = useRef(null);
 
@@ -537,9 +550,9 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
 
   if (!data || data.length === 0) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 gap-3 p-4">
-        <Calculator className="w-8 h-8 md:w-10 md:h-10 text-slate-300 dark:text-slate-700" />
-        <p className="text-[12px] md:text-[13px] font-semibold text-slate-400 text-center">Completá el monto y el plazo para ver tu proyección</p>
+      <div className="w-full h-full flex flex-col items-center justify-center rounded-control border border-dashed border-hair dark:border-hair-dark gap-2 p-4">
+        <Calculator className="w-6 h-6 text-faint dark:text-faint-dark" />
+        <p className="text-body text-faint dark:text-faint-dark text-center">{vacio}</p>
       </div>
     );
   }
@@ -556,7 +569,7 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
       {/* TOOLTIP: fijo en esquina superior derecha */}
       {hovered && (
         <div
-          className="absolute top-1 z-[200] bg-slate-900/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/10 p-3 sm:p-4 w-[220px] sm:w-[240px] pointer-events-none"
+          className="absolute top-1 z-[200] bg-slate-900/95 backdrop-blur-md shadow-lg rounded-control border border-white/10 p-3 w-[220px] sm:w-[240px] pointer-events-none"
           style={{ right: `clamp(0px, calc(${100 - hovered.pct}% - 110px), calc(100% - 220px))` }}
         >
           <TooltipContent data={hovered.data} isRent={isRent} />
@@ -606,21 +619,6 @@ function CompositionChart({ data, dateMode, showRemMarker, isRent = false, fulls
             </g>
           );
         })}
-        {/* Línea divisoria IPC → REM */}
-        {showRemMarker && (() => {
-          const transIdx = sampled.findIndex(d => d.source === 'REM' || d.source === 'INERCIA');
-          if (transIdx > 0) {
-            const barAreaW = anchoUtil / sampled.length;
-            const tx = padL + transIdx * barAreaW - barAreaW * 0.1;
-            return (
-              <g>
-                <line x1={tx} y1={padT} x2={tx} y2={h - padB} stroke="#818cf8" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6"/>
-                <text x={tx + 6} y={padT + 12} className="text-[11px] fill-indigo-400 font-bold" opacity="0.7">Proyectado →</text>
-              </g>
-            );
-          }
-          return null;
-        })()}
       </svg>
     </div>
   );
@@ -818,6 +816,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const [copiedShare, setCopiedShare] = useState(false);
 
+  // Tramos de inflacion que vinieron fijados en un link: no se pisan con el ultimo REM.
+  const desdeLink = useRef({ primeros: false, restantes: false });
+
   // Cargar parámetros desde URL compartida
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -830,6 +831,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
         if (decoded.r) setRate(String(decoded.r));
         if (decoded.lt) setLoanType(decoded.lt);
         if (decoded.am === 'aleman') setSistema('aleman');
+        if (decoded.ri) setRemInstallments(decoded.ri);
+        if (decoded.bc === 'ars' || decoded.bc === 'uva') setBalanceCurrency(decoded.bc);
+        if (decoded.if1 === 'custom') { setInflFirstMode('custom'); setInflFirstAnnual(String(decoded.ia1)); desdeLink.current.primeros = true; }
+        if (decoded.il === 'custom') { setInflLongMode('custom'); setInflLongAnnual(String(decoded.ia2)); desdeLink.current.restantes = true; }
         // Limpiar la URL después de cargar
         window.history.replaceState({}, '', window.location.pathname);
       }
@@ -837,7 +842,9 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   }, []);
 
   const getShareParams = () => ({
-    t: 'mortgage', a: amount, y: years, r: rate, lt: loanType, am: sistema
+    t: 'mortgage', a: amount, y: years, r: rate, lt: loanType, am: sistema,
+    ri: remInstallments, bc: balanceCurrency,
+    if1: inflFirstMode, ia1: inflFirstAnnual, il: inflLongMode, ia2: inflLongAnnual
   });
 
   const handleReset = () => {
@@ -854,8 +861,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   useEffect(() => {
     if (ultimoRemMensual > 0) {
       const anual = String(Math.round(mensualAAnual(ultimoRemMensual)));
-      setInflFirstAnnual(anual);
-      setInflLongAnnual(anual);
+      if (!desdeLink.current.primeros) setInflFirstAnnual(anual);
+      if (!desdeLink.current.restantes) setInflLongAnnual(anual);
     }
   }, [ultimoRemMensual]);
 
@@ -1040,7 +1047,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
 
   const copyToWhatsApp = () => {
       if (schedule.length === 0) return;
-      const text = `Proyección de crédito UVA - ProyectAR\nSistema ${sistema === 'aleman' ? 'alemán' : 'francés'}\n\nPrimera cuota: ${money(totals.cuotaInicial)}\nIntereses totales: ${money(totals.totalIntereses)}\nTotal a pagar: ${money(totals.totalPagadoFinal)}\n\nSimulá tu crédito gratis en proyectar.io`;
+      const text = `Proyección de crédito UVA - ProyectAR\nSistema ${sistema === 'aleman' ? 'alemán' : 'francés'}\n\n${loanType === 'ongoing' ? 'Próxima cuota' : 'Primera cuota'}: ${money(totals.cuotaInicial)}\nIntereses totales: ${money(totals.totalIntereses)}\n${loanType === 'ongoing' ? 'Falta pagar' : 'Total a pagar'}: ${money(totals.totalPagadoFinal)}\n\nSimulá tu crédito gratis en proyectar.io`;
       navigator.clipboard.writeText(text);
       setCopiedWP(true);
       setTimeout(() => setCopiedWP(false), 2000);
@@ -1058,10 +1065,10 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
               if(exportType === 'csv') exportToCSV();
           }}
           downloadLink={
-            <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} sistema={sistema} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
+            <PDFDownloadLink document={<MortgagePDFDocument data={datosExport} summary={totals} sistema={sistema} loanType={loanType} />} fileName={`ProyectAR_Reporte_${new Date().getTime()}.pdf`}>
               {({ loading }) => (
-                <button disabled={loading} className="w-full py-3.5 bg-acento hover:opacity-90 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2">
-                   <FileText className="w-4 h-4"/> {loading ? 'Generando Archivo...' : 'Descargar PDF Ahora'}
+                <button disabled={loading} className={BOTON_DESCARGA}>
+                   <FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF'}
                 </button>
               )}
             </PDFDownloadLink>
@@ -1070,7 +1077,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del crédito">
-          <CompositionChart data={filteredData} dateMode="calendar" showRemMarker fullscreen />
+          <CompositionChart data={filteredData} dateMode="calendar" fullscreen />
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Tabla de Amortización">
@@ -1091,8 +1098,8 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           >
             Tipo de crédito
             <Tooltip iconClass="w-3.5 h-3.5 text-faint">
-              <p className="mb-3"><b className="text-indigo-400">Nuevo:</b> todavía no lo sacaste. Simulás desde cero con el monto, el plazo y la tasa que te ofrece el banco.</p>
-              <p><b className="text-indigo-400">En curso:</b> ya lo tenés. Proyectás desde tu saldo deudor actual y las cuotas que te quedan.</p>
+              <p className="mb-3"><b className="text-white">Nuevo:</b> todavía no lo sacaste. Simulás desde cero con el monto, el plazo y la tasa que te ofrece el banco.</p>
+              <p><b className="text-white">En curso:</b> ya lo tenés. Proyectás desde tu saldo deudor actual y las cuotas que te quedan.</p>
             </Tooltip>
           </SectionTitle>
 
@@ -1367,7 +1374,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
                     { value: 'all', label: 'Todo' },
                   ]}
                 />
-                <button onClick={() => setIsFullscreen(true)} title="Ver en pantalla completa" aria-label="Ver en pantalla completa"
+                <button onClick={() => { if (schedule.length > 0) setIsFullscreen(true); }} title="Ver en pantalla completa" aria-label="Ver en pantalla completa"
                   className="p-2 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors shrink-0">
                   <Maximize2 className="w-4 h-4" />
                 </button>
@@ -1383,7 +1390,7 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
           </div>
 
           <div className="w-full h-[220px] sm:h-auto sm:aspect-[1000/320]">
-            <CompositionChart data={filteredData} dateMode="calendar" showRemMarker />
+            <CompositionChart data={filteredData} dateMode="calendar" vacio="Cargá el monto, el plazo y la tasa para ver la proyección." />
           </div>
 
           <Hint className="mt-3 flex items-center gap-1.5">
@@ -1466,11 +1473,16 @@ function MortgageCalculator({ uvaValue, remData, dolarOficial }) {
   );
 }
 
-// Helmet no esta inyectando nada en el <head> (bug aparte, previo a esta rama),
-// asi que el titulo de la pestania se fija a mano desde cada ruta.
-function TituloPagina({ titulo }) {
-  useEffect(() => { document.title = titulo; }, [titulo]);
-  return null;
+// Titulo, descripcion y structured data de cada ruta. react-helmet-async no
+// funciona con React 19 (no inyectaba nada en el <head>), asi que se hace a mano:
+// se actualizan el titulo y la descripcion que ya trae index.html, y el JSON-LD
+// va como script dentro de la pagina, que Google lee igual que en el <head>.
+function PaginaSEO({ titulo, descripcion, datos }) {
+  useEffect(() => {
+    document.title = titulo;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', descripcion);
+  }, [titulo, descripcion]);
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datos) }} />;
 }
 
 // --- VISTA ALQUILERES (INTEGRADA) ---
@@ -1586,6 +1598,9 @@ function RentCalculator({ remData, dolarOficial }) {
 
   const aNumero = (v) => Number(String(v).replace(',', '.')) || 0;
 
+  // Tramos de inflacion que vinieron fijados en un link: no se pisan con el ultimo REM.
+  const desdeLink = useRef({ primeros: false, restantes: false });
+
   // Cargar parametros desde un link compartido. Los links viejos pueden traer
   // modo propietario, fecha o inflacion manual: se ignoran sin romperse.
   useEffect(() => {
@@ -1599,14 +1614,18 @@ function RentCalculator({ remData, dolarOficial }) {
         if (decoded.dm) setDurationMonths(decoded.dm);
         if (decoded.ap) setAdjustPeriod(decoded.ap);
         if (decoded.rt) setRentType(decoded.rt);
-        if (decoded.ms) setMonthsSinceLastAdjust(decoded.ms);
+        if (decoded.ms) setMonthsSinceLastAdjust(Number(decoded.ap) > 0 ? Math.min(Number(decoded.ms), Number(decoded.ap) - 1) : decoded.ms);
+        if (decoded.pv) setPropertyValueUsd(String(decoded.pv));
+        if (decoded.if1 === 'custom') { setInflFirstMode('custom'); setInflFirstAnnual(String(decoded.ia1)); desdeLink.current.primeros = true; }
+        if (decoded.il === 'custom') { setInflLongMode('custom'); setInflLongAnnual(String(decoded.ia2)); desdeLink.current.restantes = true; }
         window.history.replaceState({}, '', window.location.pathname);
       }
     }
   }, []);
 
   const getShareParams = () => ({
-    t: 'rent', ra: rentAmount, ea: expensesAmount, dm: durationMonths, ap: adjustPeriod, rt: rentType, ms: monthsSinceLastAdjust
+    t: 'rent', ra: rentAmount, ea: expensesAmount, dm: durationMonths, ap: adjustPeriod, rt: rentType, ms: monthsSinceLastAdjust,
+    pv: propertyValueUsd, if1: inflFirstMode, ia1: inflFirstAnnual, il: inflLongMode, ia2: inflLongAnnual
   });
 
   const handleReset = () => {
@@ -1622,8 +1641,8 @@ function RentCalculator({ remData, dolarOficial }) {
   useEffect(() => {
     if (ultimoRemMensual > 0) {
       const anual = String(Math.round(mensualAAnual(ultimoRemMensual)));
-      setInflFirstAnnual(anual);
-      setInflLongAnnual(anual);
+      if (!desdeLink.current.primeros) setInflFirstAnnual(anual);
+      if (!desdeLink.current.restantes) setInflLongAnnual(anual);
     }
   }, [ultimoRemMensual]);
 
@@ -1632,7 +1651,11 @@ function RentCalculator({ remData, dolarOficial }) {
     if ((rentAmount === 0 && expensesAmount === 0) || totalMonths <= 0) return [];
 
     const periodo = Number(adjustPeriod) || 0;
-    const desdeAjuste = rentType === 'ongoing' ? (Number(monthsSinceLastAdjust) || 0) : 0;
+    // Nunca pueden haber pasado un periodo entero o mas sin aumento: si el dato
+    // quedo mas alto (se bajo la frecuencia o vino asi en un link), se recorta.
+    const desdeAjuste = rentType === 'ongoing'
+      ? Math.min(Number(monthsSinceLastAdjust) || 0, periodo > 0 ? periodo - 1 : Infinity)
+      : 0;
     const inflacionMap = (remData && remData.length > 0)
       ? new Map(remData.map(d => [d.mes + '-' + d.año, d]))
       : new Map();
@@ -1809,14 +1832,14 @@ function RentCalculator({ remData, dolarOficial }) {
           }}
           downloadLink={
             <PDFDownloadLink document={<RentPDFDocument data={datosExport} summary={totals} />} fileName={`ProyectAR_Alquiler_${new Date().getTime()}.pdf`}>
-              {({ loading }) => (<button disabled={loading} className="w-full py-3.5 bg-acento hover:opacity-90 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2"><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF Ahora'}</button>)}
+              {({ loading }) => (<button disabled={loading} className={BOTON_DESCARGA}><FileText className="w-4 h-4"/> {loading ? 'Generando...' : 'Descargar PDF'}</button>)}
             </PDFDownloadLink>
           }
         />
       )}
 
       <ChartModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)} title="Proyección de pagos del alquiler">
-        <CompositionChart data={schedule} dateMode="calendar" showRemMarker isRent fullscreen />
+        <CompositionChart data={schedule} dateMode="calendar" isRent fullscreen />
       </ChartModal>
 
       <TableModal isOpen={isTableFullscreen} onClose={() => setIsTableFullscreen(false)} title="Pagos mes a mes">
@@ -1837,8 +1860,8 @@ function RentCalculator({ remData, dolarOficial }) {
           >
             Tipo de contrato
             <Tooltip iconClass="w-3.5 h-3.5 text-faint">
-              <p className="mb-3"><b className="text-indigo-400">Nuevo:</b> todavía no lo firmaste o recién empieza. Simulás desde el primer mes.</p>
-              <p><b className="text-indigo-400">En curso:</b> ya lo estás pagando. Proyectás desde lo que pagás hoy y los meses que pasaron desde el último aumento.</p>
+              <p className="mb-3"><b className="text-white">Nuevo:</b> todavía no lo firmaste o recién empieza. Simulás desde el primer mes.</p>
+              <p><b className="text-white">En curso:</b> ya lo estás pagando. Proyectás desde lo que pagás hoy y los meses que pasaron desde el último aumento.</p>
             </Tooltip>
           </SectionTitle>
 
@@ -1882,7 +1905,13 @@ function RentCalculator({ remData, dolarOficial }) {
               >
                 <NumberField
                   value={adjustPeriod}
-                  onChange={(v) => { const n = soloNumeros(v); setAdjustPeriod(n === '' ? '' : Math.min(24, Number(n))); }}
+                  onChange={(v) => {
+                    const n = soloNumeros(v);
+                    const periodo = n === '' ? '' : Math.min(24, Number(n));
+                    setAdjustPeriod(periodo);
+                    // Si baja la frecuencia, los meses desde el ultimo aumento no pueden quedar por encima.
+                    if (periodo > 0) setMonthsSinceLastAdjust(m => (m === '' ? '' : Math.min(Number(m), periodo - 1)));
+                  }}
                 />
               </Field>
             </div>
@@ -2057,7 +2086,7 @@ function RentCalculator({ remData, dolarOficial }) {
                     { value: 'all', label: 'Todo' },
                   ]}
                 />
-                <button onClick={() => setIsFullscreen(true)} title="Ver en pantalla completa" aria-label="Ver en pantalla completa"
+                <button onClick={() => { if (schedule.length > 0) setIsFullscreen(true); }} title="Ver en pantalla completa" aria-label="Ver en pantalla completa"
                   className="p-2 rounded-control text-faint hover:text-ink dark:hover:text-ink-dark transition-colors shrink-0">
                   <Maximize2 className="w-4 h-4" />
                 </button>
@@ -2073,7 +2102,7 @@ function RentCalculator({ remData, dolarOficial }) {
           </div>
 
           <div className="w-full h-[220px] sm:h-auto sm:aspect-[1000/320]">
-            <CompositionChart data={filteredData} dateMode="calendar" showRemMarker isRent />
+            <CompositionChart data={filteredData} dateMode="calendar" isRent vacio="Cargá el alquiler, las expensas y la duración para ver la proyección." />
           </div>
 
           <Hint className="mt-3 flex items-center gap-1.5">
@@ -2248,7 +2277,6 @@ export default function App() {
   }, []);
 
   return (
-    <HelmetProvider>
       <Router>
         <div className={darkMode ? 'dark' : ''}>
           <div className="min-h-screen bg-page dark:bg-page-dark text-ink dark:text-ink-dark transition-colors flex flex-col max-w-[100vw] overflow-x-hidden relative" style={{ fontFamily:"'Inter', system-ui, -apple-system, sans-serif" }}>
@@ -2273,7 +2301,7 @@ export default function App() {
 
             <main className={`${CONTENEDOR} py-6 md:py-8 flex-grow`}>
               {loading ? (
-                <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-6"><div className="w-20 h-20 border-[8px] border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin"></div><p className="text-[14px] font-semibold tracking-[0.4em] text-slate-400 text-center">Sincronizando Mercados...</p></div>
+                <div className="flex flex-col items-center justify-center py-40 md:py-60 gap-4"><div className="w-8 h-8 border-[3px] border-hair dark:border-hair-dark border-t-indigo-500 rounded-full animate-spin"></div><p className="text-body text-muted dark:text-muted-dark text-center">Cargando la UVA, el dólar y la inflación...</p></div>
               ) : (
                 <div className="">
                   <Routes>
@@ -2283,13 +2311,11 @@ export default function App() {
                     {/* RUTA 1: HIPOTECAS (NUEVA URL) */}
                     <Route path="/calculadora-creditos-uva" element={
                       <>
-                        <Helmet>
-                          <title>Calculadora de créditos UVA · ProyectAR</title>
-                          <meta name="description" content="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Proyectá cuánto sube tu cuota mes a mes con el sistema francés en UVA." />
-                          <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Créditos UVA","url":"https://proyectar.io/calculadora-creditos-uva","description":"Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés, exportación a PDF/Excel.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }
-                          })}</script>
-                        </Helmet>
-                        <TituloPagina titulo="Calculadora de créditos UVA · ProyectAR" />
+                        <PaginaSEO
+                          titulo="Calculadora de créditos UVA · ProyectAR"
+                          descripcion="Simulá tu crédito hipotecario UVA con ajuste por inflación y datos oficiales del REM (BCRA). Proyectá cuánto sube tu cuota mes a mes en sistema francés o alemán."
+                          datos={{"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Créditos UVA","url":"https://proyectar.io/calculadora-creditos-uva","description":"Simulador de créditos hipotecarios UVA con inflación proyectada (IPC + REM BCRA), sistema francés o alemán, exportación a PDF/Excel.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }}}
+                        />
                         <MortgageCalculator uvaValue={uvaValue} remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
@@ -2297,13 +2323,11 @@ export default function App() {
                     {/* RUTA 2: ALQUILERES (QUEDA IGUAL) */}
                     <Route path="/calculadora-alquileres" element={
                       <>
-                        <Helmet>
-                          <title>Calculadora de alquileres · ProyectAR</title>
-                          <meta name="description" content="Calculá la actualización de tu contrato de alquiler, expensas e inflación. Ideal para inquilinos y propietarios en Argentina." />
-                          <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Alquileres","url":"https://proyectar.io/calculadora-alquileres","description":"Simulador de contratos de alquiler con ajuste por inflación (IPC + REM BCRA), cálculo de expensas, yield para propietarios.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }
-                          })}</script>
-                        </Helmet>
-                        <TituloPagina titulo="Calculadora de alquileres · ProyectAR" />
+                        <PaginaSEO
+                          titulo="Calculadora de alquileres · ProyectAR"
+                          descripcion="Calculá la actualización de tu contrato de alquiler, expensas e inflación. Ideal para inquilinos y propietarios en Argentina."
+                          datos={{"@context":"https://schema.org","@type":"WebApplication","name":"ProyectAR - Calculadora de Alquileres","url":"https://proyectar.io/calculadora-alquileres","description":"Simulador de contratos de alquiler con ajuste por inflación (IPC + REM BCRA), cálculo de expensas, yield para propietarios.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers": {"@type":"Offer","price":"0","priceCurrency":"ARS" },"author": {"@type":"Person","name":"Maxi Navarro" }}}
+                        />
                         <RentCalculator remData={remData} dolarOficial={dolarOficial} />
                       </>
                     } />
@@ -2311,15 +2335,12 @@ export default function App() {
                     {/* RUTA 3: FAQ */}
                     <Route path="/faq" element={
                       <>
-                        <Helmet>
-                          <title>Preguntas frecuentes · ProyectAR</title>
-                          <meta name="description" content="Por qué sube tu cuota UVA, de dónde sale la inflación proyectada (IPC + REM del BCRA) y qué no incluye la simulación." />
-                          {/* El structured data se arma con las mismas preguntas que se muestran en pantalla. */}
-                          <script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity": faqsOperativas.map(f => ({"@type":"Question","name": f.q,"acceptedAnswer": {"@type":"Answer","text": f.resumen }
-                            }))
-                          })}</script>
-                        </Helmet>
-                        <TituloPagina titulo="Preguntas frecuentes · ProyectAR" />
+                        {/* El structured data se arma con las mismas preguntas que se muestran en pantalla. */}
+                        <PaginaSEO
+                          titulo="Preguntas frecuentes · ProyectAR"
+                          descripcion="Por qué sube tu cuota UVA, francés o alemán, qué es el costo real, de dónde sale la inflación proyectada (IPC + REM del BCRA) y cómo se ajusta un alquiler."
+                          datos={{"@context":"https://schema.org","@type":"FAQPage","mainEntity": faqsOperativas.map(f => ({"@type":"Question","name": f.q,"acceptedAnswer": {"@type":"Answer","text": f.resumen }}))}}
+                        />
                         <FAQ />
                       </>
                     } />
@@ -2344,26 +2365,27 @@ export default function App() {
               </div>
             </div>
 
-            <footer className={`${CONTENEDOR} border-t border-hair dark:border-hair-dark mt-10 md:mt-16 py-10 flex flex-col gap-8`}>
-              <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
-                <div className="flex-1 text-center lg:text-left leading-none"><p className="text-[13px] font-bold text-slate-400 tracking-[0.2em] opacity-50">{`República Argentina · ${CURRENT_YEAR} · v${APP_VERSION}`}</p></div>
-                <div className="flex-[2] max-w-2xl mx-auto text-center opacity-60"><p className="text-[12px] leading-relaxed tracking-tighter font-medium text-slate-500 dark:text-slate-400"><span className="font-semibold text-indigo-500">Aviso Legal:</span> {"ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (REM-BCRA) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos."}</p></div>
-                <div className="flex-1 flex flex-col items-center lg:items-end gap-2 text-[13px] font-bold text-slate-400 opacity-50 italic"><a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Github className="w-4 h-4" /> @MaxiNavarro97</a><a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-2 hover:text-indigo-400 transition-colors leading-none"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a></div>
-              </div>
-              <div className="border-t dark:border-slate-800 pt-6 text-center">
-                <p className="text-[11px] font-semibold text-slate-400 opacity-40 mb-3">Fuentes de datos · Últ. act. {formatDateTime(lastUpdate)}</p>
-                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12px] font-bold text-slate-400 opacity-50">
-                  <a href="https://www.bcra.gob.ar/relevamiento-expectativas-mercado-rem/" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">BCRA (REM {remDateLabel || '---'})</a>
-                  <span className="text-slate-700">·</span>
-                  <a href="https://argentinadatos.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">ArgentinaDatos API</a>
-                  <span className="text-slate-700">·</span>
-                  <a href="https://dolarapi.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">DolarAPI</a>
+            {/* Pie: todo en letra chica y tenue, igual que la tira de datos de arriba. */}
+            <footer className={`${CONTENEDOR} border-t border-hair dark:border-hair-dark mt-10 md:mt-16 py-8 flex flex-col gap-6 text-micro text-faint dark:text-faint-dark`}>
+              <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-6 text-center lg:text-left">
+                <p className="lg:flex-1">República Argentina · {CURRENT_YEAR} · v{APP_VERSION}</p>
+                <p className="lg:flex-[2] max-w-2xl"><span className="font-medium text-muted dark:text-muted-dark">Aviso legal:</span> ProyectAR proporciona esta información como un servicio de simulación financiera. No constituye una interpretación legal, asesoramiento financiero, ni garantiza resultados futuros. Las proyecciones se basan en datos de terceros (INDEC, BCRA, ArgentinaDatos y DolarAPI) y pueden variar. Ante decisiones de renta, inversión o crédito, se recomienda consultar con profesionales idóneos.</p>
+                <div className="lg:flex-1 flex flex-col items-center lg:items-end gap-2">
+                  <a href="https://github.com/MaxiNavarro97" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-ink dark:hover:text-ink-dark transition-colors"><Github className="w-3.5 h-3.5" /> @MaxiNavarro97</a>
+                  <a href="mailto:proyectarapp@gmail.com" className="flex items-center gap-1.5 hover:text-ink dark:hover:text-ink-dark transition-colors"><Mail className="w-3.5 h-3.5" /> proyectarapp@gmail.com</a>
                 </div>
+              </div>
+              <div className="border-t border-hair dark:border-hair-dark pt-5 flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 text-center">
+                <span>Fuentes de datos, actualizadas el {formatDateTime(lastUpdate)}:</span>
+                <a href="https://www.bcra.gob.ar/relevamiento-expectativas-mercado-rem/" target="_blank" rel="noopener noreferrer" className="hover:text-ink dark:hover:text-ink-dark transition-colors">BCRA (REM {remDateLabel || '---'})</a>
+                <span aria-hidden="true">·</span>
+                <a href="https://argentinadatos.com" target="_blank" rel="noopener noreferrer" className="hover:text-ink dark:hover:text-ink-dark transition-colors">ArgentinaDatos API</a>
+                <span aria-hidden="true">·</span>
+                <a href="https://dolarapi.com" target="_blank" rel="noopener noreferrer" className="hover:text-ink dark:hover:text-ink-dark transition-colors">DolarAPI</a>
               </div>
             </footer>
           </div>
         </div>
       </Router>
-    </HelmetProvider>
   );
 }
